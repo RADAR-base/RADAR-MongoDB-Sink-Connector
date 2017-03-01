@@ -1,0 +1,186 @@
+plugins {
+    // Apply the java plugin to add support for Java
+    id 'java'
+    id 'idea'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'pmd'
+    id "com.jfrog.bintray" version "1.7.3"
+    id 'maven-publish'
+}
+
+version '0.1-alpha.1'
+
+targetCompatibility = '1.8'
+sourceCompatibility = '1.8'
+
+ext.radarCommonsVersion = 'v0.1-alpha.3'
+ext.mongoDbSinkVersion = 'v0.1-alpha.1'
+ext.junitVersion = '4.12'
+ext.codacyVersion = '1.0.10'
+
+
+configurations {
+    codacy
+}
+
+repositories {
+    jcenter()
+    maven { url 'http://packages.confluent.io/maven/' }
+    maven { url 'https://jitpack.io' }
+    maven { url 'http://dl.bintray.com/typesafe/maven-releases' }
+}
+
+dependencies {
+    compile group: 'org.radarcns', name: 'radar-commons', version: radarCommonsVersion
+    compile group: "org.radarcns", name: 'kafka-connect-mongodb-sink', version: mongoDbSinkVersion
+
+    testCompile group: 'junit', name: 'junit', version: junitVersion
+
+    codacy group: 'com.github.codacy', name: 'codacy-coverage-reporter', version: codacyVersion
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'RADAR-CNS MongoDB Connector',
+                'Implementation-Version': version
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+//---------------------------------------------------------------------------//
+// Style checking                                                            //
+//---------------------------------------------------------------------------//
+
+checkstyle {
+    // codacy version
+    toolVersion '6.16'
+    ignoreFailures false
+
+    // ignore tests
+    sourceSets = [sourceSets.main]
+}
+
+pmd {
+    // codacy version
+    toolVersion = '5.5.2'
+    ignoreFailures = false
+
+    // ignore tests
+    sourceSets = [sourceSets.main]
+
+    consoleOutput = true
+
+    ruleSets = []
+    ruleSetFiles = files("config/pmd/ruleset.xml")
+}
+
+//---------------------------------------------------------------------------//
+// Build system metadata                                                     //
+//---------------------------------------------------------------------------//
+idea {
+    module {
+        downloadSources = true
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled false
+    }
+}
+
+task downloadDependencies(type: Exec) {
+    configurations.codacy.files
+    commandLine 'echo', 'Downloaded all dependencies'
+}
+
+task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
+    main = 'com.codacy.CodacyCoverageReporter'
+    classpath = configurations.codacy
+    args = ['-l', 'Java', '-r', "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"]
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "pre-release"
+        }
+    }
+    developers {
+        developer {
+            id "radar-cns"
+            name "Nivethika"
+            email "nivethika@thehyve.nl"
+        }
+    }
+}
+// custom tasks for creating source/javadoc jars
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.output
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// add javadoc/source jar tasks as artifacts
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
+
+publishing {
+    publications {
+        RadarPublication(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            groupId 'org.radarcns'
+            artifactId 'radar-mongodb-sink-connector'
+            version version
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'A MongoDB Sink connector for RADAR-CNS platform.')
+                root.appendNode('name', 'radar-mongodb-sink-connector')
+                root.appendNode('url', 'https://github.com/RADAR-CNS/RADAR-MongoDB-Sink-Connector.git')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+
+
+bintray {
+    user = System.getenv('BINTRAY_USER')? System.getenv('BINTRAY_USER') : project.property('bintrayUser')
+    key = System.getenv('BINTRAY_API_KEY') ? System.getenv('BINTRAY_API_KEY') : project.property('bintrayApiKey')
+    override = false
+    publications = ['RadarPublication']
+    pkg {
+        repo = 'org.radarcns'
+        name = 'radar-mongodb-sink-connector'
+        userOrg = 'radar-cns'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/RADAR-CNS/RADAR-MongoDB-Sink-Connector.git'
+        version {
+            name = version
+            desc = 'RADAR-MongoDb-Sink-Connector: Initial release'
+            vcsTag = version
+        }
+    }
+}
+
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2.1'
+    distributionUrl distributionUrl.replace("bin", "all")
+}
