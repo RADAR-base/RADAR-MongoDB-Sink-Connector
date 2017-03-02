@@ -1,4 +1,6 @@
 # RADAR-MongoDB-Sink-Connector
+[![Build Status](https://travis-ci.org/RADAR-CNS/RADAR-MongoDB-Sink-Connector.svg?branch=master)](https://travis-ci.org/RADAR-CNS/RADAR-Commons)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/33b7a59ca6f946c2a168fa403e3e5644)](https://www.codacy.com/app/RADAR-CNS/RADAR-MongoDB-Sink-Connector?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RADAR-CNS/RADAR-MongoDB-Sink-Connector&amp;utm_campaign=Badge_Grade)
 
 Implements the hot-storage support for RADAR-CNS platform using MongoDBSinkConnector
 
