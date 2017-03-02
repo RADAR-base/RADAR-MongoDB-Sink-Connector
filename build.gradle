@@ -172,9 +172,9 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/RADAR-CNS/RADAR-MongoDB-Sink-Connector.git'
         version {
-            name = version
+            name = System.getenv('TRAVIS_TAG')
             desc = 'RADAR-MongoDb-Sink-Connector: Initial release'
-            vcsTag = version
+            vcsTag = System.getenv('TRAVIS_TAG')
         }
     }
 }
