@@ -146,7 +146,7 @@ publishing {
             artifact javadocJar
             groupId 'org.radarcns'
             artifactId 'radar-mongodb-sink-connector'
-            version version
+            version project.version
             pom.withXml {
                 def root = asNode()
                 root.appendNode('description', 'A MongoDB Sink connector for RADAR-CNS platform.')
@@ -172,9 +172,10 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/RADAR-CNS/RADAR-MongoDB-Sink-Connector.git'
         version {
-            name = System.getenv('TRAVIS_TAG')
-            desc = 'RADAR-MongoDb-Sink-Connector: Initial release'
+            name = project.version
+            desc = 'RADAR-MongoDb-Sink-Connector: alpha release'
             vcsTag = System.getenv('TRAVIS_TAG')
+            released  = new Date()
         }
     }
 }

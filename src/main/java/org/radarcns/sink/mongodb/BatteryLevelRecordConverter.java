@@ -16,6 +16,8 @@
 
 package org.radarcns.sink.mongodb;
 
+import static org.radarcns.sink.mongodb.util.Converter.measurementKeyToMongoDbKey;
+
 import java.util.Collection;
 import java.util.Collections;
 import org.apache.kafka.connect.data.Struct;
@@ -63,13 +65,5 @@ public class BatteryLevelRecordConverter implements RecordConverter {
     }
 
 
-    /**
-     * Creates a key string using userId and sourceId
-     * @param key
-     * @return converted key string
-     */
-    private static String measurementKeyToMongoDbKey(Struct key) {
-        return key.get("userId")
-                + "-" + key.get("sourceId");
-    }
+
 }
