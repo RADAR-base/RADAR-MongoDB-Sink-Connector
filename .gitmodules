@@ -1,0 +1,4 @@
+[submodule "radarDocker"]
+	path = src/endToEndTest/radarDocker
+	url = https://github.com/RADAR-CNS/RADAR-Docker.git
+	branch = dev
