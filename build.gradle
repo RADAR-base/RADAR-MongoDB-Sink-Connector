@@ -9,22 +9,48 @@ plugins {
     id 'maven-publish'
 }
 
-version '0.1-alpha.1'
+version '0.1-alpha.1-SNAPSHOT'
+group = 'org.radarcns'
+ext.vcsUrl = 'https://github.com/RADAR-CNS/RADAR-MongoDB-Sink-Connector.git'
 
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
-ext.radarCommonsVersion = 'v0.1-alpha.3'
+ext.radarCommonsVersion = '0.1-SNAPSHOT'
 ext.mongoDbSinkVersion = 'v0.1-alpha.1'
 ext.junitVersion = '4.12'
 ext.codacyVersion = '1.0.10'
 
 
+
+//---------------------------------------------------------------------------//
+// Sources and classpath configurations                                      //
+//---------------------------------------------------------------------------//
+
+sourceSets {
+    // Note that just declaring this sourceset creates two configurations.
+    endToEndTest {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+        resources {
+            srcDir 'src/endToEndTest/resources'
+        }
+    }
+}
+
 configurations {
     codacy
+    endToEndTestCompile.extendsFrom testCompile
+    endToEndTestRuntime.extendsFrom testRuntime
 }
 
 repositories {
+
+    // For working with dev-branch commons
+    maven { url "${rootProject.projectDir}/libs" }
+
     jcenter()
     maven { url 'http://packages.confluent.io/maven/' }
     maven { url 'https://jitpack.io' }
@@ -78,6 +104,78 @@ pmd {
 }
 
 //---------------------------------------------------------------------------//
+// Testing                                                                   //
+//---------------------------------------------------------------------------//
+
+tasks.matching {it instanceof Test}.all {
+    def stdout = new LinkedList<String>()
+    beforeTest { TestDescriptor td ->
+        stdout.clear()
+    }
+
+    onOutput { TestDescriptor td, TestOutputEvent toe ->
+        stdout.addAll(toe.getMessage().split('(?m)$'))
+        while (stdout.size() > 100) {
+            stdout.remove()
+        }
+    }
+
+    afterTest { TestDescriptor td, TestResult tr ->
+        if (tr.resultType == TestResult.ResultType.FAILURE) {
+            println()
+            print("${td.className}.${td.name} FAILED")
+            if (stdout.empty) {
+                println(" without any output")
+            } else {
+                println(" with last 100 lines of output:")
+                println('=' * 100)
+                stdout.each { print(it) }
+                println('=' * 100)
+            }
+        }
+    }
+
+    testLogging {
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        exceptionFormat "full"
+    }
+}
+
+//---------------------------------------------------------------------------//
+// End to End Test                                                           //
+//---------------------------------------------------------------------------//
+task endToEndTest(type: Test){
+    description = "Run integration tests (located in src/endToEndTest/...)."
+    testClassesDir project.sourceSets.endToEndTest.output.classesDir
+    classpath = project.sourceSets.endToEndTest.runtimeClasspath
+    // This is not needed, but I like to see which tests have run
+    testLogging {
+        events "skipped", "failed"
+    }
+}
+
+task setRadarEnvironmentForDocker << {
+    File volumes = new File("src/endToEndTest/radarDocker/volumes")
+    volumes.mkdir()
+    String volumePath = volumes.getAbsolutePath()
+
+    def fileEnv = new File("src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack/.env")
+    fileEnv.text = fileEnv.text.replace('/usr/local/var/lib/docker', volumePath)
+    fileEnv.text = fileEnv.text.replace('HOTSTORAGE_USERNAME=<mongodb-user>', 'HOTSTORAGE_USERNAME=restapi')
+    fileEnv.text = fileEnv.text.replace('HOTSTORAGE_PASSWORD=XXXXXXXX', 'HOTSTORAGE_PASSWORD=radarcns')
+    fileEnv.text = fileEnv.text.replace('HOTSTORAGE_NAME=<mongodb-database>', 'HOTSTORAGE_NAME=hotstorage')
+
+    def fileInstall = new File("src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack/install-radar-stack.sh")
+    fileInstall.text = fileInstall.text.replace('/usr/local/var/lib/docker', volumePath)
+
+    new File("src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack/smtp.env.template").renameTo("src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack/smtp.env")
+}
+
+
+
+//---------------------------------------------------------------------------//
 // Build system metadata                                                     //
 //---------------------------------------------------------------------------//
 idea {
@@ -87,6 +185,7 @@ idea {
 }
 
 jacocoTestReport {
+    executionData test, endToEndTest
     reports {
         xml.enabled true
         csv.enabled false
@@ -95,6 +194,8 @@ jacocoTestReport {
 }
 
 task downloadDependencies(type: Exec) {
+    configurations.testRuntime.files
+    configurations.jacocoAnt.files
     configurations.codacy.files
     commandLine 'echo', 'Downloaded all dependencies'
 }
@@ -110,7 +211,7 @@ def pomConfig = {
         license {
             name "The Apache Software License, Version 2.0"
             url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-            distribution "pre-release"
+            distribution rootProject.name
         }
     }
     developers {
@@ -150,8 +251,8 @@ publishing {
             pom.withXml {
                 def root = asNode()
                 root.appendNode('description', 'A MongoDB Sink connector for RADAR-CNS platform.')
-                root.appendNode('name', 'radar-mongodb-sink-connector')
-                root.appendNode('url', 'https://github.com/RADAR-CNS/RADAR-MongoDB-Sink-Connector.git')
+                root.appendNode('name', rootProject.name)
+                root.appendNode('url', vcsUrl)
                 root.children().last() + pomConfig
             }
         }
@@ -166,14 +267,14 @@ bintray {
     override = false
     publications = ['RadarPublication']
     pkg {
-        repo = 'org.radarcns'
-        name = 'radar-mongodb-sink-connector'
+        repo = project.group
+        name = rootProject.name
         userOrg = 'radar-cns'
         licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/RADAR-CNS/RADAR-MongoDB-Sink-Connector.git'
+        vcsUrl = vcsUrl
         version {
             name = project.version
-            desc = 'RADAR-MongoDb-Sink-Connector: alpha release'
+            desc = 'RADAR-MongoDb-Sink-Connector: Initial release'
             vcsTag = System.getenv('TRAVIS_TAG')
             released  = new Date()
         }
@@ -182,6 +283,6 @@ bintray {
 
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.2.1'
+    gradleVersion = '3.4.1'
     distributionUrl distributionUrl.replace("bin", "all")
 }
