@@ -1,11 +1,17 @@
 language: java
 jdk:
   - oraclejdk8
-sudo: false
+sudo: required
+
+services:
+  - docker
+
+env:
+  DOCKER_COMPOSE_VERSION: 1.9.0
+
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-  - rm -fr $HOME/.gradle/caches/*/scripts/
+  - rm -fr $HOME/.gradle/caches/3.*.*
 cache:
   directories:
     - $HOME/.gradle/caches/
@@ -13,6 +19,23 @@ cache:
 
 before_install:
   - ./gradlew downloadDependencies
+  - mkdir -p "$HOME/bin"
+  - export PATH="$PATH:$HOME/bin"
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose"
+  - chmod +x "$HOME/bin/docker-compose"
+
+script:
+  - echo "END TO END TEST"
+  - ./gradlew setRadarEnvironmentForDocker
+  - cd src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack
+  - sudo ./install-radar-stack.sh
+  - sudo docker ps -a
+  - cd -
+  - ./gradlew endToEndTest
+  - cd src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack
+  - sudo docker-compose -f docker-compose.yml down
+  - cd -
+
 after_script:
   - ./gradlew sendCoverageToCodacy
 
@@ -20,10 +43,8 @@ deploy:
   provider: releases
   api_key:
     secure: ${GH_TOKEN}
-  file:
-    - build/libs/radar-mongodb-sink-connector-${TRAVIS_TAG}.jar
-    - build/libs/radar-mongodb-sink-connector-${TRAVIS_TAG}-javadoc.jar
-    - build/libs/radar-mongodb-sink-connector-${TRAVIS_TAG}-sources.jar
+  file_glob: true
+  file: build/libs/*.jar
   skip_cleanup: true
   on:
     tags: true
