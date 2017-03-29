@@ -454,7 +454,7 @@ public abstract class ExpectedValue<V> {
                 .append("sum", getStatValue(SUM, doubleArrayCollector.getCollectors()))
                 .append("count", getStatValue(COUNT, doubleArrayCollector.getCollectors()))
                 .append("avg", getStatValue(AVERAGE, doubleArrayCollector.getCollectors()))
-                .append("quartile", extractQuartile((List<Double>) getStatValue(
+                .append("quartile", extractAccelerationQuartile((List<List<Double>> ) getStatValue(
                         QUARTILES, doubleArrayCollector.getCollectors())))
                 .append("iqr", getStatValue(INTERQUARTILE_RANGE,
                         doubleArrayCollector.getCollectors()))
@@ -463,6 +463,14 @@ public abstract class ExpectedValue<V> {
         }
 
         return list;
+    }
+
+    private Document extractAccelerationQuartile(List<List<Double>> statValue) {
+        Document quartile = new Document();
+        quartile.put("x", extractQuartile(statValue.get(0)));
+        quartile.put("y", extractQuartile(statValue.get(1)));
+        quartile.put("z", extractQuartile(statValue.get(2)));
+        return quartile;
     }
 
     public static List<Document> extractQuartile(List<Double> component) {

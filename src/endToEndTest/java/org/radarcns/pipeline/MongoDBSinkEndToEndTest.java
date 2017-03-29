@@ -4,6 +4,7 @@ import static com.mongodb.client.model.Sorts.ascending;
 import static com.mongodb.client.model.Sorts.descending;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -103,8 +104,7 @@ public class MongoDBSinkEndToEndTest {
                 assertDocument(key.getSensor(), expectedDoc, actualDoc);
                 count++;
             }
-            System.out.println("Expected count " + expecetedDocs.size());
-            System.out.println("Actual count " + count);
+            LOGGER.info("Expected count {} and Actual count {}  ", expecetedDocs.size(), count);
 
             assertEquals(expecetedDocs.size(), count);
         }
@@ -135,6 +135,7 @@ public class MongoDBSinkEndToEndTest {
                 case "start":
                 case "end":
                     assertEquals((Date) expected.get(key), (Date) actual.get(key));
+                    break;
                 case "quartile":
                     assertQuartiles(expected, actual);
                     break;
@@ -168,8 +169,39 @@ public class MongoDBSinkEndToEndTest {
                 case "source":
                     assertEquals(expected.get(key), actual.get(key));
                     break;
+                case "start":
+                case "end":
+                    assertEquals((Date) expected.get(key), (Date) actual.get(key));
+                    break;
+                case "quartile":
+                    assertAccelerationQuartiles(expected, actual);
+                    break;
+                default:
+                    assertAccelerometerDocuments((ArrayList) expected.get(key) , (Document) actual.get(key));
             }
         }
+    }
+
+    private void assertAccelerationQuartiles(Document expected, Document actual) {
+        Document actualQuartileDoc = (Document) actual.get("quartile");
+        Document expectedQuartile = (Document) expected.get("quartile");
+        for(String axis: expectedQuartile.keySet()) {
+            assertNotNull(actualQuartileDoc.get(axis));
+            assertAccelerationAxisQuartileValues((List)expectedQuartile.get(axis) , (List)actualQuartileDoc.get(axis));
+        }
+    }
+
+    private void assertAccelerationAxisQuartileValues(List expected, List actual) {
+        assertEquals(expected.size(), actual.size());
+        assertEquals((Double) ((Document)expected.get(0)).get("25"), (Double) ((Document)actual.get(0)).get("25"), DELTA);
+        assertEquals((Double) ((Document)expected.get(1)).get("50"), (Double) ((Document)actual.get(1)).get("50"), DELTA);
+        assertEquals((Double) ((Document)expected.get(2)).get("75"), (Double) ((Document)actual.get(2)).get("75"), DELTA);
+    }
+
+    private void assertAccelerometerDocuments(ArrayList accelerationList, Document actualDocument) {
+        assertEquals((Double) accelerationList.get(0), (Double) actualDocument.get("x") , DELTA);
+        assertEquals((Double) accelerationList.get(1), (Double) actualDocument.get("y") , DELTA);
+        assertEquals((Double) accelerationList.get(2), (Double) actualDocument.get("z") , DELTA);
     }
 
     private void checkMongoDbConnection() {
@@ -196,15 +228,12 @@ public class MongoDBSinkEndToEndTest {
 
     }
 
-
-
     private void streamCsvDataToKafka() throws IOException, InterruptedException {
         MockProducer producer = new MockProducer(getBasicMockConfig());
         LOGGER.info("Streaming data into Kafka ...");
         producer.start();
         producer.shutdown();
     }
-
 
     /**
      * Starting from the expected values computed using the available CSV files, it computes all
