@@ -1,4 +1,3 @@
-package org.radarcns.pipeline;
 
 /*
  *  Copyright 2016 Kings College London and The Hyve
@@ -15,6 +14,8 @@ package org.radarcns.pipeline;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.radarcns.pipeline;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

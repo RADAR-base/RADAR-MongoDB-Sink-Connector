@@ -1,7 +1,5 @@
-package org.radarcns.integration.commons;
-
 /*
- *  Copyright 2016 Kings College London and The Hyve
+ *  Copyright 2017 Kings College London and The Hyve
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +14,8 @@ package org.radarcns.integration.commons;
  * limitations under the License.
  */
 
+package org.radarcns.integration.commons;
+
 import com.opencsv.CSVReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -28,7 +28,6 @@ import org.apache.avro.Schema;
 import org.apache.avro.specific.SpecificData;
 import org.radarcns.integration.aggregator.ExpectedValue.ExpectedType;
 import org.radarcns.mock.MockDataConfig;
-//import org.radarcns.pipeline.mock.config.MockDataConfig;
 
 /**
  * Starting from a CVS file, this parser generates a map containing all available fields.

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Kings College London and The Hyve
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.radarcns.integration.aggregator;
 
 import static org.radarcns.integration.aggregator.ExpectedValue.STAT_TYPE.AVERAGE;
@@ -22,24 +38,6 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import org.radarcns.avro.restapi.dataset.Dataset;
-//import org.radarcns.avro.restapi.dataset.Item;
-//import org.radarcns.avro.restapi.dataset.Quartiles;
-//import org.radarcns.avro.restapi.header.DescriptiveStatistic;
-//import org.radarcns.avro.restapi.header.EffectiveTimeFrame;
-//import org.radarcns.avro.restapi.header.Header;
-//import org.radarcns.avro.restapi.sensor.Acceleration;
-//import org.radarcns.avro.restapi.sensor.Battery;
-//import org.radarcns.avro.restapi.sensor.BloodVolumePulse;
-//import org.radarcns.avro.restapi.sensor.ElectroDermalActivity;
-//import org.radarcns.avro.restapi.sensor.HeartRate;
-//import org.radarcns.avro.restapi.sensor.InterBeatInterval;
-//import org.radarcns.avro.restapi.sensor.SensorType;
-//import org.radarcns.avro.restapi.sensor.Temperature;
-//import org.radarcns.avro.restapi.sensor.Unit;
-//import org.radarcns.avro.restapi.source.SourceType;
-//import org.radarcns.source.SourceCatalog;
-//import org.radarcns.util.RadarConverter;
 
 /**
  * It computes the expected value for a test case.
@@ -59,9 +57,11 @@ public abstract class ExpectedValue<V> {
         AVERAGE
 
     }
+
     /**
      * Enumerator containing all possible collector implementations. Useful to understand if
-     *      the current isntance is managing single doubles or arrays of doubles.
+     * the current isntance is managing single doubles or arrays of doubles.
+     *
      * @see {@link DoubleArrayCollector}
      * @see {@link DoubleValueCollector}
      **/
@@ -86,6 +86,7 @@ public abstract class ExpectedValue<V> {
 
         /**
          * Return the {@code ExpectedType} associated to the input String.
+         *
          * @param value representing an {@code ExpectedType} item
          * @return the {@code ExpectedType} that matches the input
          **/
@@ -100,7 +101,7 @@ public abstract class ExpectedValue<V> {
     }
 
     //Timewindow length in milliseconds
-    @SuppressWarnings({"checkstyle:AbbreviationAsWordInName","checkstyle:MemberName"})
+    @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
     protected long DURATION = TimeUnit.SECONDS.toMillis(10);
 
     protected String user;
@@ -111,7 +112,9 @@ public abstract class ExpectedValue<V> {
     protected HashMap<Long, V> series;
 
 
-    /** Constructor. **/
+    /**
+     * Constructor.
+     **/
     public ExpectedValue(String user, String source)
             throws IllegalAccessException, InstantiationException {
         series = new HashMap<>();
@@ -126,64 +129,6 @@ public abstract class ExpectedValue<V> {
         lastValue = valueClass.newInstance();
     }
 
-//    /**
-//     * @return {@code EffectiveTimeFrame} for the simulated inteval.
-//     * @see {@link org.radarcns.avro.restapi.header.EffectiveTimeFrame}
-//     */
-//    public EffectiveTimeFrame getEffectiveTimeFrame() {
-//        List<Long> windows = new ArrayList<>(series.keySet());
-//        Collections.sort(windows);
-//
-//        EffectiveTimeFrame eft = new EffectiveTimeFrame(
-//            RadarConverter.getISO8601(new Date(windows.get(0))),
-//            RadarConverter.getISO8601(new Date(windows.get(windows.size() - 1)
-//                + DURATION)));
-//
-//        return eft;
-//    }
-//
-//    /**
-//     * @param value timestamp.
-//     * @return {@code EffectiveTimeFrame} starting on value and ending
-//     *      {@link ExpectedValue#DURATION} milliseconds after.
-//     * @see {@link org.radarcns.avro.restapi.header.EffectiveTimeFrame}
-//     */
-//    public EffectiveTimeFrame getEffectiveTimeFrame(Long value) {
-//        return new EffectiveTimeFrame(RadarConverter.getISO8601(new Date(value)),
-//            RadarConverter.getISO8601(new Date(value + DURATION)));
-//    }
-//
-//    /**
-//     * It generates the {@code Header} for the resulting {@code Dataset}.
-//     * @param statistic function that has to be simulated
-//     * @param unit values unit
-//     * @return {@link org.radarcns.avro.restapi.header.Header} for a
-//     *      {@link org.radarcns.avro.restapi.dataset.Dataset}
-//     **/
-//    public Header getHeader(DescriptiveStatistic statistic, Unit unit) {
-//        return new Header(statistic, unit, getEffectiveTimeFrame());
-//    }
-//
-//    /**
-//     * It generates the {@code List<Item>} for the resulting {@code Dataset}
-//     *      @see {@link org.radarcns.avro.restapi.dataset.Item}.
-//     * @param statistic function that has to be simulated
-//     * @return {@code List<Item>} for a {@link org.radarcns.avro.restapi.dataset.Dataset}
-//     **/
-//    public List<Item> getItem(DescriptiveStatistic statistic, SensorType sensorType)
-//        throws IllegalAccessException, InstantiationException {
-//
-//        List<Long> keys = new LinkedList<>(series.keySet());
-//        Collections.sort(keys);
-//
-//        switch (getExpectedType()) {
-//            case ARRAY: return getArrayItems(keys, statistic, sensorType);
-//            case DOUBLE: return getSingletonItems(keys, statistic, sensorType);
-//            default:
-//                throw new IllegalArgumentException(sensorType.name() + " not supported yet");
-//        }
-//    }
-//
     public ExpectedType getExpectedType() {
         for (ExpectedType expectedType : ExpectedType.values()) {
             if (expectedType.getValue().equals(lastValue.getClass().getCanonicalName())) {
@@ -194,113 +139,16 @@ public abstract class ExpectedValue<V> {
         return null;
     }
 
-//    /**
-//     * It generates the {@code List<Item>} for the resulting {@code Dataset}
-//     *      @see {@link org.radarcns.avro.restapi.dataset.Item} containg sensor data that can be
-//     *      represented as array of {@code Double}.
-//     * @param keys {@code Collection} of timewindow initial time
-//     * @param statistic function that has to be simulated
-//     * @param sensor
-//     * @return {@code List<Item>} for a {@link org.radarcns.avro.restapi.dataset.Dataset}
-//     **/
-//    private List<Item> getArrayItems(Collection<Long> keys, DescriptiveStatistic statistic,
-//            SensorType sensor) {
-//        List<Item> items = new LinkedList<>();
-//
-//        for (Long key : keys) {
-//            DoubleArrayCollector dac = (DoubleArrayCollector) series.get(key);
-//
-//            switch (sensor) {
-//                case ACCELEROMETER:
-//                    Object content;
-//
-//                    if (statistic.name().equals(QUARTILES.name())) {
-//                        List<List<Double>> statValues = (List<List<Double>>) getStatValue(statistic,
-//                            dac.getCollectors());
-//                        content = new Acceleration(getQuartile(statValues.get(0)),
-//                            getQuartile(statValues.get(1)), getQuartile(statValues.get(2)));
-//                    } else {
-//                        List<Double> statValues = (List<Double>) getStatValue(statistic,
-//                            dac.getCollectors());
-//                        content = new Acceleration(statValues.get(0), statValues.get(1),
-//                            statValues.get(2));
-//                    }
-//                    items.add(new Item(content, getEffectiveTimeFrame(key)));
-//                    break;
-//                default:
-//                    throw new IllegalArgumentException(sensor.name()
-//                        + " is not a supported test case");
-//            }
-//        }
-//
-//        return items;
-//    }
-//
-//    /**
-//     * It generates the {@code List<Item>} for the resulting {@code Dataset}
-//     *      @see {@link org.radarcns.avro.restapi.dataset.Item} containg sensor data that can be
-//     *      represented as {@code Double}.
-//     * @param keys {@code Collection} of timewindow initial time
-//     * @param statistic function that has to be simulated
-//     * @param sensor
-//     * @return {@code List<Item>} for a {@link org.radarcns.avro.restapi.dataset.Dataset}
-//     **/
-//    private List<Item> getSingletonItems(Collection<Long> keys, DescriptiveStatistic statistic,
-//            SensorType sensor) throws InstantiationException, IllegalAccessException {
-//        List<Item> items = new LinkedList<>();
-//
-//        for (Long key : keys) {
-//            DoubleArrayCollector.DoubleValueCollector dac = (DoubleArrayCollector.DoubleValueCollector) series.get(key);
-//
-//            Object content = getContent(getStatValue(statistic, dac), statistic,
-//                    getSensorClass(sensor));
-//
-//            items.add(new Item(content, getEffectiveTimeFrame(key)));
-//        }
-//
-//        return items;
-//    }
-//
-//
-//    public <T extends SpecificRecord> T getContent(Object object, DescriptiveStatistic stat,
-//            Class<T> tClass) throws IllegalAccessException, InstantiationException {
-//        T content;
-//
-//        switch (stat) {
-//            case QUARTILES: content = tClass.newInstance();
-//                            content.put(content.getSchema().getField("value").pos(),
-//                                getQuartile((List<Double>) object));
-//                break;
-//            default: content = tClass.newInstance();
-//                content.put(content.getSchema().getField("value").pos(), object);
-//        }
-//
-//        return content;
-//    }
-//
-//    public Class getSensorClass(SensorType sensor) {
-//        switch (sensor) {
-//            case ACCELEROMETER: return Acceleration.class;
-//            case BATTERY: return Battery.class;
-//            case BLOOD_VOLUME_PULSE: return BloodVolumePulse.class;
-//            case ELECTRODERMAL_ACTIVITY: return ElectroDermalActivity.class;
-//            case INTER_BEAT_INTERVAL: return InterBeatInterval.class;
-//            case HEART_RATE: return HeartRate.class;
-//            case THERMOMETER: return Temperature.class;
-//            default: throw new IllegalArgumentException(sensor.name()
-//                        + " is not a supported test case");
-//        }
-//    }
-//
     /**
      * It return the value of the given statistical function.
+     *
      * @param statistic function that has to be returned
      * @param collectors array of aggregated data
-     *      @see {@link org.radarcns.integration.aggregator.DoubleValueCollector}
      * @return the set of values that has to be stored within a {@code Dataset} {@code Item}
+     * @see {@link org.radarcns.integration.aggregator.DoubleValueCollector}
      **/
     private List<? extends Object> getStatValue(STAT_TYPE statistic,
-        DoubleValueCollector[] collectors) {
+            DoubleValueCollector[] collectors) {
         int len = collectors.length;
 
         List<Double> avgList = new ArrayList<>(len);
@@ -324,84 +172,71 @@ public abstract class ExpectedValue<V> {
         }
 
         switch (statistic) {
-            case AVERAGE: return avgList;
-            case COUNT: return countList;
-            case INTERQUARTILE_RANGE: return iqrList;
-            case MAXIMUM: return maxList;
-            case MEDIAN: return medList;
-            case MINIMUM: return minList;
-            case QUARTILES: return quartileList;
-            case SUM: return sumList;
-            default: throw new IllegalArgumentException(
-                statistic.toString() + " is not supported");
+            case AVERAGE:
+                return avgList;
+            case COUNT:
+                return countList;
+            case INTERQUARTILE_RANGE:
+                return iqrList;
+            case MAXIMUM:
+                return maxList;
+            case MEDIAN:
+                return medList;
+            case MINIMUM:
+                return minList;
+            case QUARTILES:
+                return quartileList;
+            case SUM:
+                return sumList;
+            default:
+                throw new IllegalArgumentException(
+                        statistic.toString() + " is not supported");
         }
     }
 
     /**
      * It return the value of the given statistical function.
+     *
      * @param statistic function that has to be returned
      * @param collector data aggregator
-     *      @see {@link org.radarcns.integration.aggregator.DoubleValueCollector}
      * @return the value that has to be stored within a {@code Dataset} {@code Item}
+     * @see {@link org.radarcns.integration.aggregator.DoubleValueCollector}
      **/
     private Object getStatValue(STAT_TYPE statistic,
-        DoubleValueCollector collector) {
+            DoubleValueCollector collector) {
 
         switch (statistic) {
-            case AVERAGE: return collector.getAvg();
-            case COUNT: return collector.getCount();
-            case INTERQUARTILE_RANGE: return collector.getIqr();
-            case MAXIMUM: return collector.getMax();
-            case MEDIAN: return collector.getQuartile().get(1);
-            case MINIMUM: return collector.getMin();
-            case QUARTILES: return collector.getQuartile();
-            case SUM: return collector.getSum();
-            default: throw new IllegalArgumentException(
-                statistic.toString() + " is not supported");
+            case AVERAGE:
+                return collector.getAvg();
+            case COUNT:
+                return collector.getCount();
+            case INTERQUARTILE_RANGE:
+                return collector.getIqr();
+            case MAXIMUM:
+                return collector.getMax();
+            case MEDIAN:
+                return collector.getQuartile().get(1);
+            case MINIMUM:
+                return collector.getMin();
+            case QUARTILES:
+                return collector.getQuartile();
+            case SUM:
+                return collector.getSum();
+            default:
+                throw new IllegalArgumentException(
+                        statistic.toString() + " is not supported");
         }
     }
-
-//    /**
-//     * @param list of {@code Double} values representing a quartile.
-//     * @return the value that has to be stored within a {@code Dataset} {@code Item}
-//     *      @see {@link org.radarcns.avro.restapi.dataset.Quartiles}.
-//     **/
-//    private Quartiles getQuartile(List<Double> list) {
-//        return new Quartiles(list.get(0), list.get(1), list.get(2));
-//    }
-//
-//    /**
-//     * It computes the {@code Dataset} resulted from the mock data.
-//     * @param statistic function that has to be simulated
-//     * @param source the simulated source device
-//     * @param sensor the simulated sensor of the source device
-//     * @return {@code Dataset} resulted by the simulation
-//     *      @see {@link org.radarcns.avro.restapi.dataset.Dataset}
-//     **/
-//    public Dataset getDataset(DescriptiveStatistic statistic, SourceType source,
-//            SensorType sensor) throws InstantiationException, IllegalAccessException {
-//        return new Dataset(getHeader(statistic,
-//                SourceCatalog.getInstance(source).getMeasurementUnit(sensor)),
-//                getItem(statistic, sensor));
-//    }
-//
-//    @Override
-//    public String toString() {
-//        String result = "";
-//        for (Long interval : series.keySet()) {
-//            result += interval.toString() + "-" + (interval + DURATION) + '\t'
-//                + series.get(interval).toString() + "\n";
-//        }
-//        return result;
-//    }
 
     public List<Document> getDocuments() {
         switch (getExpectedType()) {
-            case ARRAY: return getDocumentsByArray();
-            default: return getDocumentsBySingle();
+            case ARRAY:
+                return getDocumentsByArray();
+            default:
+                return getDocumentsBySingle();
         }
     }
-//
+
     private List<Document> getDocumentsBySingle() {
         LinkedList<Document> list = new LinkedList<>();
 
@@ -415,24 +250,24 @@ public abstract class ExpectedValue<V> {
 
             end = timestamp + DURATION;
 
-            list.add( new Document("_id", user + "-" + source + "-" + timestamp + "-" + end)
-                .append("user", user)
-                .append("source", source)
-                .append("min", getStatValue(MINIMUM, doubleValueCollector))
-                .append("max", getStatValue(MAXIMUM, doubleValueCollector))
-                .append("sum", getStatValue(SUM, doubleValueCollector))
-                .append("count", getStatValue(COUNT, doubleValueCollector))
-                .append("avg", getStatValue(AVERAGE, doubleValueCollector))
-                .append("quartile", extractQuartile((List<Double>) getStatValue(
-                        QUARTILES, doubleValueCollector)))
-                .append("iqr", getStatValue(INTERQUARTILE_RANGE, doubleValueCollector))
-                .append("start", new Date(timestamp))
-                .append("end", new Date(end)));
+            list.add(new Document("_id", user + "-" + source + "-" + timestamp + "-" + end)
+                    .append("user", user)
+                    .append("source", source)
+                    .append("min", getStatValue(MINIMUM, doubleValueCollector))
+                    .append("max", getStatValue(MAXIMUM, doubleValueCollector))
+                    .append("sum", getStatValue(SUM, doubleValueCollector))
+                    .append("count", getStatValue(COUNT, doubleValueCollector))
+                    .append("avg", getStatValue(AVERAGE, doubleValueCollector))
+                    .append("quartile", extractQuartile((List<Double>) getStatValue(
+                            QUARTILES, doubleValueCollector)))
+                    .append("iqr", getStatValue(INTERQUARTILE_RANGE, doubleValueCollector))
+                    .append("start", new Date(timestamp))
+                    .append("end", new Date(end)));
         }
 
         return list;
     }
-//
+
     private List<Document> getDocumentsByArray() {
         LinkedList<Document> list = new LinkedList<>();
 
@@ -446,20 +281,21 @@ public abstract class ExpectedValue<V> {
 
             end = timestamp + DURATION;
 
-            list.add( new Document("_id", user + "-" + source + "-" + timestamp + "-" + end)
-                .append("user", user)
-                .append("source", source)
-                .append("min",  getStatValue(MINIMUM, doubleArrayCollector.getCollectors()))
-                .append("max", getStatValue(MAXIMUM, doubleArrayCollector.getCollectors()))
-                .append("sum", getStatValue(SUM, doubleArrayCollector.getCollectors()))
-                .append("count", getStatValue(COUNT, doubleArrayCollector.getCollectors()))
-                .append("avg", getStatValue(AVERAGE, doubleArrayCollector.getCollectors()))
-                .append("quartile", extractAccelerationQuartile((List<List<Double>> ) getStatValue(
-                        QUARTILES, doubleArrayCollector.getCollectors())))
-                .append("iqr", getStatValue(INTERQUARTILE_RANGE,
-                        doubleArrayCollector.getCollectors()))
-                .append("start", new Date(timestamp))
-                .append("end", new Date(end)));
+            list.add(new Document("_id", user + "-" + source + "-" + timestamp + "-" + end)
+                    .append("user", user)
+                    .append("source", source)
+                    .append("min", getStatValue(MINIMUM, doubleArrayCollector.getCollectors()))
+                    .append("max", getStatValue(MAXIMUM, doubleArrayCollector.getCollectors()))
+                    .append("sum", getStatValue(SUM, doubleArrayCollector.getCollectors()))
+                    .append("count", getStatValue(COUNT, doubleArrayCollector.getCollectors()))
+                    .append("avg", getStatValue(AVERAGE, doubleArrayCollector.getCollectors()))
+                    .append("quartile",
+                            extractAccelerationQuartile((List<List<Double>>) getStatValue(
+                                    QUARTILES, doubleArrayCollector.getCollectors())))
+                    .append("iqr", getStatValue(INTERQUARTILE_RANGE,
+                            doubleArrayCollector.getCollectors()))
+                    .append("start", new Date(timestamp))
+                    .append("end", new Date(end)));
         }
 
         return list;
@@ -475,23 +311,10 @@ public abstract class ExpectedValue<V> {
 
     public static List<Document> extractQuartile(List<Double> component) {
         return Arrays.asList(new Document[]{
-            new Document("25", component.get(0)),
-            new Document("50", component.get(1)),
-            new Document("75", component.get(2))
+                new Document("25", component.get(0)),
+                new Document("50", component.get(1)),
+                new Document("75", component.get(2))
         });
     }
-//
-////    /**
-////     * Compare two {@code EffectiveTimeFrame} values.
-////     *      @see {@link org.radarcns.avro.restapi.header.EffectiveTimeFrame}
-////     * @param window1 first component that to has to be compared
-////     * @param window2 second component that to has to be compared
-////     * @return {@code true} if they match, false otherwise
-////     **/
-////    public static boolean compareEffectiveTimeFrame(EffectiveTimeFrame window1,
-////        EffectiveTimeFrame window2) {
-////        return window1.getStartDateTime().equals(window2.getStartDateTime())
-////            && window1.getEndDateTime().equals(window2.getEndDateTime());
-////    }
 
 }

@@ -1,3 +1,19 @@
+/*
+ *  Copyright 2017 Kings College London and The Hyve
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.radarcns.integration.commons;
 
 import java.io.IOException;
@@ -34,65 +50,4 @@ public class EndToEndUtility {
 
         return client.newCall(request).execute();
     }
-
-
-//    public static void checkMongoDB(BasicMockConfig config) {
-//        MongoClient mongoClient = null;
-//
-//        try {
-//            List<MongoCredential> credentials = new ArrayList<>();
-//            credentials.add(
-//                    MongoCredential.createCredential("restapi", "radarcns", "hotstorage".toCharArray()));
-//
-//
-//            MongoClientOptions timeout = MongoClientOptions.builder()
-//                    .connectTimeout(11)
-////                    .socketTimeout(1)
-////                    .serverSelectionTimeout(1)
-//                    .build();
-//
-//            mongoClient = new MongoClient(new ServerAddress("localhost", Integer.parseInt("27017")), credentials, timeout);
-////            mongoClient = new MongoClient(Properties.getInstance().getMongoHosts(),credentials);
-//
-//            if (checkMongoConnection(mongoClient)) {
-//
-//                LOGGER.info("MongoDB connection established");
-//            }
-//        } catch (com.mongodb.MongoSocketOpenException exec) {
-//            if (mongoClient != null) {
-//                mongoClient.close();
-//            }
-//
-//            LOGGER.error(exec.getMessage());
-//        }
-//    }
-//
-//    /**
-//     * Checks if with the given client and credential is it possible to establish a connection
-//     *      towards the MongoDB host.
-//     *
-//     * @param mongoClient client for MongoDB
-//     * @return {@code true} if the connection can be established false otherwise
-//     */
-//    public static boolean checkMongoConnection(MongoClient mongoClient) {
-//        Boolean flag = true;
-//        try {
-//            for (MongoCredential user : mongoClient.getCredentialsList()) {
-//                mongoClient.getDatabase(user.getSource()).runCommand(new Document("ping", 1));
-//            }
-//
-//        } catch (Exception exec) {
-//            flag = false;
-//
-//            if (mongoClient != null) {
-//                mongoClient.close();
-//            }
-//
-//            LOGGER.error("Error during connection test",exec);
-//        }
-//
-//        LOGGER.info("MongoDB connection is {}",flag.toString());
-//
-//        return flag;
-//    }
 }

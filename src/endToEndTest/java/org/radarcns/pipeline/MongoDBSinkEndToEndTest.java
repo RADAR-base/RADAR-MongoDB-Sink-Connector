@@ -1,10 +1,24 @@
+/*
+ * Copyright 2017 Kings College London and The Hyve
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.radarcns.pipeline;
 
 import static com.mongodb.client.model.Sorts.ascending;
-import static com.mongodb.client.model.Sorts.descending;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -14,21 +28,17 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.MongoIterable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import javax.print.Doc;
 import okhttp3.Response;
 import org.bson.Document;
 import org.junit.Test;
@@ -58,7 +68,7 @@ public class MongoDBSinkEndToEndTest {
     // Latency expressed in second
     private static final long LATENCY = 60;
 
-    private static final double DELTA =  Math.pow(10.0, -1.0 * 10);
+    private static final double DELTA = Math.pow(10.0, -1.0 * 10);
 
     @Test
     public void testMongoDBSinkPipeline()
@@ -123,7 +133,7 @@ public class MongoDBSinkEndToEndTest {
     }
 
     private void compareSingleItemDocument(Document expected, Document actual) {
-        for(String key : expected.keySet()) {
+        for (String key : expected.keySet()) {
             //assert both documents have same headers
             assertNotNull(actual.get(key));
             switch (key) {
@@ -140,7 +150,7 @@ public class MongoDBSinkEndToEndTest {
                     assertQuartiles(expected, actual);
                     break;
                 default:
-                    assertEquals((Double) expected.get(key), (Double) actual.get(key) ,DELTA );
+                    assertEquals((Double) expected.get(key), (Double) actual.get(key), DELTA);
             }
         }
 
@@ -149,19 +159,19 @@ public class MongoDBSinkEndToEndTest {
     private void assertQuartiles(Document expected, Document actual) {
         List expectedQuartile = (List) expected.get("quartile");
         ArrayList<Document> actualQuartile = (ArrayList<Document>) actual.get("quartile");
-        for (int i=0; i < expectedQuartile.size();i++) {
+        for (int i = 0; i < expectedQuartile.size(); i++) {
             Document act = actualQuartile.get(i);
-            Document exp = (Document)expectedQuartile.get(i);
+            Document exp = (Document) expectedQuartile.get(i);
 
-            for(String key : exp.keySet()) {
+            for (String key : exp.keySet()) {
                 assertNotNull(act.get(key));
-                assertEquals((Double) exp.get(key) , (Double) act.get(key), DELTA);
+                assertEquals((Double) exp.get(key), (Double) act.get(key), DELTA);
             }
         }
     }
 
     private void compareArrayItemDocument(Document expected, Document actual) {
-        for(String key : expected.keySet()) {
+        for (String key : expected.keySet()) {
             assertNotNull(actual.get(key));
             switch (key) {
                 case "_id":
@@ -177,7 +187,8 @@ public class MongoDBSinkEndToEndTest {
                     assertAccelerationQuartiles(expected, actual);
                     break;
                 default:
-                    assertAccelerometerDocuments((ArrayList) expected.get(key) , (Document) actual.get(key));
+                    assertAccelerometerDocuments((ArrayList) expected.get(key),
+                            (Document) actual.get(key));
             }
         }
     }
@@ -185,23 +196,27 @@ public class MongoDBSinkEndToEndTest {
     private void assertAccelerationQuartiles(Document expected, Document actual) {
         Document actualQuartileDoc = (Document) actual.get("quartile");
         Document expectedQuartile = (Document) expected.get("quartile");
-        for(String axis: expectedQuartile.keySet()) {
+        for (String axis : expectedQuartile.keySet()) {
             assertNotNull(actualQuartileDoc.get(axis));
-            assertAccelerationAxisQuartileValues((List)expectedQuartile.get(axis) , (List)actualQuartileDoc.get(axis));
+            assertAccelerationAxisQuartileValues((List) expectedQuartile.get(axis),
+                    (List) actualQuartileDoc.get(axis));
         }
     }
 
     private void assertAccelerationAxisQuartileValues(List expected, List actual) {
         assertEquals(expected.size(), actual.size());
-        assertEquals((Double) ((Document)expected.get(0)).get("25"), (Double) ((Document)actual.get(0)).get("25"), DELTA);
-        assertEquals((Double) ((Document)expected.get(1)).get("50"), (Double) ((Document)actual.get(1)).get("50"), DELTA);
-        assertEquals((Double) ((Document)expected.get(2)).get("75"), (Double) ((Document)actual.get(2)).get("75"), DELTA);
+        assertEquals((Double) ((Document) expected.get(0)).get("25"),
+                (Double) ((Document) actual.get(0)).get("25"), DELTA);
+        assertEquals((Double) ((Document) expected.get(1)).get("50"),
+                (Double) ((Document) actual.get(1)).get("50"), DELTA);
+        assertEquals((Double) ((Document) expected.get(2)).get("75"),
+                (Double) ((Document) actual.get(2)).get("75"), DELTA);
     }
 
     private void assertAccelerometerDocuments(ArrayList accelerationList, Document actualDocument) {
-        assertEquals((Double) accelerationList.get(0), (Double) actualDocument.get("x") , DELTA);
-        assertEquals((Double) accelerationList.get(1), (Double) actualDocument.get("y") , DELTA);
-        assertEquals((Double) accelerationList.get(2), (Double) actualDocument.get("z") , DELTA);
+        assertEquals((Double) accelerationList.get(0), (Double) actualDocument.get("x"), DELTA);
+        assertEquals((Double) accelerationList.get(1), (Double) actualDocument.get("y"), DELTA);
+        assertEquals((Double) accelerationList.get(2), (Double) actualDocument.get("z"), DELTA);
     }
 
     private void checkMongoDbConnection() {
