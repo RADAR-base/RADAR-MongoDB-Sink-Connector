@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: org.radarcns:radar-commons:0.3-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/org/radarcns/radar-commons/0.3-SNAPSHOT/radar-commons-0.3-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

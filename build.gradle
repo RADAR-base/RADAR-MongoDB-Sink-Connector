@@ -16,7 +16,8 @@ ext.vcsUrl = 'https://github.com/RADAR-CNS/RADAR-MongoDB-Sink-Connector.git'
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
-ext.radarCommonsVersion = '0.1-SNAPSHOT'
+ext.radarCommonsVersion = '0.3-SNAPSHOT'
+ext.radarSchemaSdkVersion = '0.1'
 ext.mongoDbSinkVersion = 'v0.1-alpha.1'
 ext.junitVersion = '4.12'
 ext.codacyVersion = '1.0.10'
@@ -61,10 +62,12 @@ repositories {
 
 dependencies {
     compile group: 'org.radarcns', name: 'radar-commons', version: radarCommonsVersion
+    compile group: 'org.radarcns', name: 'radar-schemas-commons', version: radarSchemaSdkVersion
     compile group: "org.radarcns", name: 'kafka-connect-mongodb-sink', version: mongoDbSinkVersion
 
     endToEndTestCompile  group: 'com.opencsv', name: 'opencsv', version: openCsvVersion
     endToEndTestCompile group: 'org.apache.commons', name: 'commons-math3', version: mathVersion
+    endToEndTestCompile group: 'org.radarcns', name: 'radar-commons-testing', version: radarCommonsVersion
     testCompile group: 'junit', name: 'junit', version: junitVersion
 
     codacy group: 'com.github.codacy', name: 'codacy-coverage-reporter', version: codacyVersion

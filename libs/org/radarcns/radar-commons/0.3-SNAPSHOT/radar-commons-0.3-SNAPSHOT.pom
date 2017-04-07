@@ -3,8 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.radarcns</groupId>
   <artifactId>radar-commons</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.3-SNAPSHOT</version>
   <dependencies>
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro</artifactId>
+      <version>1.8.1</version>
+      <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-clients</artifactId>
@@ -18,9 +24,9 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.avro</groupId>
-      <artifactId>avro</artifactId>
-      <version>1.8.1</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>3.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -48,21 +54,40 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-  <description>Common utilities library containing basic schemas, streaming features, testing bridges and utils.</description>
+  <description/>
   <name>radar-commons</name>
   <url>https://github.com/RADAR-CNS/RADAR-Commons.git</url>
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>radar-commons</distribution>
+      <distribution>repo</distribution>
     </license>
   </licenses>
   <developers>
     <developer>
-      <id>radar-cns</id>
-      <name>Nivethika</name>
+      <id>nivemaham</id>
+      <name>Nivethika Mahasivam</name>
       <email>nivethika@thehyve.nl</email>
+      <organization>The Hyve</organization>
+    </developer>
+    <developer>
+      <id>blootsvoets</id>
+      <name>Joris Borgdorff</name>
+      <email>joris@thehyve.nl</email>
+      <organization>The Hyve</organization>
     </developer>
   </developers>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/RADAR-CNS/RADAR-Commons.git/issues</url>
+  </issueManagement>
+  <organization>
+    <name>RADAR-CNS</name>
+    <url>http://radar-cns.org</url>
+  </organization>
+  <scm>
+    <connection>scm:git:https://github.com/RADAR-CNS/RADAR-Commons.git</connection>
+    <url>https://github.com/RADAR-CNS/RADAR-Commons.git</url>
+  </scm>
 </project>

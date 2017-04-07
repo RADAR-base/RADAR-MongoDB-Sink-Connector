@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.radarcns</groupId>
+  <artifactId>radar-commons-testing</artifactId>
+  <version>0.3-SNAPSHOT</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.radarcns</groupId>
+      <artifactId>radar-commons</artifactId>
+      <version>0.3-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro</artifactId>
+      <version>1.8.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.radarcns</groupId>
+      <artifactId>radar-schemas-commons</artifactId>
+      <version>0.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>3.9</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.8.5</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+  <description/>
+  <name>radar-commons-testing</name>
+  <url>https://github.com/RADAR-CNS/RADAR-Commons.git</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>nivemaham</id>
+      <name>Nivethika Mahasivam</name>
+      <email>nivethika@thehyve.nl</email>
+      <organization>The Hyve</organization>
+    </developer>
+    <developer>
+      <id>blootsvoets</id>
+      <name>Joris Borgdorff</name>
+      <email>joris@thehyve.nl</email>
+      <organization>The Hyve</organization>
+    </developer>
+  </developers>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/RADAR-CNS/RADAR-Commons.git/issues</url>
+  </issueManagement>
+  <organization>
+    <name>RADAR-CNS</name>
+    <url>http://radar-cns.org</url>
+  </organization>
+  <scm>
+    <connection>scm:git:https://github.com/RADAR-CNS/RADAR-Commons.git</connection>
+    <url>https://github.com/RADAR-CNS/RADAR-Commons.git</url>
+  </scm>
+</project>

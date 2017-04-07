@@ -16,14 +16,16 @@
 
 package org.radarcns.integration.aggregator;
 
-import static org.radarcns.integration.aggregator.ExpectedValue.STAT_TYPE.AVERAGE;
-import static org.radarcns.integration.aggregator.ExpectedValue.STAT_TYPE.COUNT;
-import static org.radarcns.integration.aggregator.ExpectedValue.STAT_TYPE.INTERQUARTILE_RANGE;
-import static org.radarcns.integration.aggregator.ExpectedValue.STAT_TYPE.MAXIMUM;
-import static org.radarcns.integration.aggregator.ExpectedValue.STAT_TYPE.MEDIAN;
-import static org.radarcns.integration.aggregator.ExpectedValue.STAT_TYPE.MINIMUM;
-import static org.radarcns.integration.aggregator.ExpectedValue.STAT_TYPE.QUARTILES;
-import static org.radarcns.integration.aggregator.ExpectedValue.STAT_TYPE.SUM;
+
+import static org.radarcns.integration.model.ExpectedValue.DURATION;
+import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.AVERAGE;
+import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.COUNT;
+import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.INTERQUARTILE_RANGE;
+import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.MAXIMUM;
+import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.MEDIAN;
+import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.MINIMUM;
+import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.QUARTILES;
+import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.SUM;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -33,8 +35,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.bson.Document;
+import org.radarcns.integration.model.ExpectedValue;
+import org.radarcns.integration.model.ExpectedValue.STAT_TYPE;
+import org.radarcns.integration.model.ExpectedValueFactory;
+import org.radarcns.mock.MockDataConfig;
+import org.radarcns.stream.aggregator.DoubleArrayCollector;
+import org.radarcns.stream.aggregator.DoubleValueCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,102 +51,102 @@ import org.slf4j.LoggerFactory;
 /**
  * It computes the expected value for a test case.
  */
-public abstract class ExpectedValue<V> {
+public class ExpectedDocumentFactory implements ExpectedValueFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExpectedValue.class);
-
-    public enum STAT_TYPE {
-        MINIMUM,
-        MAXIMUM,
-        SUM,
-        QUARTILES,
-        MEDIAN,
-        INTERQUARTILE_RANGE,
-        COUNT,
-        AVERAGE
-
-    }
-
-    /**
-     * Enumerator containing all possible collector implementations. Useful to understand if
-     * the current isntance is managing single doubles or arrays of doubles.
-     *
-     * @see {@link DoubleArrayCollector}
-     * @see {@link DoubleValueCollector}
-     **/
-    public enum ExpectedType {
-        ARRAY("org.radarcns.integration.aggregator.DoubleArrayCollector"),
-        DOUBLE("org.radarcns.integration.aggregator.DoubleValueCollector");
-
-        private String value;
-
-        ExpectedType(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return this.getValue();
-        }
-
-        /**
-         * Return the {@code ExpectedType} associated to the input String.
-         *
-         * @param value representing an {@code ExpectedType} item
-         * @return the {@code ExpectedType} that matches the input
-         **/
-        public static ExpectedType getEnum(String value) {
-            for (ExpectedType v : values()) {
-                if (v.getValue().equalsIgnoreCase(value)) {
-                    return v;
-                }
-            }
-            throw new IllegalArgumentException();
-        }
-    }
-
-    //Timewindow length in milliseconds
-    @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
-    protected long DURATION = TimeUnit.SECONDS.toMillis(10);
-
-    protected String user;
-    protected String source;
-
-    protected Long lastTimestamp;
-    protected V lastValue;
-    protected HashMap<Long, V> series;
-
-
-    /**
-     * Constructor.
-     **/
-    public ExpectedValue(String user, String source)
-            throws IllegalAccessException, InstantiationException {
-        series = new HashMap<>();
-
-        this.user = user;
-        this.source = source;
-        lastTimestamp = 0L;
-
-        Class<V> valueClass = (Class<V>) ((ParameterizedType) getClass()
-                .getGenericSuperclass()).getActualTypeArguments()[0];
-
-        lastValue = valueClass.newInstance();
-    }
-
-    public ExpectedType getExpectedType() {
-        for (ExpectedType expectedType : ExpectedType.values()) {
-            if (expectedType.getValue().equals(lastValue.getClass().getCanonicalName())) {
-                return expectedType;
-            }
-        }
-
-        return null;
-    }
+//    private static final Logger LOGGER = LoggerFactory.getLogger(ExpectedValue.class);
+//
+//    public enum STAT_TYPE {
+//        MINIMUM,
+//        MAXIMUM,
+//        SUM,
+//        QUARTILES,
+//        MEDIAN,
+//        INTERQUARTILE_RANGE,
+//        COUNT,
+//        AVERAGE
+//
+//    }
+//
+//    /**
+//     * Enumerator containing all possible collector implementations. Useful to understand if
+//     * the current isntance is managing single doubles or arrays of doubles.
+//     *
+//     * @see {@link DoubleArrayCollector}
+//     * @see {@link DoubleValueCollector}
+//     **/
+//    public enum ExpectedType {
+//        ARRAY("org.radarcns.integration.aggregator.DoubleArrayCollector"),
+//        DOUBLE("org.radarcns.integration.aggregator.DoubleValueCollector");
+//
+//        private String value;
+//
+//        ExpectedType(String value) {
+//            this.value = value;
+//        }
+//
+//        public String getValue() {
+//            return value;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return this.getValue();
+//        }
+//
+//        /**
+//         * Return the {@code ExpectedType} associated to the input String.
+//         *
+//         * @param value representing an {@code ExpectedType} item
+//         * @return the {@code ExpectedType} that matches the input
+//         **/
+//        public static ExpectedType getEnum(String value) {
+//            for (ExpectedType v : values()) {
+//                if (v.getValue().equalsIgnoreCase(value)) {
+//                    return v;
+//                }
+//            }
+//            throw new IllegalArgumentException();
+//        }
+//    }
+//
+//    //Timewindow length in milliseconds
+//    @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
+//    protected long DURATION = TimeUnit.SECONDS.toMillis(10);
+//
+//    protected String user;
+//    protected String source;
+//
+//    protected Long lastTimestamp;
+//    protected V lastValue;
+//    protected HashMap<Long, V> series;
+//
+//
+//    /**
+//     * Constructor.
+//     **/
+//    public ExpectedValue(String user, String source)
+//            throws IllegalAccessException, InstantiationException {
+//        series = new HashMap<>();
+//
+//        this.user = user;
+//        this.source = source;
+//        lastTimestamp = 0L;
+//
+//        Class<V> valueClass = (Class<V>) ((ParameterizedType) getClass()
+//                .getGenericSuperclass()).getActualTypeArguments()[0];
+//
+//        lastValue = valueClass.newInstance();
+//    }
+//
+//    public ExpectedType getExpectedType() {
+//        for (ExpectedType expectedType : ExpectedType.values()) {
+//            if (expectedType.getValue().equals(lastValue.getClass().getCanonicalName())) {
+//                return expectedType;
+//            }
+//        }
+//
+//        return null;
+//    }
 
     /**
      * It return the value of the given statistical function.
@@ -145,7 +154,7 @@ public abstract class ExpectedValue<V> {
      * @param statistic function that has to be returned
      * @param collectors array of aggregated data
      * @return the set of values that has to be stored within a {@code Dataset} {@code Item}
-     * @see {@link org.radarcns.integration.aggregator.DoubleValueCollector}
+     * @see {@link DoubleValueCollector}
      **/
     private List<? extends Object> getStatValue(STAT_TYPE statistic,
             DoubleValueCollector[] collectors) {
@@ -200,7 +209,7 @@ public abstract class ExpectedValue<V> {
      * @param statistic function that has to be returned
      * @param collector data aggregator
      * @return the value that has to be stored within a {@code Dataset} {@code Item}
-     * @see {@link org.radarcns.integration.aggregator.DoubleValueCollector}
+     * @see {@link .DoubleValueCollector}
      **/
     private Object getStatValue(STAT_TYPE statistic,
             DoubleValueCollector collector) {
@@ -228,31 +237,24 @@ public abstract class ExpectedValue<V> {
         }
     }
 
-    public List<Document> getDocuments() {
-        switch (getExpectedType()) {
-            case ARRAY:
-                return getDocumentsByArray();
-            default:
-                return getDocumentsBySingle();
-        }
-    }
 
-    private List<Document> getDocumentsBySingle() {
+
+    private List<Document> getDocumentsBySingle(ExpectedValue expectedValue) {
         LinkedList<Document> list = new LinkedList<>();
 
-        List<Long> windows = new ArrayList<>(series.keySet());
+        List<Long> windows = new ArrayList<>(expectedValue.getSeries().keySet());
         Collections.sort(windows);
 
         DoubleValueCollector doubleValueCollector;
         Long end;
         for (Long timestamp : windows) {
-            doubleValueCollector = (DoubleValueCollector) series.get(timestamp);
+            doubleValueCollector = (DoubleValueCollector) expectedValue.getSeries().get(timestamp);
 
             end = timestamp + DURATION;
 
-            list.add(new Document("_id", user + "-" + source + "-" + timestamp + "-" + end)
-                    .append("user", user)
-                    .append("source", source)
+            list.add(new Document("_id", expectedValue.getUser() + "-" + expectedValue.getSource() + "-" + timestamp + "-" + end)
+                    .append("user", expectedValue.getUser())
+                    .append("source", expectedValue.getSource())
                     .append("min", getStatValue(MINIMUM, doubleValueCollector))
                     .append("max", getStatValue(MAXIMUM, doubleValueCollector))
                     .append("sum", getStatValue(SUM, doubleValueCollector))
@@ -268,22 +270,22 @@ public abstract class ExpectedValue<V> {
         return list;
     }
 
-    private List<Document> getDocumentsByArray() {
+    private List<Document> getDocumentsByArray(ExpectedValue expectedValue) {
         LinkedList<Document> list = new LinkedList<>();
 
-        List<Long> windows = new ArrayList<>(series.keySet());
+        List<Long> windows = new ArrayList<>(expectedValue.getSeries().keySet());
         Collections.sort(windows);
 
         DoubleArrayCollector doubleArrayCollector;
         Long end;
         for (Long timestamp : windows) {
-            doubleArrayCollector = (DoubleArrayCollector) series.get(timestamp);
+            doubleArrayCollector = (DoubleArrayCollector) expectedValue.getSeries().get(timestamp);
 
             end = timestamp + DURATION;
 
-            list.add(new Document("_id", user + "-" + source + "-" + timestamp + "-" + end)
-                    .append("user", user)
-                    .append("source", source)
+            list.add(new Document("_id", expectedValue.getUser() + "-" + expectedValue.getSource() + "-" + timestamp + "-" + end)
+                    .append("user", expectedValue.getUser())
+                    .append("source", expectedValue.getSource())
                     .append("min", getStatValue(MINIMUM, doubleArrayCollector.getCollectors()))
                     .append("max", getStatValue(MAXIMUM, doubleArrayCollector.getCollectors()))
                     .append("sum", getStatValue(SUM, doubleArrayCollector.getCollectors()))
@@ -317,4 +319,13 @@ public abstract class ExpectedValue<V> {
         });
     }
 
+    @Override
+    public List<Document> produceExpectedData(ExpectedValue expectedValue) {
+            switch (expectedValue.getExpectedType()) {
+                case ARRAY:
+                    return getDocumentsByArray(expectedValue);
+                default:
+                    return getDocumentsBySingle(expectedValue);
+            }
+    }
 }
