@@ -39,13 +39,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.Response;
 import org.bson.Document;
 import org.junit.Test;
 import org.radarcns.config.YamlConfigLoader;
 import org.radarcns.integration.aggregator.ExpectedDocumentFactory;
 import org.radarcns.integration.aggregator.MockAggregator;
-import org.radarcns.integration.commons.EndToEndUtility;
 import org.radarcns.integration.model.ExpectedValue;
 import org.radarcns.mock.BasicMockConfig;
 import org.radarcns.mock.CsvGenerator;
@@ -270,7 +271,8 @@ public class MongoDBSinkEndToEndTest {
         assertEquals(testCase, expectedValue.size());
         Map<MockDataConfig, List<Document>> docMap = new HashMap<>();
         for (MockDataConfig key : expectedValue.keySet()) {
-            List<Document> documents = (List<Document>) expectedDocumentFactory.produceExpectedData(expectedValue.get(key));
+            List<Document> documents = (List<Document>) expectedDocumentFactory
+                    .produceExpectedData(expectedValue.get(key));
             docMap.put(key, documents);
         }
         return docMap;
@@ -322,7 +324,7 @@ public class MongoDBSinkEndToEndTest {
 
             Response response = null;
             try {
-                response = EndToEndUtility.makeRequest(
+                response = makeRequest(
                         config.getRestProxy().getUrlString() + "/topics");
                 if (response.code() == 200) {
                     String topics = response.body().string().toString();
@@ -367,5 +369,24 @@ public class MongoDBSinkEndToEndTest {
         return config;
     }
 
+    /**
+     * Makes an HTTP request to given URL.
+     *
+     * @param url end-point
+     * @return HTTP Response
+     */
+    public static Response makeRequest(String url) throws IOException {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
 
+        Request request = new Request.Builder()
+                .header("User-Agent", "Mozilla/5.0")
+                .url(url)
+                .build();
+
+        return client.newCall(request).execute();
+    }
 }

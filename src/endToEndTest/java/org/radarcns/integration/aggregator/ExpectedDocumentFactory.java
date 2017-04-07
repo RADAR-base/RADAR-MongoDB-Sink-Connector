@@ -27,126 +27,24 @@ import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.MINIMUM;
 import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.QUARTILES;
 import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.SUM;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import org.bson.Document;
 import org.radarcns.integration.model.ExpectedValue;
 import org.radarcns.integration.model.ExpectedValue.STAT_TYPE;
 import org.radarcns.integration.model.ExpectedValueFactory;
-import org.radarcns.mock.MockDataConfig;
 import org.radarcns.stream.aggregator.DoubleArrayCollector;
 import org.radarcns.stream.aggregator.DoubleValueCollector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
- * It computes the expected value for a test case.
+ * It computes the expected Documents for a test case i.e. {@link ExpectedValue}.
  */
 public class ExpectedDocumentFactory implements ExpectedValueFactory {
-
-//    private static final Logger LOGGER = LoggerFactory.getLogger(ExpectedValue.class);
-//
-//    public enum STAT_TYPE {
-//        MINIMUM,
-//        MAXIMUM,
-//        SUM,
-//        QUARTILES,
-//        MEDIAN,
-//        INTERQUARTILE_RANGE,
-//        COUNT,
-//        AVERAGE
-//
-//    }
-//
-//    /**
-//     * Enumerator containing all possible collector implementations. Useful to understand if
-//     * the current isntance is managing single doubles or arrays of doubles.
-//     *
-//     * @see {@link DoubleArrayCollector}
-//     * @see {@link DoubleValueCollector}
-//     **/
-//    public enum ExpectedType {
-//        ARRAY("org.radarcns.integration.aggregator.DoubleArrayCollector"),
-//        DOUBLE("org.radarcns.integration.aggregator.DoubleValueCollector");
-//
-//        private String value;
-//
-//        ExpectedType(String value) {
-//            this.value = value;
-//        }
-//
-//        public String getValue() {
-//            return value;
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return this.getValue();
-//        }
-//
-//        /**
-//         * Return the {@code ExpectedType} associated to the input String.
-//         *
-//         * @param value representing an {@code ExpectedType} item
-//         * @return the {@code ExpectedType} that matches the input
-//         **/
-//        public static ExpectedType getEnum(String value) {
-//            for (ExpectedType v : values()) {
-//                if (v.getValue().equalsIgnoreCase(value)) {
-//                    return v;
-//                }
-//            }
-//            throw new IllegalArgumentException();
-//        }
-//    }
-//
-//    //Timewindow length in milliseconds
-//    @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
-//    protected long DURATION = TimeUnit.SECONDS.toMillis(10);
-//
-//    protected String user;
-//    protected String source;
-//
-//    protected Long lastTimestamp;
-//    protected V lastValue;
-//    protected HashMap<Long, V> series;
-//
-//
-//    /**
-//     * Constructor.
-//     **/
-//    public ExpectedValue(String user, String source)
-//            throws IllegalAccessException, InstantiationException {
-//        series = new HashMap<>();
-//
-//        this.user = user;
-//        this.source = source;
-//        lastTimestamp = 0L;
-//
-//        Class<V> valueClass = (Class<V>) ((ParameterizedType) getClass()
-//                .getGenericSuperclass()).getActualTypeArguments()[0];
-//
-//        lastValue = valueClass.newInstance();
-//    }
-//
-//    public ExpectedType getExpectedType() {
-//        for (ExpectedType expectedType : ExpectedType.values()) {
-//            if (expectedType.getValue().equals(lastValue.getClass().getCanonicalName())) {
-//                return expectedType;
-//            }
-//        }
-//
-//        return null;
-//    }
 
     /**
      * It return the value of the given statistical function.
@@ -238,7 +136,6 @@ public class ExpectedDocumentFactory implements ExpectedValueFactory {
     }
 
 
-
     private List<Document> getDocumentsBySingle(ExpectedValue expectedValue) {
         LinkedList<Document> list = new LinkedList<>();
 
@@ -252,7 +149,9 @@ public class ExpectedDocumentFactory implements ExpectedValueFactory {
 
             end = timestamp + DURATION;
 
-            list.add(new Document("_id", expectedValue.getUser() + "-" + expectedValue.getSource() + "-" + timestamp + "-" + end)
+            list.add(new Document("_id",
+                    expectedValue.getUser() + "-" + expectedValue.getSource() + "-" + timestamp
+                            + "-" + end)
                     .append("user", expectedValue.getUser())
                     .append("source", expectedValue.getSource())
                     .append("min", getStatValue(MINIMUM, doubleValueCollector))
@@ -283,7 +182,9 @@ public class ExpectedDocumentFactory implements ExpectedValueFactory {
 
             end = timestamp + DURATION;
 
-            list.add(new Document("_id", expectedValue.getUser() + "-" + expectedValue.getSource() + "-" + timestamp + "-" + end)
+            list.add(new Document("_id",
+                    expectedValue.getUser() + "-" + expectedValue.getSource() + "-" + timestamp
+                            + "-" + end)
                     .append("user", expectedValue.getUser())
                     .append("source", expectedValue.getSource())
                     .append("min", getStatValue(MINIMUM, doubleArrayCollector.getCollectors()))
