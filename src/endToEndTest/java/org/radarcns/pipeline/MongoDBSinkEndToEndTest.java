@@ -45,7 +45,7 @@ import okhttp3.Response;
 import org.bson.Document;
 import org.junit.Test;
 import org.radarcns.config.YamlConfigLoader;
-import org.radarcns.integration.aggregator.ExpectedDocumentFactory;
+import org.radarcns.integration.ExpectedDocumentFactory;
 import org.radarcns.integration.aggregator.MockAggregator;
 import org.radarcns.integration.model.ExpectedValue;
 import org.radarcns.mock.BasicMockConfig;

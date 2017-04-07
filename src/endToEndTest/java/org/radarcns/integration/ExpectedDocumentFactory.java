@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.radarcns.integration.aggregator;
+package org.radarcns.integration;
 
 
 import static org.radarcns.integration.model.ExpectedValue.DURATION;
