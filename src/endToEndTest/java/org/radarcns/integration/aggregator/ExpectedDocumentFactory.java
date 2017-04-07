@@ -321,11 +321,11 @@ public class ExpectedDocumentFactory implements ExpectedValueFactory {
 
     @Override
     public List<Document> produceExpectedData(ExpectedValue expectedValue) {
-            switch (expectedValue.getExpectedType()) {
-                case ARRAY:
-                    return getDocumentsByArray(expectedValue);
-                default:
-                    return getDocumentsBySingle(expectedValue);
-            }
+        switch (expectedValue.getExpectedType()) {
+            case ARRAY:
+                return getDocumentsByArray(expectedValue);
+            default:
+                return getDocumentsBySingle(expectedValue);
+        }
     }
 }

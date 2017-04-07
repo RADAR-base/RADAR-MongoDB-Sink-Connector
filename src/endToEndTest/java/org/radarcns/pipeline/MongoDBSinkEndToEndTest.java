@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import okhttp3.Response;
 import org.bson.Document;
 import org.junit.Test;
@@ -93,12 +94,12 @@ public class MongoDBSinkEndToEndTest {
 
         streamCsvDataToKafka();
 
-//        LOGGER.info("Waiting data ({} seconds) ... ", LATENCY);
-//        Thread.sleep(TimeUnit.SECONDS.toMillis(LATENCY));
-//
-//        checkMongoDbConnection();
-//
-//        assetDataWithExpectedDocuments(expectedDocument);
+        LOGGER.info("Waiting data ({} seconds) ... ", LATENCY);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(LATENCY));
+
+        checkMongoDbConnection();
+
+        assetDataWithExpectedDocuments(expectedDocument);
 
 
     }
