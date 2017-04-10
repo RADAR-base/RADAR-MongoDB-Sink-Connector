@@ -135,7 +135,6 @@ public class ExpectedDocumentFactory {
         }
     }
 
-
     private List<Document> getDocumentsBySingle(ExpectedValue expectedValue) {
         LinkedList<Document> list = new LinkedList<>();
 
