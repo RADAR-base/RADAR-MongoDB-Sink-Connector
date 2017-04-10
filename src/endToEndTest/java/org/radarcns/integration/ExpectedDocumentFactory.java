@@ -18,14 +18,15 @@ package org.radarcns.integration;
 
 
 import static org.radarcns.integration.model.ExpectedValue.DURATION;
-import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.AVERAGE;
-import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.COUNT;
-import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.INTERQUARTILE_RANGE;
-import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.MAXIMUM;
-import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.MEDIAN;
-import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.MINIMUM;
-import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.QUARTILES;
-import static org.radarcns.integration.model.ExpectedValue.STAT_TYPE.SUM;
+
+import static org.radarcns.integration.model.ExpectedValue.StatType.AVERAGE;
+import static org.radarcns.integration.model.ExpectedValue.StatType.COUNT;
+import static org.radarcns.integration.model.ExpectedValue.StatType.INTERQUARTILE_RANGE;
+import static org.radarcns.integration.model.ExpectedValue.StatType.MAXIMUM;
+import static org.radarcns.integration.model.ExpectedValue.StatType.MEDIAN;
+import static org.radarcns.integration.model.ExpectedValue.StatType.MINIMUM;
+import static org.radarcns.integration.model.ExpectedValue.StatType.QUARTILES;
+import static org.radarcns.integration.model.ExpectedValue.StatType.SUM;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,8 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bson.Document;
 import org.radarcns.integration.model.ExpectedValue;
-import org.radarcns.integration.model.ExpectedValue.STAT_TYPE;
-import org.radarcns.integration.model.ExpectedValueFactory;
+import org.radarcns.integration.model.ExpectedValue.StatType;
 import org.radarcns.stream.aggregator.DoubleArrayCollector;
 import org.radarcns.stream.aggregator.DoubleValueCollector;
 
@@ -44,7 +44,7 @@ import org.radarcns.stream.aggregator.DoubleValueCollector;
 /**
  * It computes the expected Documents for a test case i.e. {@link ExpectedValue}.
  */
-public class ExpectedDocumentFactory implements ExpectedValueFactory {
+public class ExpectedDocumentFactory {
 
     /**
      * It return the value of the given statistical function.
@@ -54,7 +54,7 @@ public class ExpectedDocumentFactory implements ExpectedValueFactory {
      * @return the set of values that has to be stored within a {@code Dataset} {@code Item}
      * @see {@link DoubleValueCollector}
      **/
-    private List<? extends Object> getStatValue(STAT_TYPE statistic,
+    private List<? extends Object> getStatValue(StatType statistic,
             DoubleValueCollector[] collectors) {
         int len = collectors.length;
 
@@ -109,7 +109,7 @@ public class ExpectedDocumentFactory implements ExpectedValueFactory {
      * @return the value that has to be stored within a {@code Dataset} {@code Item}
      * @see {@link .DoubleValueCollector}
      **/
-    private Object getStatValue(STAT_TYPE statistic,
+    private Object getStatValue(StatType statistic,
             DoubleValueCollector collector) {
 
         switch (statistic) {
@@ -220,7 +220,6 @@ public class ExpectedDocumentFactory implements ExpectedValueFactory {
         });
     }
 
-    @Override
     public List<Document> produceExpectedData(ExpectedValue expectedValue) {
         switch (expectedValue.getExpectedType()) {
             case ARRAY:
