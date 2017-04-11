@@ -55,7 +55,9 @@ import org.radarcns.mock.MockProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/**
+ * MongoDB Sink connector e2e test
+ */
 public class MongoDBSinkEndToEndTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoDBSinkEndToEndTest.class);
