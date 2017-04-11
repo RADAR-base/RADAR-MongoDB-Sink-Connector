@@ -378,7 +378,7 @@ public class MongoDBSinkEndToEndTest {
      */
     public static Response makeRequest(String url) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder().
-                connectTimeout(30, TimeUnit.SECONDS).
+                connectTimeout(60, TimeUnit.SECONDS).
                 writeTimeout(30, TimeUnit.SECONDS).
                 readTimeout(30, TimeUnit.SECONDS).
                 build();
