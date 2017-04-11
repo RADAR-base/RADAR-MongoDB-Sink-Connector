@@ -150,19 +150,19 @@ public class ExpectedDocumentFactory {
 
             list.add(new Document("_id",
                     expectedValue.getUser() + "-" + expectedValue.getSource() + "-" + timestamp
-                            + "-" + end)
-                    .append("user", expectedValue.getUser())
-                    .append("source", expectedValue.getSource())
-                    .append("min", getStatValue(MINIMUM, doubleValueCollector))
-                    .append("max", getStatValue(MAXIMUM, doubleValueCollector))
-                    .append("sum", getStatValue(SUM, doubleValueCollector))
-                    .append("count", getStatValue(COUNT, doubleValueCollector))
-                    .append("avg", getStatValue(AVERAGE, doubleValueCollector))
-                    .append("quartile", extractQuartile((List<Double>) getStatValue(
-                            QUARTILES, doubleValueCollector)))
-                    .append("iqr", getStatValue(INTERQUARTILE_RANGE, doubleValueCollector))
-                    .append("start", new Date(timestamp))
-                    .append("end", new Date(end)));
+                            + "-" + end).
+                    append("user", expectedValue.getUser()).
+                    append("source", expectedValue.getSource()).
+                    append("min", getStatValue(MINIMUM, doubleValueCollector)).
+                    append("max", getStatValue(MAXIMUM, doubleValueCollector)).
+                    append("sum", getStatValue(SUM, doubleValueCollector)).
+                    append("count", getStatValue(COUNT, doubleValueCollector)).
+                    append("avg", getStatValue(AVERAGE, doubleValueCollector)).
+                    append("quartile", extractQuartile((List<Double>) getStatValue(
+                            QUARTILES, doubleValueCollector))).
+                    append("iqr", getStatValue(INTERQUARTILE_RANGE, doubleValueCollector)).
+                    append("start", new Date(timestamp)).
+                    append("end", new Date(end)));
         }
 
         return list;
@@ -183,21 +183,21 @@ public class ExpectedDocumentFactory {
 
             list.add(new Document("_id",
                     expectedValue.getUser() + "-" + expectedValue.getSource() + "-" + timestamp
-                            + "-" + end)
-                    .append("user", expectedValue.getUser())
-                    .append("source", expectedValue.getSource())
-                    .append("min", getStatValue(MINIMUM, doubleArrayCollector.getCollectors()))
-                    .append("max", getStatValue(MAXIMUM, doubleArrayCollector.getCollectors()))
-                    .append("sum", getStatValue(SUM, doubleArrayCollector.getCollectors()))
-                    .append("count", getStatValue(COUNT, doubleArrayCollector.getCollectors()))
-                    .append("avg", getStatValue(AVERAGE, doubleArrayCollector.getCollectors()))
-                    .append("quartile",
+                            + "-" + end).
+                    append("user", expectedValue.getUser()).
+                    append("source", expectedValue.getSource()).
+                    append("min", getStatValue(MINIMUM, doubleArrayCollector.getCollectors())).
+                    append("max", getStatValue(MAXIMUM, doubleArrayCollector.getCollectors())).
+                    append("sum", getStatValue(SUM, doubleArrayCollector.getCollectors())).
+                    append("count", getStatValue(COUNT, doubleArrayCollector.getCollectors())).
+                    append("avg", getStatValue(AVERAGE, doubleArrayCollector.getCollectors())).
+                    append("quartile",
                             extractAccelerationQuartile((List<List<Double>>) getStatValue(
-                                    QUARTILES, doubleArrayCollector.getCollectors())))
-                    .append("iqr", getStatValue(INTERQUARTILE_RANGE,
-                            doubleArrayCollector.getCollectors()))
-                    .append("start", new Date(timestamp))
-                    .append("end", new Date(end)));
+                                    QUARTILES, doubleArrayCollector.getCollectors()))).
+                    append("iqr", getStatValue(INTERQUARTILE_RANGE,
+                            doubleArrayCollector.getCollectors())).
+                    append("start", new Date(timestamp)).
+                    append("end", new Date(end)));
         }
 
         return list;

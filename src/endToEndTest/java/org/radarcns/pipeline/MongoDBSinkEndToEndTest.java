@@ -87,8 +87,8 @@ public class MongoDBSinkEndToEndTest {
 
         generateCsvInputFiles();
 
-        Map<MockDataConfig, ExpectedValue> expectedValue = MockAggregator
-                .getSimulations(getBasicMockConfig().getData());
+        Map<MockDataConfig, ExpectedValue> expectedValue = MockAggregator.
+                getSimulations(getBasicMockConfig().getData());
 
         Map<MockDataConfig, List<Document>> expectedDocument = produceExpectedDocument(
                 expectedValue);
@@ -109,8 +109,8 @@ public class MongoDBSinkEndToEndTest {
             Map<MockDataConfig, List<Document>> expectedDocument) {
         String collection_suffix = "_output";
         for (MockDataConfig key : expectedDocument.keySet()) {
-            FindIterable<Document> collection = hotstorage
-                    .getCollection(key.getTopic() + collection_suffix).find().sort(ascending(ID));
+            FindIterable<Document> collection = hotstorage.
+                    getCollection(key.getTopic() + collection_suffix).find().sort(ascending(ID));
             List<Document> expecetedDocs = expectedDocument.get(key);
             MongoCursor cursor = collection.iterator();
             int count = 0;
@@ -135,6 +135,7 @@ public class MongoDBSinkEndToEndTest {
                 break;
             default:
                 compareSingleItemDocument(expected, actual);
+                break;
         }
     }
 
@@ -157,6 +158,7 @@ public class MongoDBSinkEndToEndTest {
                     break;
                 default:
                     assertEquals((Double) expected.get(key), (Double) actual.get(key), DELTA);
+                    break;
             }
         }
 
@@ -235,8 +237,6 @@ public class MongoDBSinkEndToEndTest {
         hotstorage = client.getDatabase("hotstorage");
         try {
             hotstorage.runCommand(new Document("ping", 1));
-            assertTrue(true);
-
 
         } catch (Exception ex) {
             LOGGER.error("Error during MongoDB connection test", ex);
@@ -244,7 +244,6 @@ public class MongoDBSinkEndToEndTest {
             if (client != null) {
                 client.close();
             }
-            assertTrue(false);
         }
 
     }
@@ -271,8 +270,8 @@ public class MongoDBSinkEndToEndTest {
         assertEquals(testCase, expectedValue.size());
         Map<MockDataConfig, List<Document>> docMap = new HashMap<>();
         for (MockDataConfig key : expectedValue.keySet()) {
-            List<Document> documents = (List<Document>) expectedDocumentFactory
-                    .produceExpectedData(expectedValue.get(key));
+            List<Document> documents = (List<Document>) expectedDocumentFactory.
+                    produceExpectedData(expectedValue.get(key));
             docMap.put(key, documents);
         }
         return docMap;
@@ -282,8 +281,8 @@ public class MongoDBSinkEndToEndTest {
     private void generateCsvInputFiles() throws IOException {
         LOGGER.info("Generating CVS files ...");
         File parentFile = new File(
-                MongoDBSinkEndToEndTest.class.getClassLoader()
-                        .getResource(BASIC_MOCK_CONFIG_FILE).getFile()
+                MongoDBSinkEndToEndTest.class.getClassLoader().
+                        getResource(BASIC_MOCK_CONFIG_FILE).getFile()
         );
         for (MockDataConfig config : getBasicMockConfig().getData()) {
             CsvGenerator.generate(config, (long) 30, parentFile);
@@ -328,8 +327,8 @@ public class MongoDBSinkEndToEndTest {
                         config.getRestProxy().getUrlString() + "/topics");
                 if (response.code() == 200) {
                     String topics = response.body().string().toString();
-                    String[] topicArray = topics.substring(1, topics.length() - 1).replace("\"", "")
-                            .split(",");
+                    String[] topicArray = topics.substring(1, topics.length() - 1).
+                            replace("\"", "").split(",");
 
                     for (String topic : topicArray) {
                         if (expectedTopics.contains(topic)) {
@@ -358,8 +357,8 @@ public class MongoDBSinkEndToEndTest {
             try {
                 config = new YamlConfigLoader().load(
                         new File(
-                                MongoDBSinkEndToEndTest.class.getClassLoader()
-                                        .getResource(BASIC_MOCK_CONFIG_FILE).getFile()
+                                MongoDBSinkEndToEndTest.class.getClassLoader().
+                                        getResource(BASIC_MOCK_CONFIG_FILE).getFile()
                         ), BasicMockConfig.class);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -376,16 +375,16 @@ public class MongoDBSinkEndToEndTest {
      * @return HTTP Response
      */
     public static Response makeRequest(String url) throws IOException {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .build();
+        OkHttpClient client = new OkHttpClient.Builder().
+                connectTimeout(30, TimeUnit.SECONDS).
+                writeTimeout(30, TimeUnit.SECONDS).
+                readTimeout(30, TimeUnit.SECONDS).
+                build();
 
-        Request request = new Request.Builder()
-                .header("User-Agent", "Mozilla/5.0")
-                .url(url)
-                .build();
+        Request request = new Request.Builder().
+                header("User-Agent", "Mozilla/5.0").
+                url(url).
+                build();
 
         return client.newCall(request).execute();
     }
