@@ -199,6 +199,7 @@ public class MongoDBSinkEndToEndTest {
                 default:
                     assertAccelerometerDocuments((ArrayList) expected.get(key),
                             (Document) actual.get(key));
+                    break;
             }
         }
     }
@@ -364,7 +365,6 @@ public class MongoDBSinkEndToEndTest {
                         ), BasicMockConfig.class);
             } catch (IOException e) {
                 e.printStackTrace();
-                assertTrue(false);
             }
         }
         return config;
