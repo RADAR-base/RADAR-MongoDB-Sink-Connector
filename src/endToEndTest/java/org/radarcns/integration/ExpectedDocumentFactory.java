@@ -156,25 +156,39 @@ public class ExpectedDocumentFactory {
 
             list.add(new Document(ID,
                     expectedValue.getLastKey().getUserId()
-                        + "-" + expectedValue.getLastKey().getUserId()
+                        + "-" + expectedValue.getLastKey().getSourceId()
                         + "-" + timestamp + "-" + end)
                     .append(USER, expectedValue.getLastKey().getUserId())
-                    .append(SOURCE, expectedValue.getLastKey().getUserId())
-                    .append(MINIMUM.getParam(), getStatValue(MINIMUM, doubleArrayCollector))
-                    .append(MAXIMUM.getParam(), getStatValue(MAXIMUM, doubleArrayCollector))
-                    .append(SUM.getParam(), getStatValue(SUM, doubleArrayCollector))
-                    .append(COUNT.getParam(), getStatValue(COUNT, doubleArrayCollector))
-                    .append(AVERAGE.getParam(), getStatValue(AVERAGE, doubleArrayCollector))
+                    .append(SOURCE, expectedValue.getLastKey().getSourceId())
+                    .append(MINIMUM.getParam(), extractAccelerationValue(
+                            (List<Double>) getStatValue(MINIMUM, doubleArrayCollector)))
+                    .append(MAXIMUM.getParam(), extractAccelerationValue(
+                            (List<Double>) getStatValue(MAXIMUM, doubleArrayCollector)))
+                    .append(SUM.getParam(), extractAccelerationValue(
+                            (List<Double>) getStatValue(SUM, doubleArrayCollector)))
+                    .append(COUNT.getParam(), extractAccelerationValue(
+                            (List<Double>) getStatValue(COUNT, doubleArrayCollector)))
+                    .append(AVERAGE.getParam(), extractAccelerationValue(
+                            (List<Double>) getStatValue(AVERAGE, doubleArrayCollector)))
                     .append(QUARTILES.getParam(),
                         extractAccelerationQuartile((List<List<Double>>) getStatValue(
                             QUARTILES, doubleArrayCollector)))
-                    .append(INTERQUARTILE_RANGE.getParam(), getStatValue(INTERQUARTILE_RANGE,
-                        doubleArrayCollector))
+                    .append(INTERQUARTILE_RANGE.getParam(), extractAccelerationValue(
+                            (List<Double>) getStatValue(INTERQUARTILE_RANGE,
+                                doubleArrayCollector)))
                     .append(START, new Date(timestamp))
                     .append(END, new Date(end)));
         }
 
         return list;
+    }
+
+    private Document extractAccelerationValue(List<Double> statValue) {
+        Document quartile = new Document();
+        quartile.put(X_LABEL, statValue.get(0));
+        quartile.put(Y_LABEL, statValue.get(1));
+        quartile.put(Z_LABEL, statValue.get(2));
+        return quartile;
     }
 
     private Document extractAccelerationQuartile(List<List<Double>> statValue) {

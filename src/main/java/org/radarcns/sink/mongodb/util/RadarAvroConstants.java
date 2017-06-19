@@ -22,13 +22,13 @@ public class RadarAvroConstants {
     public static final String USER_ID = "userID";
     public static final String SOURCE_ID = "sourceID";
 
-    public static final String MIN = "MINIMUM";
-    public static final String MAX = "MAX";
+    public static final String MIN = "min";
+    public static final String MAX = "max";
     public static final String SUM = "sum";
-    public static final String COUNT = "COUNT";
-    public static final String AVG = "AVERAGE";
-    public static final String QUARTILE = "QUARTILES";
-    public static final String IQR = "INTERQUARTILE_RANGE";
+    public static final String COUNT = "count";
+    public static final String AVG = "avg";
+    public static final String QUARTILE = "quartile";
+    public static final String IQR = "iqr";
 
     public static final String START = "start";
     public static final String END = "end";

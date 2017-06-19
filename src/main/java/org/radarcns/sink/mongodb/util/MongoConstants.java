@@ -44,13 +44,13 @@ public class MongoConstants {
      *      that has to be used to compute the result.
      */
     public enum Stat {
-        AVERAGE("AVERAGE"),
-        COUNT("COUNT"),
-        INTERQUARTILE_RANGE("INTERQUARTILE_RANGE"),
-        MAXIMUM("MAX"),
-        MEDIAN("QUARTILES"),
-        MINIMUM("MINIMUM"),
-        QUARTILES("QUARTILES"),
+        AVERAGE("avg"),
+        COUNT("count"),
+        INTERQUARTILE_RANGE("iqr"),
+        MAXIMUM("max"),
+        MEDIAN("quartiles"),
+        MINIMUM("min"),
+        QUARTILES("quartiles"),
         SUM("sum");
 
         private final String param;

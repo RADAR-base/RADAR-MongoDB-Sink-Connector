@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.radarcns.pipeline;
+package org.radarcns;
 
 import static com.mongodb.client.model.Sorts.ascending;
 import static java.util.Arrays.asList;
@@ -82,7 +82,7 @@ public class EndToEndTest {
     private static final String SUFFIX = "_output";
 
     // Latency expressed in second
-    private static final long LATENCY = 60;
+    private static final long LATENCY = 120;
 
     private static final String MONGO_CONTAINER = "localhost";
     private static final String MONGO_PORT = "27017";
@@ -215,7 +215,6 @@ public class EndToEndTest {
     /**
      * Checks if a MongoDb Client can be instantiated.
      */
-    //TODO add modify file host to README to access hotstorage container.
     private void checkMongoDbConnection() {
         List<ServerAddress> servers = asList(new ServerAddress(
                 MONGO_CONTAINER.concat(":").concat(MONGO_PORT)));
@@ -243,7 +242,6 @@ public class EndToEndTest {
             FindIterable<Document> collection = hotstorage
                     .getCollection(sensor.getTopic().concat(SUFFIX)).find().sort(ascending(ID));
             List<Document> expecetedDocs = expectedDocument.get(sensor);
-
             MongoCursor cursor = collection.iterator();
 
             int count = 0;
@@ -260,6 +258,10 @@ public class EndToEndTest {
     }
 
     private void assertDocument(Document expected, Document actual, Double delta) {
+
+        LOGGER.info("Expected: {}", expected.toJson());
+        LOGGER.info("Actual: {}", actual.toJson());
+
         assertEquals(expected.keySet(), actual.keySet());
 
         for (String key : expected.keySet()) {
