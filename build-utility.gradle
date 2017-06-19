@@ -179,6 +179,19 @@ task optimiseNginx() {
             comment ? rowList.addLast("# $line") : rowList.addLast(line)
         }
 
+        def index = 0
+        for (def i = rowList.size() - 1 ; i >= 0; i--) {
+            def temp = rowList.remove(i).replace('#', '')
+            rowList.add(i, temp)
+
+            if (temp.contains('}')) {
+                index++
+                if (index == 2) {
+                    break
+                }
+            }
+        }
+
         PrintWriter writer = new PrintWriter(new File("${radarStackPath}/etc/nginx.conf"))
         rowList.each { row -> writer.println(row) }
         writer.close()
