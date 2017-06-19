@@ -243,7 +243,7 @@ task installRadarStack(type: Exec, dependsOn: validateCompose) {
 
     workingDir radarStackPath
     standardInput = System.in
-    commandLine sudoLinux + ['./install-radar-stack.sh', 'radar-mongodb-connector']
+    commandLine sudoLinux + ['./install-radar-stack.sh']
 }
 
 task listDockerProcesses(type: Exec) {
