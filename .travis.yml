@@ -1,50 +1,52 @@
 language: java
+
 jdk:
   - oraclejdk8
+
 sudo: required
 
 services:
   - docker
 
 env:
-  DOCKER_COMPOSE_VERSION: 1.9.0
+  DOCKER_COMPOSE_VERSION: 1.11.2
+
+addons:
+  hosts:
+    - hotstorage
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/3.*.*
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
 cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
 before_install:
-  - ./gradlew downloadDependencies
-  - mkdir -p "$HOME/bin"
-  - export PATH="$PATH:$HOME/bin"
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose"
-  - chmod +x "$HOME/bin/docker-compose"
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-engine
+  - docker --version
+  - mkdir -p "$HOME/bin";
+  - export PATH="$HOME/bin:$PATH";
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose";
+  - chmod +x "$HOME/bin/docker-compose";
+  - sudo $HOME/bin/docker-compose --version
 
 script:
-  - echo "END TO END TEST"
-  - ./gradlew setRadarEnvironmentForDocker
-  - cd src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack
-  - sudo ./install-radar-stack.sh
-  - sudo docker ps -a
-  - cd -
-  - ./gradlew endToEndTest
-  - cd src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack
-  - sudo docker-compose -f docker-compose.yml down
-  - cd -
+  - ./gradlew check
+  - ./gradlew -PdockerComposePath="$HOME/bin/docker-compose" endToEndTest
 
 after_script:
   - ./gradlew sendCoverageToCodacy
 
 deploy:
   provider: releases
-  api_key:
-    secure: ${GH_TOKEN}
+  api_key: ${GH_TOKEN}
   file_glob: true
-  file: build/libs/*.jar
+  file:
+    - "build/libs/*.jar"
   skip_cleanup: true
   on:
     tags: true

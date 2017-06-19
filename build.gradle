@@ -2,33 +2,96 @@ plugins {
     // Apply the java plugin to add support for Java
     id 'java'
     id 'idea'
-    id 'jacoco'
     id 'checkstyle'
     id 'pmd'
     id "com.jfrog.bintray" version "1.7.3"
     id 'maven-publish'
+    id 'jacoco'
 }
 
-version '0.1-alpha.1-SNAPSHOT'
+version '0.1-alpha.2'
 group = 'org.radarcns'
-ext.vcsUrl = 'https://github.com/RADAR-CNS/RADAR-MongoDB-Sink-Connector.git'
 
-targetCompatibility = '1.8'
-sourceCompatibility = '1.8'
+ext.githubRepoName = 'RADAR-CNS/RADAR-MongoDB-Sink-Connector'
+ext.githubUrl = 'https://github.com/' + githubRepoName + '.git'
+ext.issueUrl = 'https://github.com/' + githubRepoName + '/issues'
+ext.website = 'http://radar-cns.org'
 
-ext.radarCommonsVersion = '0.3-SNAPSHOT'
-ext.radarSchemaSdkVersion = '0.1'
-ext.mongoDbSinkVersion = 'v0.1-alpha.1'
-ext.junitVersion = '4.12'
-ext.codacyVersion = '1.0.10'
-ext.openCsvVersion = '3.9'
-ext.mathVersion = '3.0'
+ext.description = 'RADAR MongoDB Connector containing customised converter from AVRO to BSON Document.'
 
+//---------------------------------------------------------------------------//
+// Dependencies                                                              //
+//---------------------------------------------------------------------------//
+ext.pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution 'repo'
+        }
+    }
+    developers {
+        developer {
+            id 'nivemaham'
+            name 'Nivethika Mahasivam'
+            email 'nivethika@thehyve.nl'
+            organization 'The Hyve'
+        }
+        developer {
+            id 'blootsvoets'
+            name 'Joris Borgdorff'
+            email 'joris@thehyve.nl'
+            organization 'The Hyve'
+        }
+        developer {
+            id 'fnobilia'
+            name 'Francesco Nobilia'
+            email 'francesco.nobilia@kcl.ac.uk'
+            organization 'King\'s College London'
+        }
+    }
+    issueManagement {
+        system 'GitHub'
+        url githubUrl + '/issues'
+    }
+    organization {
+        name 'RADAR-CNS'
+        url website
+    }
+    scm {
+        connection 'scm:git:' + githubUrl
+        url githubUrl
+    }
+}
 
+idea {
+    module {
+        downloadSources = true
+    }
+}
 
 //---------------------------------------------------------------------------//
 // Sources and classpath configurations                                      //
 //---------------------------------------------------------------------------//
+repositories {
+    jcenter()
+    maven { url 'https://jitpack.io' }
+    maven { url 'http://packages.confluent.io/maven/' }
+    maven { url 'http://dl.bintray.com/typesafe/maven-releases' }
+    maven { url 'https://dl.bintray.com/radar-cns/org.radarcns' }
+
+    // For working with dev-branch commons
+    maven { url "${rootProject.projectDir}/libs" }
+}
+
+targetCompatibility = '1.8'
+sourceCompatibility = '1.8'
+
+ext.radarCommonsVersion = '0.4'
+ext.radarSchemasVersion = '0.1.1-alpha.1'
+ext.mongoDbSinkVersion = 'v0.1-alpha.1'
+ext.junitVersion = '4.12'
+ext.codacyVersion = '1.0.10'
 
 sourceSets {
     // Note that just declaring this sourceset creates two configurations.
@@ -36,6 +99,7 @@ sourceSets {
         java {
             compileClasspath += main.output
             runtimeClasspath += main.output
+            srcDir file('src/endToEndTest/java')
         }
         resources {
             srcDir 'src/endToEndTest/resources'
@@ -51,24 +115,16 @@ configurations {
 
 repositories {
 
-    // For working with dev-branch commons
-    maven { url "${rootProject.projectDir}/libs" }
-
-    jcenter()
-    maven { url 'http://packages.confluent.io/maven/' }
-    maven { url 'https://jitpack.io' }
-    maven { url 'http://dl.bintray.com/typesafe/maven-releases' }
 }
 
 dependencies {
-    compile group: 'org.radarcns', name: 'radar-commons', version: radarCommonsVersion
-    compile group: 'org.radarcns', name: 'radar-schemas-commons', version: radarSchemaSdkVersion
     compile group: "org.radarcns", name: 'kafka-connect-mongodb-sink', version: mongoDbSinkVersion
+    compile group: 'org.radarcns', name: 'radar-commons', version: radarCommonsVersion
+    compile group: 'org.radarcns', name: 'radar-schemas-commons', version: radarSchemasVersion
 
-    endToEndTestCompile  group: 'com.opencsv', name: 'opencsv', version: openCsvVersion
-    endToEndTestCompile group: 'org.apache.commons', name: 'commons-math3', version: mathVersion
-    endToEndTestCompile group: 'org.radarcns', name: 'radar-commons-testing', version: radarCommonsVersion
     testCompile group: 'junit', name: 'junit', version: junitVersion
+
+    endToEndTestCompile group: 'org.radarcns' , name: 'radar-commons-testing' , version: radarCommonsVersion
 
     codacy group: 'com.github.codacy', name: 'codacy-coverage-reporter', version: codacyVersion
 }
@@ -84,36 +140,19 @@ jar {
 }
 
 //---------------------------------------------------------------------------//
-// Style checking                                                            //
+// Import Script                                                             //
 //---------------------------------------------------------------------------//
+apply from: 'build-utility.gradle'
 
-checkstyle {
-    // codacy version
-    toolVersion '6.16'
-    ignoreFailures false
-
-    // ignore tests
-    sourceSets = [sourceSets.main]
-}
-
-pmd {
-    // codacy version
-    toolVersion = '5.5.2'
-    ignoreFailures = false
-
-    // ignore tests
-    sourceSets = [sourceSets.main]
-
-    consoleOutput = true
-
-    ruleSets = []
-    ruleSetFiles = files("config/pmd/ruleset.xml")
-}
+//---------------------------------------------------------------------------//
+// Clean definition                                                          //
+//---------------------------------------------------------------------------//
+clean.dependsOn cleanRadarStack
+clean.dependsOn removeJar
 
 //---------------------------------------------------------------------------//
 // Testing                                                                   //
 //---------------------------------------------------------------------------//
-
 tasks.matching {it instanceof Test}.all {
     def stdout = new LinkedList<String>()
     beforeTest { TestDescriptor td ->
@@ -150,47 +189,53 @@ tasks.matching {it instanceof Test}.all {
     }
 }
 
-//---------------------------------------------------------------------------//
-// End to End Test                                                           //
-//---------------------------------------------------------------------------//
-task endToEndTest(type: Test){
-    description = "Run integration tests (located in src/endToEndTest/...)."
-    testClassesDir project.sourceSets.endToEndTest.output.classesDir
-    classpath = project.sourceSets.endToEndTest.runtimeClasspath
-    // This is not needed, but I like to see which tests have run
+test {
     testLogging {
+        // Show that tests are run in the command-line output
         events "skipped", "failed"
     }
 }
 
-task setRadarEnvironmentForDocker {
-    doLast {
-        File volumes = new File("src/endToEndTest/radarDocker/volumes")
-        volumes.mkdir()
-        String volumePath = volumes.getAbsolutePath()
 
-        def fileEnv = new File("src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack/.env")
-        fileEnv.text = fileEnv.text.replace('/usr/local/var/lib/docker', volumePath)
-        fileEnv.text = fileEnv.text.replace('HOTSTORAGE_USERNAME=<mongodb-user>', 'HOTSTORAGE_USERNAME=restapi')
-        fileEnv.text = fileEnv.text.replace('HOTSTORAGE_PASSWORD=XXXXXXXX', 'HOTSTORAGE_PASSWORD=radarcns')
-        fileEnv.text = fileEnv.text.replace('HOTSTORAGE_NAME=<mongodb-database>', 'HOTSTORAGE_NAME=hotstorage')
+task endToEndTest(type: Test, dependsOn: ['installRadarStack', 'listDockerProcesses']) {
+    description = "Run end to end tests (located in src/endToEndTest/...)."
 
-        def fileInstall = new File("src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack/install-radar-stack.sh")
-        fileInstall.text = fileInstall.text.replace('/usr/local/var/lib/docker', volumePath)
+    testClassesDir = sourceSets.endToEndTest.output.classesDir
+    classpath = sourceSets.endToEndTest.runtimeClasspath
 
-        new File("src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack/smtp.env.template").renameTo("src/endToEndTest/radarDocker/dcompose-stack/radar-cp-hadoop-stack/smtp.env")
+    testLogging {
+        events "failed"
+
+        debug {
+            events "started", "skipped", "failed"
+            exceptionFormat "full"
+        }
     }
+
+    testLogging.showStandardStreams = true
+}
+endToEndTest.finalizedBy 'stopRadarStack'
+
+//---------------------------------------------------------------------------//
+// Style checking                                                            //
+//---------------------------------------------------------------------------//
+checkstyle {
+    // codacy version
+    toolVersion '6.16'
+    ignoreFailures false
+
+    configFile = rootProject.file('config/checkstyle/checkstyle.xml')
 }
 
+pmd {
+    // pmd version
+    toolVersion = '5.5.2'
+    ignoreFailures = false
 
+    consoleOutput = true
 
-//---------------------------------------------------------------------------//
-// Build system metadata                                                     //
-//---------------------------------------------------------------------------//
-idea {
-    module {
-        downloadSources = true
-    }
+    ruleSets = []
+    ruleSetFiles = files(rootProject.file("config/pmd/ruleset.xml"))
 }
 
 jacocoTestReport {
@@ -215,38 +260,36 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
     args = ['-l', 'Java', '-r', "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"]
 }
 
-def pomConfig = {
-    licenses {
-        license {
-            name "The Apache Software License, Version 2.0"
-            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-            distribution rootProject.name
-        }
-    }
-    developers {
-        developer {
-            id "radar-cns"
-            name "Nivethika"
-            email "nivethika@thehyve.nl"
-        }
-    }
+//---------------------------------------------------------------------------//
+// Build system metadata                                                     //
+//---------------------------------------------------------------------------//
+
+ext.sharedManifest = manifest {
+    attributes("Implementation-Title": rootProject.name,
+            "Implementation-Version": version)
+}
+
+jar {
+    manifest.from sharedManifest
 }
 // custom tasks for creating source/javadoc jars
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
-    from sourceSets.main.output
+    from sourceSets.main.allSource
+    manifest.from sharedManifest
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
+    manifest.from sharedManifest
 }
 
 // add javadoc/source jar tasks as artifacts
 artifacts {
-    archives sourcesJar, javadocJar
+    archives javadocJar
+    archives sourcesJar
 }
-
 
 publishing {
     publications {
@@ -254,42 +297,44 @@ publishing {
             from components.java
             artifact sourcesJar
             artifact javadocJar
-            groupId 'org.radarcns'
-            artifactId 'radar-mongodb-sink-connector'
+            groupId project.group
+            artifactId rootProject.name
             version project.version
             pom.withXml {
                 def root = asNode()
-                root.appendNode('description', 'A MongoDB Sink connector for RADAR-CNS platform.')
+                root.appendNode('description', description)
                 root.appendNode('name', rootProject.name)
-                root.appendNode('url', vcsUrl)
+                root.appendNode('url', githubUrl)
                 root.children().last() + pomConfig
             }
         }
     }
 }
 
-
-
 bintray {
-    user = System.getenv('BINTRAY_USER')? System.getenv('BINTRAY_USER') : project.property('bintrayUser')
-    key = System.getenv('BINTRAY_API_KEY') ? System.getenv('BINTRAY_API_KEY') : project.property('bintrayApiKey')
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
     override = false
     publications = ['RadarPublication']
     pkg {
         repo = project.group
         name = rootProject.name
         userOrg = 'radar-cns'
+        desc = description
         licenses = ['Apache-2.0']
-        vcsUrl = vcsUrl
+        websiteUrl = website
+        issueTrackerUrl = issueUrl
+        vcsUrl = githubUrl
+        githubRepo = githubRepoName
+        githubReleaseNotesFile = 'README.md'
         version {
             name = project.version
-            desc = 'RADAR-MongoDb-Sink-Connector: Initial release'
+            desc = description
             vcsTag = System.getenv('TRAVIS_TAG')
-            released  = new Date()
+            released = new Date()
         }
     }
 }
-
 
 task wrapper(type: Wrapper) {
     gradleVersion = '3.4.1'

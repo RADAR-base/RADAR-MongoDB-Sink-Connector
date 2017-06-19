@@ -20,6 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.radarcns.serialization.RecordConverter;
 import org.radarcns.serialization.RecordConverterFactory;
+import org.radarcns.sink.mongodb.converter.AccelerationCollectorConverter;
+import org.radarcns.sink.mongodb.converter.DoubleArrayCollectorConverter;
+import org.radarcns.sink.mongodb.converter.RecordCountConverter;
+import org.radarcns.sink.mongodb.converter.ServerStatusConverter;
+import org.radarcns.sink.mongodb.converter.UptimeStatusConverter;
 
 /**
  * Extended RecordConverterFactory to allow customized RecordConverter class that are needed
@@ -34,12 +39,11 @@ public class RecordConverterFactoryRadar extends RecordConverterFactory {
     protected List<RecordConverter> genericConverters() {
         List<RecordConverter> recordConverters = new ArrayList<RecordConverter>();
         recordConverters.addAll(super.genericConverters());
-        recordConverters.add(new AggregatedAccelerationRecordConverter());
-        recordConverters.add(new DoubleAggregatedRecordConverter());
-        recordConverters.add(new BatteryLevelRecordConverter());
-        recordConverters.add(new CountsStatusRecordConverter());
-        recordConverters.add(new ServerStatusRecordConverter());
-        recordConverters.add(new UptimeStatusRecordConverter());
+        recordConverters.add(new AccelerationCollectorConverter());
+        recordConverters.add(new DoubleArrayCollectorConverter());
+        recordConverters.add(new RecordCountConverter());
+        recordConverters.add(new ServerStatusConverter());
+        recordConverters.add(new UptimeStatusConverter());
         return recordConverters;
     }
 

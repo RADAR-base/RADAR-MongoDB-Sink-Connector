@@ -1,5 +1,9 @@
 package org.radarcns.sink.mongodb.util;
 
+import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SEPARATOR;
+import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SOURCE_ID;
+import static org.radarcns.sink.mongodb.util.RadarAvroConstants.USER_ID;
+
 import org.apache.kafka.connect.data.Struct;
 import org.bson.BsonDateTime;
 
@@ -36,6 +40,6 @@ public final class Converter {
      * @return converted key string
      */
     public static String measurementKeyToMongoDbKey(Struct key) {
-        return key.get("userId") + "-" + key.get("sourceId");
+        return key.get(USER_ID) + SEPARATOR + key.get(SOURCE_ID);
     }
 }

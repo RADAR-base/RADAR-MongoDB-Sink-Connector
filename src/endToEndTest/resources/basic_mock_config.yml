@@ -1,26 +1,24 @@
-#================================ Kafka ================================#
-#List of Kafka brokers
-broker:
-    - host: localhost
-      port: 9092
-
-#=========================== Schema Registry ===========================#
+#=========================== Schema Registry ============================#
 #List of Schema Registry instances
 schema_registry:
-    host: localhost
-    port: 8081
-    protocol: http
-#=========================== Rest Proxy  ===============================#
+  protocol: https
+  host: localhost
+  path: /schema/
+  unsafe: true
+#============================ Rest Proxy ================================#
 # if the producer_mode is rest, you must provide rest_proxy values
 rest_proxy:
-    host: localhost
-    port: 8082
-    protocol: http
+  protocol: https
+  host: localhost
+  path: /kafka/
+  unsafe: true
 
-#Possible value are direct or rest
+#=============================== Test ===================================#
+# time duration that mock data has to cover expressed in milliseconds.
+duration_millis: 60000
+
+#Possible value are direct, rest
 producer_mode: rest
-
-#number_of_devices: 1
 
 data:
   - topic: android_empatica_e4_acceleration
@@ -29,35 +27,58 @@ data:
     file: accelerometer.csv
     key_schema: org.radarcns.key.MeasurementKey
     value_schema: org.radarcns.empatica.EmpaticaE4Acceleration
-    assert_header: "x, y, z"
+    value_fields: [x, y, z]
+    minimum: -2.0
+    maximum: 2.0
+    maximum_difference: 1e-10
   - topic: android_empatica_e4_battery_level
-    sensor: BATTERY_LEVEL
+    sensor: BATTERY
     frequency: 1.0
     file: battery.csv
     key_schema: org.radarcns.key.MeasurementKey
     value_schema: org.radarcns.empatica.EmpaticaE4BatteryLevel
-    assert_header: "batteryLevel"
-#  - topic: android_empatica_e4_blood_volume_pulse
-#    sensor: BLOOD_VOLUME_PULSE
-#    frequency: 64.0
-#    file: blood_volume_pulse.csv
-#    key_schema: org.radarcns.key.MeasurementKey
-#    value_schema: org.radarcns.empatica.EmpaticaE4BloodVolumePulse
-#  - topic: android_empatica_e4_electrodermal_activity
-#    sensor: ELECTRODERMAL_ACTIVITY
-#    frequency: 4.0
-#    file: electrodermal_activity.csv
-#    key_schema: org.radarcns.key.MeasurementKey
-#    value_schema: org.radarcns.empatica.EmpaticaE4ElectroDermalActivity
-#  - topic: android_empatica_e4_inter_beat_interval
-#    sensor: INTER_BEAT_INTERVAL
-#    frequency: 1.0
-#    file: inter_beat_interval.csv
-#    key_schema: org.radarcns.key.MeasurementKey
-#    value_schema: org.radarcns.empatica.EmpaticaE4InterBeatInterval
-#  - topic: android_empatica_e4_temperature
-#    sensor: THERMOMETER
-#    frequency: 4.0
-#    file: thermometer.csv
-#    key_schema: org.radarcns.key.MeasurementKey
-#    value_schema: org.radarcns.empatica.EmpaticaE4Temperature
+    value_fields: [batteryLevel]
+    minimum: 0
+    maximum: 1
+    maximum_difference: 1e-10
+  - topic: android_empatica_e4_blood_volume_pulse
+    frequency: 64.0
+    sensor: BLOOD_VOLUME_PULSE
+    file: blood_volume_pulse.csv
+    key_schema: org.radarcns.key.MeasurementKey
+    value_schema: org.radarcns.empatica.EmpaticaE4BloodVolumePulse
+    value_fields: [bloodVolumePulse]
+    minimum: -200
+    maximum: 200
+    maximum_difference: 1e-10
+  - topic: android_empatica_e4_electrodermal_activity
+    frequency: 4.0
+    sensor: ELECTRODERMAL_ACTIVITY
+    file: electrodermal_activity.csv
+    key_schema: org.radarcns.key.MeasurementKey
+    value_schema: org.radarcns.empatica.EmpaticaE4ElectroDermalActivity
+    value_fields: [electroDermalActivity]
+    minimum: 0.01
+    maximum: 0.05
+    maximum_difference: 1e-10
+  - topic: android_empatica_e4_inter_beat_interval
+    frequency: 1.0
+    sensor: INTER_BEAT_INTERVAL
+    file: inter_beat_interval.csv
+    key_schema: org.radarcns.key.MeasurementKey
+    value_schema: org.radarcns.empatica.EmpaticaE4InterBeatInterval
+    value_fields: [interBeatInterval]
+    minimum: 0.5
+    maximum: 1.1
+    maximum_difference: 1e-10
+  - topic: android_empatica_e4_temperature
+    frequency: 4.0
+    sensor: THERMOMETER
+    file: thermometer.csv
+    key_schema: org.radarcns.key.MeasurementKey
+    value_schema: org.radarcns.empatica.EmpaticaE4Temperature
+    value_fields: [temperature]
+    minimum: 20
+    maximum: 55
+    maximum_difference: 1e-10
+
