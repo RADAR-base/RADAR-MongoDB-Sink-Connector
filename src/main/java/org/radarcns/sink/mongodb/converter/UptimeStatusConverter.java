@@ -66,10 +66,10 @@ public class UptimeStatusConverter implements RecordConverter {
         Struct key = (Struct) sinkRecord.key();
         Struct value = (Struct) sinkRecord.value();
 
-        return new Document(ID, Converter.measurementKeyToMongoDbKey(key))
-                .append(USER, key.getString(USER_ID))
-                .append(SOURCE, key.getString(SOURCE_ID))
-                .append(APPLICATION_UPTIME, value.getFloat64(UPTIME))
-                .append(TIMESTAMP, Converter.toDateTime(value.get(TIME_RECEIVED)));
+        return new Document(ID, Converter.measurementKeyToMongoDbKey(key)).append(
+                USER, key.getString(USER_ID)).append(
+                SOURCE, key.getString(SOURCE_ID)).append(
+                APPLICATION_UPTIME, value.getFloat64(UPTIME)).append(
+                TIMESTAMP, Converter.toDateTime(value.get(TIME_RECEIVED)));
     }
 }

@@ -61,32 +61,31 @@ public class AccelerationCollectorConverter implements RecordConverter {
         Struct key = (Struct) record.key();
         Struct value = (Struct) record.value();
 
-        return new Document(ID, Utility.intervalKeyToMongoKey(key))
-                .append(USER, key.getString(USER_ID))
-                .append(SOURCE, key.getString(SOURCE_ID))
-                .append(Stat.MINIMUM.getParam(), accCompToDoc(value.getArray(MIN)))
-                .append(Stat.MAXIMUM.getParam(), accCompToDoc(value.getArray(MAX)))
-                .append(Stat.SUM.getParam(), accCompToDoc(value.getArray(SUM)))
-                .append(Stat.COUNT.getParam(), accCompToDoc(value.getArray(COUNT)))
-                .append(Stat.AVERAGE.getParam(), accCompToDoc(value.getArray(AVG)))
-                .append(Stat.QUARTILES.getParam(),
-                        accQuartileToDoc(value.getArray(QUARTILE)))
-                .append(Stat.INTERQUARTILE_RANGE.getParam(), accCompToDoc(value.getArray(IQR)))
-                .append(MongoConstants.START,
-                        new BsonDateTime(key.getInt64(RadarAvroConstants.START)))
-                .append(MongoConstants.END,
+        return new Document(ID, Utility.intervalKeyToMongoKey(key)).append(
+                USER, key.getString(USER_ID)).append(
+                SOURCE, key.getString(SOURCE_ID)).append(
+                Stat.MINIMUM.getParam(), accCompToDoc(value.getArray(MIN))).append(
+                Stat.MAXIMUM.getParam(), accCompToDoc(value.getArray(MAX))).append(
+                Stat.SUM.getParam(), accCompToDoc(value.getArray(SUM))).append(
+                Stat.COUNT.getParam(), accCompToDoc(value.getArray(COUNT))).append(
+                Stat.AVERAGE.getParam(), accCompToDoc(value.getArray(AVG))).append(
+                Stat.QUARTILES.getParam(), accQuartileToDoc(value.getArray(QUARTILE))).append(
+                Stat.INTERQUARTILE_RANGE.getParam(), accCompToDoc(value.getArray(IQR))).append(
+                MongoConstants.START,
+                        new BsonDateTime(key.getInt64(RadarAvroConstants.START))).append(
+                MongoConstants.END,
                         new BsonDateTime(key.getInt64(RadarAvroConstants.END)));
     }
 
     private static Document accCompToDoc(List<Double> component) {
-        return new Document(X_LABEL, component.get(0))
-                .append(Y_LABEL, component.get(1))
-                .append(Z_LABEL, component.get(2));
+        return new Document(X_LABEL, component.get(0)).append(
+                Y_LABEL, component.get(1)).append(
+                Z_LABEL, component.get(2));
     }
 
     private static Document accQuartileToDoc(List<List<Double>> list) {
-        return new Document(X_LABEL, Utility.extractQuartile(list.get(0)))
-                .append(Y_LABEL, Utility.extractQuartile(list.get(1)))
-                .append(Z_LABEL, Utility.extractQuartile(list.get(2)));
+        return new Document(X_LABEL, Utility.extractQuartile(list.get(0))).append(
+                Y_LABEL, Utility.extractQuartile(list.get(1))).append(
+                Z_LABEL, Utility.extractQuartile(list.get(2)));
     }
 }

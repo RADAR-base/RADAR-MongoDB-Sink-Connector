@@ -56,19 +56,19 @@ public class DoubleArrayCollectorConverter implements RecordConverter {
         Struct key = (Struct) record.key();
         Struct value = (Struct) record.value();
 
-        return new Document(ID, Utility.intervalKeyToMongoKey(key))
-                .append(USER, key.getString(USER_ID))
-                .append(SOURCE, key.getString(SOURCE_ID))
-                .append(Stat.MINIMUM.getParam(), new BsonDouble(value.getFloat64(MIN)))
-                .append(Stat.MAXIMUM.getParam(), new BsonDouble(value.getFloat64(MAX)))
-                .append(Stat.SUM.getParam(), new BsonDouble(value.getFloat64(SUM)))
-                .append(Stat.COUNT.getParam(), new BsonDouble(value.getFloat64(COUNT)))
-                .append(Stat.AVERAGE.getParam(), new BsonDouble(value.getFloat64(AVG)))
-                .append(Stat.QUARTILES.getParam(),
-                            Utility.extractQuartile(value.getArray(QUARTILE)))
-                .append(Stat.INTERQUARTILE_RANGE.getParam(), new BsonDouble(value.getFloat64(IQR)))
-                .append(MongoConstants.START,
-                        new BsonDateTime(key.getInt64(RadarAvroConstants.START)))
-                .append(MongoConstants.END, new BsonDateTime(key.getInt64(RadarAvroConstants.END)));
+        return new Document(ID, Utility.intervalKeyToMongoKey(key)).append(
+                USER, key.getString(USER_ID)).append(
+                SOURCE, key.getString(SOURCE_ID)).append(
+                Stat.MINIMUM.getParam(), new BsonDouble(value.getFloat64(MIN))).append(
+                Stat.MAXIMUM.getParam(), new BsonDouble(value.getFloat64(MAX))).append(
+                Stat.SUM.getParam(), new BsonDouble(value.getFloat64(SUM))).append(
+                Stat.COUNT.getParam(), new BsonDouble(value.getFloat64(COUNT))).append(
+                Stat.AVERAGE.getParam(), new BsonDouble(value.getFloat64(AVG))).append(
+                Stat.QUARTILES.getParam(),
+                        Utility.extractQuartile(value.getArray(QUARTILE))).append(
+                Stat.INTERQUARTILE_RANGE.getParam(), new BsonDouble(value.getFloat64(IQR))).append(
+                MongoConstants.START,
+                        new BsonDateTime(key.getInt64(RadarAvroConstants.START))).append(
+                MongoConstants.END, new BsonDateTime(key.getInt64(RadarAvroConstants.END)));
     }
 }

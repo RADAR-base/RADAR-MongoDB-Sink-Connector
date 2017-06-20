@@ -70,7 +70,7 @@ public class EndToEndTest {
 
     private final ExpectedDocumentFactory expectedDocumentFactory = new ExpectedDocumentFactory();
 
-    private static final String BASIC_MOCK_CONFIG_FILE = "basic_mock_config.yml";
+    private static final String CONFIG_FILE = "basic_mock_config.yml";
 
     //TODO add it to BasicMockConfig. It is used also in the REST-API project.
     private static final long DURATION = 60000;
@@ -96,8 +96,7 @@ public class EndToEndTest {
      */
     @BeforeClass
     public static void setUpClass() throws IOException, InterruptedException {
-        URL configResource = EndToEndTest.class.getClassLoader()
-                .getResource(BASIC_MOCK_CONFIG_FILE);
+        URL configResource = EndToEndTest.class.getClassLoader().getResource(CONFIG_FILE);
         assertNotNull(configResource);
         File configFile = new File(configResource.getFile());
         config = new YamlConfigLoader().load(configFile, BasicMockConfig.class);
@@ -239,21 +238,21 @@ public class EndToEndTest {
 
     private void fetchMongoDb(Map<MockDataConfig, List<Document>> expectedDocument) {
         for (MockDataConfig sensor : expectedDocument.keySet()) {
-            FindIterable<Document> collection = hotstorage
-                    .getCollection(sensor.getTopic().concat(SUFFIX)).find().sort(ascending(ID));
-            List<Document> expecetedDocs = expectedDocument.get(sensor);
+            FindIterable<Document> collection = hotstorage.getCollection(
+                    sensor.getTopic().concat(SUFFIX)).find().sort(ascending(ID));
+            List<Document> expectedDocs = expectedDocument.get(sensor);
             MongoCursor cursor = collection.iterator();
 
             int count = 0;
 
             while (cursor.hasNext()) {
                 Document actualDoc = (Document) cursor.next();
-                Document expectedDoc = expecetedDocs.get(count);
+                Document expectedDoc = expectedDocs.get(count);
                 assertDocument(expectedDoc, actualDoc, sensor.getMaximumDifference());
                 count++;
             }
 
-            assertEquals(expecetedDocs.size(), count);
+            assertEquals(expectedDocs.size(), count);
         }
     }
 

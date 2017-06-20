@@ -68,12 +68,12 @@ public class ServerStatusConverter implements RecordConverter {
         Struct key = (Struct) sinkRecord.key();
         Struct value = (Struct) sinkRecord.value();
 
-        return new Document(ID, Converter.measurementKeyToMongoDbKey(key))
-                .append(USER, key.getString(USER_ID))
-                .append(SOURCE, key.getString(SOURCE_ID))
-                .append(MongoConstants.SERVER_STATUS,
-                        value.getString(RadarAvroConstants.SERVER_STATUS))
-                .append(CLIENT_IP, value.getString(IP_ADDRESS))
-                .append(TIMESTAMP, Converter.toDateTime(value.get(TIME_RECEIVED)));
+        return new Document(ID, Converter.measurementKeyToMongoDbKey(key)).append(
+                USER, key.getString(USER_ID)).append(
+                SOURCE, key.getString(SOURCE_ID)).append(
+                MongoConstants.SERVER_STATUS,
+                        value.getString(RadarAvroConstants.SERVER_STATUS)).append(
+                CLIENT_IP, value.getString(IP_ADDRESS)).append(
+                TIMESTAMP, Converter.toDateTime(value.get(TIME_RECEIVED)));
     }
 }
