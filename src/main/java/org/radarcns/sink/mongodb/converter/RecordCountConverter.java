@@ -1,5 +1,7 @@
+package org.radarcns.sink.mongodb.converter;
+
 /*
- * Copyright 2017 Kings College London and The Hyve
+ * Copyright 2016 King's College London and The Hyve
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,8 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.radarcns.sink.mongodb.converter;
 
 import static org.radarcns.sink.mongodb.util.MongoConstants.ID;
 import static org.radarcns.sink.mongodb.util.MongoConstants.SOURCE;
@@ -38,15 +38,16 @@ import org.radarcns.sink.mongodb.util.MongoConstants;
 import org.radarcns.sink.mongodb.util.RadarAvroConstants;
 
 /**
- * RecordConverter to convert a StatusRecordCounts record to a MongoDB Document.
+ * {@link RecordConverter} to convert a {@link ApplicationRecordCounts} record to Bson Document.
  */
 public class RecordCountConverter implements RecordConverter {
 
     /**
-     * Returns the list of supported schemas, which behaves as the id to select suitable
-     * RecordConverter for a SinkRecord.
+     * Returns a {@code Collection<String>} reporting schema names supported by this converter.
+     *      These names behaves as the key for selecting the suitable {@link RecordConverter} for
+     *      a {@link SinkRecord}.
      *
-     * @return a list of supported Schemas
+     * @return a {@code Collection<String>} containing the supported Avro schema names
      */
     @Override
     public Collection<String> supportedSchemaNames() {
@@ -55,10 +56,10 @@ public class RecordCountConverter implements RecordConverter {
     }
 
     /**
-     * Converts a ServerStatus SinkRecord into a MongoDB Document.
+     * Converts the given {@link SinkRecord} into a custom {@link Document}.
      *
-     * @param sinkRecord record to be converted
-     * @return converted MongoDB Document to write
+     * @param sinkRecord {@link SinkRecord} to be converted
+     * @return a {@link Document} representing the input {@link SinkRecord}
      */
     @Override
     public Document convert(SinkRecord sinkRecord) throws DataException {

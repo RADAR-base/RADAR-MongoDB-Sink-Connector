@@ -87,11 +87,12 @@ repositories {
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
+ext.codacyVersion = '1.0.10'
+ext.junitVersion = '4.12'
+ext.mongoDbSinkVersion = 'v0.1-alpha.1'
 ext.radarCommonsVersion = '0.4'
 ext.radarSchemasVersion = '0.1.1-alpha.1'
-ext.mongoDbSinkVersion = 'v0.1-alpha.1'
-ext.junitVersion = '4.12'
-ext.codacyVersion = '1.0.10'
+ext.reflectionVersion = '0.9.11'
 
 sourceSets {
     // Note that just declaring this sourceset creates two configurations.
@@ -123,6 +124,7 @@ dependencies {
     compile group: 'org.radarcns', name: 'radar-schemas-commons', version: radarSchemasVersion
 
     testCompile group: 'junit', name: 'junit', version: junitVersion
+    testCompile group: 'org.reflections', name: 'reflections', version: reflectionVersion
 
     endToEndTestCompile group: 'org.radarcns' , name: 'radar-commons-testing' , version: radarCommonsVersion
 

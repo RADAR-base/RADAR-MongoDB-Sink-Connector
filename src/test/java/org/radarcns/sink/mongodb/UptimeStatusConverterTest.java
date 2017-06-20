@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.radarcns.sink.mongodb.util.MongoConstants.APPLICATION_UPTIME;
 import static org.radarcns.sink.mongodb.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.mongodb.util.MongoConstants.TIMESTAMP;
 import static org.radarcns.sink.mongodb.util.MongoConstants.USER;
@@ -36,19 +37,19 @@ import org.apache.kafka.connect.sink.SinkRecord;
 import org.bson.Document;
 import org.junit.Before;
 import org.junit.Test;
-import org.radarcns.application.ApplicationRecordCounts;
+import org.radarcns.application.ApplicationUptime;
 import org.radarcns.key.MeasurementKey;
-import org.radarcns.sink.mongodb.converter.RecordCountConverter;
-import org.radarcns.sink.mongodb.util.MongoConstants;
+import org.radarcns.sink.mongodb.converter.UptimeStatusConverter;
 import org.radarcns.sink.mongodb.util.RadarAvroConstants;
 
-public class RecordCountConverterTest {
+public class UptimeStatusConverterTest {
 
-    private RecordCountConverter converter;
+    private UptimeStatusConverter converter;
+    private static final Double UPTIME = 1000.00;
 
     @Before
     public void setUp() {
-        this.converter = new RecordCountConverter();
+        this.converter = new UptimeStatusConverter();
     }
 
     @Test
@@ -56,7 +57,7 @@ public class RecordCountConverterTest {
         Collection<String> values = this.converter.supportedSchemaNames();
         assertEquals(values.size(), 1, 0);
         assertEquals(MeasurementKey.class.getCanonicalName() + "-"
-                + ApplicationRecordCounts.class.getCanonicalName(), values.toArray()[0]);
+                + ApplicationUptime.class.getCanonicalName(), values.toArray()[0]);
     }
 
     @Test
@@ -77,15 +78,11 @@ public class RecordCountConverterTest {
         Schema valueSchema = SchemaBuilder.struct().field(
                 timeField, Schema.FLOAT64_SCHEMA).field(
                 TIME_RECEIVED, Schema.FLOAT64_SCHEMA).field(
-                RadarAvroConstants.RECORDS_CACHED, Schema.INT32_SCHEMA).field(
-                RadarAvroConstants.RECORDS_SENT, Schema.INT32_SCHEMA).field(
-                RadarAvroConstants.RECORDS_UNSENT, Schema.INT32_SCHEMA).build();
+                RadarAvroConstants.UPTIME, Schema.FLOAT64_SCHEMA).build();
         Struct valueStruct = new Struct(valueSchema);
         valueStruct.put(timeField, time.doubleValue() / 1000d);
         valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);
-        valueStruct.put(RadarAvroConstants.RECORDS_CACHED, 10);
-        valueStruct.put(RadarAvroConstants.RECORDS_SENT, 100);
-        valueStruct.put(RadarAvroConstants.RECORDS_UNSENT, 1000);
+        valueStruct.put(RadarAvroConstants.UPTIME, UPTIME);
 
         SinkRecord record = new SinkRecord("mine", 0, keySchema,
                 keyStruct, valueSchema, valueStruct, 0);
@@ -100,14 +97,8 @@ public class RecordCountConverterTest {
         assertTrue(document.get(SOURCE) instanceof String);
         assertEquals(source, document.get(SOURCE));
 
-        assertTrue(document.get(MongoConstants.RECORDS_CACHED) instanceof Integer);
-        assertEquals(10, document.get(MongoConstants.RECORDS_CACHED));
-
-        assertTrue(document.get(MongoConstants.RECORDS_SENT) instanceof Integer);
-        assertEquals(100, document.get(MongoConstants.RECORDS_SENT));
-
-        assertTrue(document.get(MongoConstants.RECORDS_UNSENT) instanceof Integer);
-        assertEquals(1000, document.get(MongoConstants.RECORDS_UNSENT));
+        assertTrue(document.get(APPLICATION_UPTIME) instanceof Double);
+        assertEquals(UPTIME, document.getDouble(APPLICATION_UPTIME), 0);
 
         assertTrue(document.get(TIMESTAMP) instanceof Date);
         assertEquals(time, document.getDate(TIMESTAMP).getTime(), 0);

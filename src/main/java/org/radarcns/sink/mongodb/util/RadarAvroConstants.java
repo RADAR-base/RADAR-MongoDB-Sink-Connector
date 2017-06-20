@@ -15,7 +15,13 @@ package org.radarcns.sink.mongodb.util;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class RadarAvroConstants {
+
+import org.apache.kafka.connect.sink.SinkRecord;
+
+/**
+ * Set of constants used to extract data from {@link SinkRecord}.
+ */
+public final class RadarAvroConstants {
 
     public static final String SEPARATOR = "-";
 
@@ -43,4 +49,9 @@ public class RadarAvroConstants {
     public static final String UPTIME = "uptime";
 
     public static final String TIME_RECEIVED = "timeReceived";
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private RadarAvroConstants() {}
 }

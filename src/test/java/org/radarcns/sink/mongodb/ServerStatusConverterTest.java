@@ -36,19 +36,23 @@ import org.apache.kafka.connect.sink.SinkRecord;
 import org.bson.Document;
 import org.junit.Before;
 import org.junit.Test;
-import org.radarcns.application.ApplicationRecordCounts;
+import org.radarcns.application.ServerStatus;
 import org.radarcns.key.MeasurementKey;
-import org.radarcns.sink.mongodb.converter.RecordCountConverter;
+import org.radarcns.sink.mongodb.converter.ServerStatusConverter;
 import org.radarcns.sink.mongodb.util.MongoConstants;
 import org.radarcns.sink.mongodb.util.RadarAvroConstants;
 
-public class RecordCountConverterTest {
+public class ServerStatusConverterTest {
 
-    private RecordCountConverter converter;
+    private ServerStatusConverter converter;
+    private static final String STATUS = "CONNECTED";
+
+    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
+    private static final String IP_ADDRESS = "127.0.0.1";
 
     @Before
     public void setUp() {
-        this.converter = new RecordCountConverter();
+        this.converter = new ServerStatusConverter();
     }
 
     @Test
@@ -56,7 +60,7 @@ public class RecordCountConverterTest {
         Collection<String> values = this.converter.supportedSchemaNames();
         assertEquals(values.size(), 1, 0);
         assertEquals(MeasurementKey.class.getCanonicalName() + "-"
-                + ApplicationRecordCounts.class.getCanonicalName(), values.toArray()[0]);
+                + ServerStatus.class.getCanonicalName(), values.toArray()[0]);
     }
 
     @Test
@@ -77,15 +81,13 @@ public class RecordCountConverterTest {
         Schema valueSchema = SchemaBuilder.struct().field(
                 timeField, Schema.FLOAT64_SCHEMA).field(
                 TIME_RECEIVED, Schema.FLOAT64_SCHEMA).field(
-                RadarAvroConstants.RECORDS_CACHED, Schema.INT32_SCHEMA).field(
-                RadarAvroConstants.RECORDS_SENT, Schema.INT32_SCHEMA).field(
-                RadarAvroConstants.RECORDS_UNSENT, Schema.INT32_SCHEMA).build();
+                RadarAvroConstants.SERVER_STATUS, Schema.STRING_SCHEMA).field(
+                RadarAvroConstants.IP_ADDRESS, Schema.STRING_SCHEMA).build();
         Struct valueStruct = new Struct(valueSchema);
         valueStruct.put(timeField, time.doubleValue() / 1000d);
         valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);
-        valueStruct.put(RadarAvroConstants.RECORDS_CACHED, 10);
-        valueStruct.put(RadarAvroConstants.RECORDS_SENT, 100);
-        valueStruct.put(RadarAvroConstants.RECORDS_UNSENT, 1000);
+        valueStruct.put(RadarAvroConstants.SERVER_STATUS, STATUS);
+        valueStruct.put(RadarAvroConstants.IP_ADDRESS, IP_ADDRESS);
 
         SinkRecord record = new SinkRecord("mine", 0, keySchema,
                 keyStruct, valueSchema, valueStruct, 0);
@@ -100,14 +102,11 @@ public class RecordCountConverterTest {
         assertTrue(document.get(SOURCE) instanceof String);
         assertEquals(source, document.get(SOURCE));
 
-        assertTrue(document.get(MongoConstants.RECORDS_CACHED) instanceof Integer);
-        assertEquals(10, document.get(MongoConstants.RECORDS_CACHED));
+        assertTrue(document.get(MongoConstants.SERVER_STATUS) instanceof String);
+        assertEquals(STATUS, document.get(MongoConstants.SERVER_STATUS));
 
-        assertTrue(document.get(MongoConstants.RECORDS_SENT) instanceof Integer);
-        assertEquals(100, document.get(MongoConstants.RECORDS_SENT));
-
-        assertTrue(document.get(MongoConstants.RECORDS_UNSENT) instanceof Integer);
-        assertEquals(1000, document.get(MongoConstants.RECORDS_UNSENT));
+        assertTrue(document.get(MongoConstants.CLIENT_IP) instanceof String);
+        assertEquals(IP_ADDRESS, document.get(MongoConstants.CLIENT_IP));
 
         assertTrue(document.get(TIMESTAMP) instanceof Date);
         assertEquals(time, document.getDate(TIMESTAMP).getTime(), 0);

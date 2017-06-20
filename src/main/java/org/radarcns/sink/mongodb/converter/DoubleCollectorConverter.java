@@ -1,5 +1,7 @@
+package org.radarcns.sink.mongodb.converter;
+
 /*
- *  Copyright 2016 Kings College London and The Hyve
+ * Copyright 2016 King's College London and The Hyve
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +16,7 @@
  * limitations under the License.
  */
 
-package org.radarcns.sink.mongodb.converter;
-
+import static org.radarcns.sink.mongodb.util.Converter.extractQuartile;
 import static org.radarcns.sink.mongodb.util.MongoConstants.ID;
 import static org.radarcns.sink.mongodb.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.mongodb.util.MongoConstants.USER;
@@ -33,42 +34,57 @@ import java.util.Collection;
 import java.util.Collections;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.sink.SinkRecord;
-import org.bson.BsonDateTime;
-import org.bson.BsonDouble;
 import org.bson.Document;
 import org.radarcns.aggregator.DoubleAggregator;
 import org.radarcns.key.WindowedKey;
 import org.radarcns.serialization.RecordConverter;
+import org.radarcns.sink.mongodb.util.Converter;
 import org.radarcns.sink.mongodb.util.MongoConstants;
 import org.radarcns.sink.mongodb.util.MongoConstants.Stat;
 import org.radarcns.sink.mongodb.util.RadarAvroConstants;
 import org.radarcns.util.Utility;
 
-public class DoubleArrayCollectorConverter implements RecordConverter {
+/**
+ * {@link RecordConverter} to convert a {@link DoubleAggregator} record to Bson Document.
+ */
+public class DoubleCollectorConverter implements RecordConverter {
+
+    /**
+     * Returns a {@code Collection<String>} reporting schema names supported by this converter.
+     *      These names behaves as the key for selecting the suitable {@link RecordConverter} for
+     *      a {@link SinkRecord}.
+     *
+     * @return a {@code Collection<String>} containing the supported Avro schema names
+     */
     @Override
     public Collection<String> supportedSchemaNames() {
         return Collections.singleton(WindowedKey.class.getCanonicalName() + "-"
                 + DoubleAggregator.class.getCanonicalName());
     }
 
+    /**
+     * Converts the given {@link SinkRecord} into a custom {@link Document}.
+     *
+     * @param sinkRecord {@link SinkRecord} to be converted
+     * @return a {@link Document} representing the input {@link SinkRecord}
+     */
     @Override
-    public Document convert(SinkRecord record) {
-        Struct key = (Struct) record.key();
-        Struct value = (Struct) record.value();
+    public Document convert(SinkRecord sinkRecord) {
+        Struct key = (Struct) sinkRecord.key();
+        Struct value = (Struct) sinkRecord.value();
 
         return new Document(ID, Utility.intervalKeyToMongoKey(key)).append(
                 USER, key.getString(USER_ID)).append(
                 SOURCE, key.getString(SOURCE_ID)).append(
-                Stat.MINIMUM.getParam(), new BsonDouble(value.getFloat64(MIN))).append(
-                Stat.MAXIMUM.getParam(), new BsonDouble(value.getFloat64(MAX))).append(
-                Stat.SUM.getParam(), new BsonDouble(value.getFloat64(SUM))).append(
-                Stat.COUNT.getParam(), new BsonDouble(value.getFloat64(COUNT))).append(
-                Stat.AVERAGE.getParam(), new BsonDouble(value.getFloat64(AVG))).append(
-                Stat.QUARTILES.getParam(),
-                        Utility.extractQuartile(value.getArray(QUARTILE))).append(
-                Stat.INTERQUARTILE_RANGE.getParam(), new BsonDouble(value.getFloat64(IQR))).append(
+                Stat.MINIMUM.getParam(), value.getFloat64(MIN)).append(
+                Stat.MAXIMUM.getParam(), value.getFloat64(MAX)).append(
+                Stat.SUM.getParam(), value.getFloat64(SUM)).append(
+                Stat.COUNT.getParam(), value.getFloat64(COUNT)).append(
+                Stat.AVERAGE.getParam(), value.getFloat64(AVG)).append(
+                Stat.QUARTILES.getParam(), extractQuartile(value.getArray(QUARTILE))).append(
+                Stat.INTERQUARTILE_RANGE.getParam(), value.getFloat64(IQR)).append(
                 MongoConstants.START,
-                        new BsonDateTime(key.getInt64(RadarAvroConstants.START))).append(
-                MongoConstants.END, new BsonDateTime(key.getInt64(RadarAvroConstants.END)));
+                        Converter.toDateTime(key.getInt64(RadarAvroConstants.START))).append(
+                MongoConstants.END, Converter.toDateTime(key.getInt64(RadarAvroConstants.END)));
     }
 }

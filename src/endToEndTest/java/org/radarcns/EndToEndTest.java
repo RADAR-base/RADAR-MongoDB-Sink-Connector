@@ -1,3 +1,5 @@
+package org.radarcns;
+
 /*
  * Copyright 2017 Kings College London and The Hyve
  *
@@ -13,8 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.radarcns;
 
 import static com.mongodb.client.model.Sorts.ascending;
 import static java.util.Arrays.asList;
@@ -59,14 +59,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * MongoDB Sink connector e2e test
+ * MongoDB Sink connector e2e test. It streams randomly generated data into the data pipeline and
+ *      then queries MongoDb to check that data has been correctly stored. The check is done using
+ *      precomputed expected data.
  */
 public class EndToEndTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EndToEndTest.class);
-
-    //private static final String USER_ID_MOCK = "UserID_0";
-    //private static final String SOURCE_ID_MOCK = "SourceID_0";
 
     private final ExpectedDocumentFactory expectedDocumentFactory = new ExpectedDocumentFactory();
 
@@ -147,6 +146,9 @@ public class EndToEndTest {
 
     @Test
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    /**
+     * Test case entry point.
+     */
     public void endToEndTest() throws Exception {
         produceInputFile();
 
@@ -236,6 +238,9 @@ public class EndToEndTest {
 
     }
 
+    /**
+     * Queries MongoDb and checks if expected data has been correctly generated.
+     */
     private void fetchMongoDb(Map<MockDataConfig, List<Document>> expectedDocument) {
         for (MockDataConfig sensor : expectedDocument.keySet()) {
             FindIterable<Document> collection = hotstorage.getCollection(
@@ -256,110 +261,29 @@ public class EndToEndTest {
         }
     }
 
+    /**
+     * Checks if the two given documents are equals. Numeric values are compared using a constant
+     * representing the maximum delta for which both numbers are still considered equal.
+     */
     private void assertDocument(Document expected, Document actual, Double delta) {
-
         LOGGER.info("Expected: {}", expected.toJson());
         LOGGER.info("Actual: {}", actual.toJson());
 
         assertEquals(expected.keySet(), actual.keySet());
 
         for (String key : expected.keySet()) {
-            assertEquals(expected.get(key), actual.get(key));
+            assertEquals(expected.get(key).getClass(), actual.get(key).getClass());
+
+            if (expected.get(key) instanceof Double) {
+                assertEquals(expected.getDouble(key), actual.getDouble(key), delta);
+            } else if (expected.get(key) instanceof Long) {
+                assertEquals(expected.getLong(key), actual.getLong(key), delta);
+            } else if (expected.get(key) instanceof Integer) {
+                assertEquals(expected.getInteger(key), actual.getInteger(key), delta);
+            } else {
+                assertEquals(expected.get(key), actual.get(key));
+            }
         }
 
     }
-
-//    private void compareSingleItemDocument(Document expected, Document actual, double delta) {
-//        for (String key : expected.keySet()) {
-//            //assert both documents have same headers
-//            assertNotNull(actual.get(key));
-//            switch (key) {
-//                case ID:
-//                case "user":
-//                case "source":
-//                    assertEquals(expected.get(key), actual.get(key));
-//                    break;
-//                case "start":
-//                case "end":
-//                    assertEquals((Date) expected.get(key), (Date) actual.get(key));
-//                    break;
-//                case "QUARTILES":
-//                    assertQuartiles(expected, actual);
-//                    break;
-//                default:
-//                    assertEquals((Double) expected.get(key), (Double) actual.get(key), delta);
-//                    break;
-//            }
-//        }
-//
-//    }
-//
-//    private void assertQuartiles(Document expected, Document actual, double delta) {
-//        List expectedQuartile = (List) expected.get(Stat.QUARTILES.getParam());
-//        ArrayList<Document> actualQuartile = (ArrayList<Document>)
-//                actual.get(Stat.QUARTILES.getParam());
-//        for (int i = 0; i < expectedQuartile.size(); i++) {
-//            Document act = actualQuartile.get(i);
-//            Document exp = (Document) expectedQuartile.get(i);
-//
-//            for (String key : exp.keySet()) {
-//                assertNotNull(act.get(key));
-//                assertEquals((Double) exp.get(key), (Double) act.get(key), delta);
-//            }
-//        }
-//    }
-//
-//    private void compareArrayItemDocument(Document expected, Document actual, double delta) {
-//        for (String key : expected.keySet()) {
-//            assertNotNull(actual.get(key));
-//            switch (key) {
-//                case ID:
-//                case USER:
-//                case SOURCE:
-//                    assertEquals(expected.get(key), actual.get(key));
-//                    break;
-//                case START:
-//                case END:
-//                    assertEquals((Date) expected.get(key), (Date) actual.get(key));
-//                    break;
-//                case "QUARTILES":
-//                    assertAccelerationQuartiles(expected, actual);
-//                    break;
-//                default:
-//                    assertAccelerometerDocuments((ArrayList) expected.get(key),
-//                            (Document) actual.get(key));
-//                    break;
-//            }
-//        }
-//    }
-//
-//    private void assertAccelerationQuartiles(Document expected, Document actual) {
-//        Document actualQuartileDoc = (Document) actual.get(Stat.QUARTILES.getParam());
-//        Document expectedQuartile = (Document) expected.get(Stat.QUARTILES.getParam());
-//        for (String axis : expectedQuartile.keySet()) {
-//            assertNotNull(actualQuartileDoc.get(axis));
-//            assertAccelerationAxisQuartileValues((List) expectedQuartile.get(axis),
-//                    (List) actualQuartileDoc.get(axis));
-//        }
-//    }
-//
-//    private void assertAccelerationAxisQuartileValues(List expected, List actual, double delta) {
-//        assertEquals(expected.size(), actual.size());
-//        assertEquals((Double) ((Document) expected.get(0)).get(FIRST_QUARTILE),
-//                (Double) ((Document) actual.get(0)).get(FIRST_QUARTILE), delta);
-//        assertEquals((Double) ((Document) expected.get(1)).get(SECOND_QUARTILE),
-//                (Double) ((Document) actual.get(1)).get(SECOND_QUARTILE), delta);
-//        assertEquals((Double) ((Document) expected.get(2)).get(THIRD_QUARTILE),
-//                (Double) ((Document) actual.get(2)).get(THIRD_QUARTILE), delta);
-//    }
-//
-//    private void assertAccelerometerDocuments(ArrayList accelerationList,
-//          Document actualDocument) {
-//        assertEquals((Double) accelerationList.get(0),
-//                  (Double) actualDocument.get(X_LABEL), delta);
-//        assertEquals((Double) accelerationList.get(1),
-//                   (Double) actualDocument.get(Y_LABEL), delta);
-//        assertEquals((Double) accelerationList.get(2),
-//                    (Double) actualDocument.get(Z_LABEL), delta);
-//    }
 }

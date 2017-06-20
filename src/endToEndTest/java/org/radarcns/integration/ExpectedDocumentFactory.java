@@ -17,9 +17,6 @@ package org.radarcns.integration;
  */
 
 import static org.radarcns.mock.model.ExpectedValue.DURATION;
-import static org.radarcns.sink.mongodb.converter.AccelerationCollectorConverter.X_LABEL;
-import static org.radarcns.sink.mongodb.converter.AccelerationCollectorConverter.Y_LABEL;
-import static org.radarcns.sink.mongodb.converter.AccelerationCollectorConverter.Z_LABEL;
 import static org.radarcns.sink.mongodb.util.MongoConstants.END;
 import static org.radarcns.sink.mongodb.util.MongoConstants.FIRST_QUARTILE;
 import static org.radarcns.sink.mongodb.util.MongoConstants.ID;
@@ -35,6 +32,9 @@ import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.QUARTILES;
 import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.SUM;
 import static org.radarcns.sink.mongodb.util.MongoConstants.THIRD_QUARTILE;
 import static org.radarcns.sink.mongodb.util.MongoConstants.USER;
+import static org.radarcns.sink.mongodb.util.MongoConstants.X_LABEL;
+import static org.radarcns.sink.mongodb.util.MongoConstants.Y_LABEL;
+import static org.radarcns.sink.mongodb.util.MongoConstants.Z_LABEL;
 
 import java.util.ArrayList;
 import java.util.Arrays;

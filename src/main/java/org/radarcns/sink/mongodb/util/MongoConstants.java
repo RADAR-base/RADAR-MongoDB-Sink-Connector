@@ -16,7 +16,10 @@ package org.radarcns.sink.mongodb.util;
  * limitations under the License.
  */
 
-public class MongoConstants {
+/**
+ * Set of constants used to create {@link org.bson.Document}.
+ */
+public final class MongoConstants {
 
     public static final String ID = "_id";
     public static final String USER = "user";
@@ -28,29 +31,38 @@ public class MongoConstants {
     public static final String SECOND_QUARTILE = "50";
     public static final String THIRD_QUARTILE = "75";
 
-    public static final String RECORDS_CACHED = "recordsCached";
-    public static final String RECORDS_SENT = "recordsSent";
-    public static final String RECORDS_UNSENT = "recordsUnsent";
+    public static final String RECORDS_CACHED = RadarAvroConstants.RECORDS_CACHED;
+    public static final String RECORDS_SENT = RadarAvroConstants.RECORDS_SENT;
+    public static final String RECORDS_UNSENT = RadarAvroConstants.RECORDS_UNSENT;
 
-    public static final String SERVER_STATUS = "serverStatus";
+    public static final String SERVER_STATUS = RadarAvroConstants.SERVER_STATUS;
     public static final String CLIENT_IP = "clientIP";
 
     public static final String APPLICATION_UPTIME = "applicationUptime";
 
     public static final String TIMESTAMP = "timestamp";
 
+    public static final String X_LABEL = "x";
+    public static final String Y_LABEL = "y";
+    public static final String Z_LABEL = "z";
+
     /**
-     * Enumerate all available statistical values. The string value represents the Document field
-     *      that has to be used to compute the result.
+     * Private constructor to prevent instantiation.
+     */
+    private MongoConstants() {}
+
+    /**
+     * Enumerate all available statistical values. The string value represents the name of Bson
+     *      Document field.
      */
     public enum Stat {
         AVERAGE("avg"),
         COUNT("count"),
         INTERQUARTILE_RANGE("iqr"),
         MAXIMUM("max"),
-        MEDIAN("quartiles"),
+        MEDIAN("quartile"),
         MINIMUM("min"),
-        QUARTILES("quartiles"),
+        QUARTILES("quartile"),
         SUM("sum");
 
         private final String param;
