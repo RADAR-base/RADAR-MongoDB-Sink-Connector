@@ -38,9 +38,7 @@ import static org.radarcns.sink.mongodb.util.RadarAvroConstants.IQR;
 import static org.radarcns.sink.mongodb.util.RadarAvroConstants.MAX;
 import static org.radarcns.sink.mongodb.util.RadarAvroConstants.MIN;
 import static org.radarcns.sink.mongodb.util.RadarAvroConstants.QUARTILE;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SOURCE_ID;
 import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SUM;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.USER_ID;
 
 import java.util.Collection;
 import java.util.Date;
@@ -59,13 +57,11 @@ import org.radarcns.sink.mongodb.converter.AccelerationCollectorConverter;
 import org.radarcns.sink.mongodb.util.Converter;
 import org.radarcns.sink.mongodb.util.MongoConstants;
 import org.radarcns.sink.mongodb.util.MongoConstants.Stat;
-import org.radarcns.sink.mongodb.util.RadarAvroConstants;
 
 public class AccelerationCollectorConverterTest {
 
     private AccelerationCollectorConverter converter;
 
-    private Schema keySchema;
     private Schema valueSchema;
 
     private static final Double MOCK_VALUE = 99.99;
@@ -76,12 +72,6 @@ public class AccelerationCollectorConverterTest {
     @Before
     public void setUp() {
         this.converter = new AccelerationCollectorConverter();
-
-        this.keySchema = SchemaBuilder.struct()
-            .field(USER_ID, Schema.STRING_SCHEMA)
-            .field(SOURCE_ID, Schema.STRING_SCHEMA)
-            .field(RadarAvroConstants.START, Schema.INT64_SCHEMA)
-            .field(RadarAvroConstants.END, Schema.INT64_SCHEMA).build();
 
         this.valueSchema = SchemaBuilder.struct().field(
             MIN, SchemaBuilder.array(Schema.FLOAT64_SCHEMA)).field(
@@ -108,22 +98,18 @@ public class AccelerationCollectorConverterTest {
         String user = "user";
         String source = "source";
 
-        Struct keyStruct = new Struct(keySchema);
-        keyStruct.put(USER_ID, user);
-        keyStruct.put(SOURCE_ID, source);
-        keyStruct.put(RadarAvroConstants.START, time);
-        keyStruct.put(RadarAvroConstants.END, time);
+        Struct keyStruct = UtilityTest.getKeyStruct(user, source, time);
 
         Struct valueStruct = new Struct(valueSchema);
-        valueStruct.put(MIN, getMockList());
-        valueStruct.put(MAX, getMockList());
-        valueStruct.put(SUM, getMockList());
-        valueStruct.put(COUNT, getMockList());
-        valueStruct.put(AVG, getMockList());
+        valueStruct.put(MIN, UtilityTest.getMockList(MOCK_VALUE));
+        valueStruct.put(MAX, UtilityTest.getMockList(MOCK_VALUE));
+        valueStruct.put(SUM, UtilityTest.getMockList(MOCK_VALUE));
+        valueStruct.put(COUNT, UtilityTest.getMockList(MOCK_VALUE));
+        valueStruct.put(AVG, UtilityTest.getMockList(MOCK_VALUE));
         valueStruct.put(QUARTILE, getMockQuartile());
-        valueStruct.put(IQR, getMockList());
+        valueStruct.put(IQR, UtilityTest.getMockList(MOCK_VALUE));
 
-        SinkRecord record = new SinkRecord("mine", 0, keySchema,
+        SinkRecord record = new SinkRecord("mine", 0, keyStruct.schema(),
                 keyStruct, valueSchema, valueStruct, 0);
         Document document = this.converter.convert(record);
 
@@ -135,7 +121,8 @@ public class AccelerationCollectorConverterTest {
         assertTrue(document.get(SOURCE) instanceof String);
         assertEquals(source, document.get(SOURCE));
 
-        Document valuesDocument = AccelerationCollectorConverter.sampleToDocument(getMockList());
+        Document valuesDocument = AccelerationCollectorConverter.sampleToDocument(
+                UtilityTest.getMockList(MOCK_VALUE));
 
         assertTrue(document.get(MINIMUM.getParam()) instanceof Document);
         assertEquals(valuesDocument, document.get(MINIMUM.getParam()));
@@ -173,7 +160,8 @@ public class AccelerationCollectorConverterTest {
                 Y_LABEL, MOCK_VALUE).append(
                 Z_LABEL, MOCK_VALUE);
 
-        Document actual = AccelerationCollectorConverter.sampleToDocument(getMockList());
+        Document actual = AccelerationCollectorConverter.sampleToDocument(
+                UtilityTest.getMockList(MOCK_VALUE));
 
         assertEquals(expected, actual);
 
@@ -190,9 +178,9 @@ public class AccelerationCollectorConverterTest {
     @Test
     public void quartileToDocument() {
         Document expected = new Document(
-                X_LABEL, Converter.extractQuartile(getMockList())).append(
-                Y_LABEL, Converter.extractQuartile(getMockList())).append(
-                Z_LABEL, Converter.extractQuartile(getMockList()));
+                X_LABEL, Converter.extractQuartile(UtilityTest.getMockList(MOCK_VALUE))).append(
+                Y_LABEL, Converter.extractQuartile(UtilityTest.getMockList(MOCK_VALUE))).append(
+                Z_LABEL, Converter.extractQuartile(UtilityTest.getMockList(MOCK_VALUE)));
 
         Document actual = AccelerationCollectorConverter.quartileToDocument(getMockQuartile());
 
@@ -218,20 +206,11 @@ public class AccelerationCollectorConverterTest {
         assertEquals(MOCK_VALUE, documents.get(2).getDouble(THIRD_QUARTILE), 0.0);
     }
 
-    private List<Double> getMockList() {
-        List<Double> values = new LinkedList<>();
-        values.add(MOCK_VALUE);
-        values.add(MOCK_VALUE);
-        values.add(MOCK_VALUE);
-
-        return values;
-    }
-
     private List<List<Double>> getMockQuartile() {
         List<List<Double>> quartileValues = new LinkedList<>();
-        quartileValues.add(getMockList());
-        quartileValues.add(getMockList());
-        quartileValues.add(getMockList());
+        quartileValues.add(UtilityTest.getMockList(MOCK_VALUE));
+        quartileValues.add(UtilityTest.getMockList(MOCK_VALUE));
+        quartileValues.add(UtilityTest.getMockList(MOCK_VALUE));
 
         return quartileValues;
     }

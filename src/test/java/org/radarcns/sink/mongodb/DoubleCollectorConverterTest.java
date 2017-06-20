@@ -32,13 +32,10 @@ import static org.radarcns.sink.mongodb.util.RadarAvroConstants.IQR;
 import static org.radarcns.sink.mongodb.util.RadarAvroConstants.MAX;
 import static org.radarcns.sink.mongodb.util.RadarAvroConstants.MIN;
 import static org.radarcns.sink.mongodb.util.RadarAvroConstants.QUARTILE;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SOURCE_ID;
 import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SUM;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.USER_ID;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
@@ -53,16 +50,28 @@ import org.radarcns.sink.mongodb.converter.DoubleCollectorConverter;
 import org.radarcns.sink.mongodb.util.Converter;
 import org.radarcns.sink.mongodb.util.MongoConstants;
 import org.radarcns.sink.mongodb.util.MongoConstants.Stat;
-import org.radarcns.sink.mongodb.util.RadarAvroConstants;
 
 public class DoubleCollectorConverterTest {
 
     private DoubleCollectorConverter converter;
+
+    private Schema valueSchema;
+
     private static final Double MOCK_VALUE = 99.99;
 
+    /** Initializer. */
     @Before
     public void setUp() {
         this.converter = new DoubleCollectorConverter();
+
+        this.valueSchema = SchemaBuilder.struct().field(
+            MIN, Schema.FLOAT64_SCHEMA).field(
+            MAX, Schema.FLOAT64_SCHEMA).field(
+            SUM, Schema.FLOAT64_SCHEMA).field(
+            COUNT, Schema.FLOAT64_SCHEMA).field(
+            AVG, Schema.FLOAT64_SCHEMA).field(
+            QUARTILE, SchemaBuilder.array(Schema.FLOAT64_SCHEMA)).field(
+            IQR, Schema.FLOAT64_SCHEMA).build();
     }
 
     @Test
@@ -79,43 +88,10 @@ public class DoubleCollectorConverterTest {
         String user = "user";
         String source = "source";
 
-        Schema keySchema = SchemaBuilder.struct()
-                .field(USER_ID, Schema.STRING_SCHEMA)
-                .field(SOURCE_ID, Schema.STRING_SCHEMA)
-                .field(RadarAvroConstants.START, Schema.INT64_SCHEMA)
-                .field(RadarAvroConstants.END, Schema.INT64_SCHEMA).build();
+        Struct keyStruct = UtilityTest.getKeyStruct(user, source, time);
 
-        Struct keyStruct = new Struct(keySchema);
-        keyStruct.put(USER_ID, user);
-        keyStruct.put(SOURCE_ID, source);
-        keyStruct.put(RadarAvroConstants.START, time);
-        keyStruct.put(RadarAvroConstants.END, time);
-
-        Schema valueSchema = SchemaBuilder.struct().field(
-                    MIN, Schema.FLOAT64_SCHEMA).field(
-                    MAX, Schema.FLOAT64_SCHEMA).field(
-                    SUM, Schema.FLOAT64_SCHEMA).field(
-                    COUNT, Schema.FLOAT64_SCHEMA).field(
-                    AVG, Schema.FLOAT64_SCHEMA).field(
-                    QUARTILE, SchemaBuilder.array(Schema.FLOAT64_SCHEMA)).field(
-                    IQR, Schema.FLOAT64_SCHEMA).build();
-
-        List<Double> quartileValues = new LinkedList<>();
-        quartileValues.add(MOCK_VALUE);
-        quartileValues.add(MOCK_VALUE);
-        quartileValues.add(MOCK_VALUE);
-
-        Struct valueStruct = new Struct(valueSchema);
-        valueStruct.put(MIN, MOCK_VALUE);
-        valueStruct.put(MAX, MOCK_VALUE);
-        valueStruct.put(SUM, MOCK_VALUE);
-        valueStruct.put(COUNT, MOCK_VALUE);
-        valueStruct.put(AVG, MOCK_VALUE);
-        valueStruct.put(QUARTILE, quartileValues);
-        valueStruct.put(IQR, MOCK_VALUE);
-
-        SinkRecord record = new SinkRecord("mine", 0, keySchema,
-                keyStruct, valueSchema, valueStruct, 0);
+        SinkRecord record = new SinkRecord("mine", 0, keyStruct.schema(),
+                keyStruct, valueSchema, getValueStruct(), 0);
         Document document = this.converter.convert(record);
 
         assertNotNull(document);
@@ -142,7 +118,8 @@ public class DoubleCollectorConverterTest {
         assertEquals(MOCK_VALUE, document.getDouble(AVERAGE.getParam()), 0);
 
         assertTrue(document.get(QUARTILES.getParam()) instanceof List);
-        assertEquals(Converter.extractQuartile(quartileValues), document.get(QUARTILES.getParam()));
+        assertEquals(Converter.extractQuartile(UtilityTest.getMockList(MOCK_VALUE)),
+                document.get(QUARTILES.getParam()));
 
         assertTrue(document.get(INTERQUARTILE_RANGE.getParam()) instanceof Double);
         assertEquals(MOCK_VALUE, document.getDouble(INTERQUARTILE_RANGE.getParam()), 0);
@@ -152,6 +129,20 @@ public class DoubleCollectorConverterTest {
 
         assertTrue(document.get(MongoConstants.END) instanceof Date);
         assertEquals(time, document.getDate(MongoConstants.END).getTime(), 0);
+    }
+
+    private Struct getValueStruct() {
+        Struct valueStruct = new Struct(valueSchema);
+
+        valueStruct.put(MIN, MOCK_VALUE);
+        valueStruct.put(MAX, MOCK_VALUE);
+        valueStruct.put(SUM, MOCK_VALUE);
+        valueStruct.put(COUNT, MOCK_VALUE);
+        valueStruct.put(AVG, MOCK_VALUE);
+        valueStruct.put(QUARTILE, UtilityTest.getMockList(MOCK_VALUE));
+        valueStruct.put(IQR, MOCK_VALUE);
+
+        return valueStruct;
     }
 
 }

@@ -23,9 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.radarcns.sink.mongodb.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.mongodb.util.MongoConstants.TIMESTAMP;
 import static org.radarcns.sink.mongodb.util.MongoConstants.USER;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SOURCE_ID;
 import static org.radarcns.sink.mongodb.util.RadarAvroConstants.TIME_RECEIVED;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.USER_ID;
 
 import java.util.Collection;
 import java.util.Date;
@@ -67,12 +65,7 @@ public class RecordCountConverterTest {
 
         String timeField = "time";
 
-        Schema keySchema = SchemaBuilder.struct().field(
-                USER_ID, Schema.STRING_SCHEMA).field(
-                SOURCE_ID, Schema.STRING_SCHEMA).build();
-        Struct keyStruct = new Struct(keySchema);
-        keyStruct.put(USER_ID, user);
-        keyStruct.put(SOURCE_ID, source);
+        Struct keyStruct = UtilityTest.getKeyStruct(user, source);
 
         Schema valueSchema = SchemaBuilder.struct().field(
                 timeField, Schema.FLOAT64_SCHEMA).field(
@@ -87,7 +80,7 @@ public class RecordCountConverterTest {
         valueStruct.put(RadarAvroConstants.RECORDS_SENT, 100);
         valueStruct.put(RadarAvroConstants.RECORDS_UNSENT, 1000);
 
-        SinkRecord record = new SinkRecord("mine", 0, keySchema,
+        SinkRecord record = new SinkRecord("mine", 0, keyStruct.schema(),
                 keyStruct, valueSchema, valueStruct, 0);
 
         Document document = this.converter.convert(record);

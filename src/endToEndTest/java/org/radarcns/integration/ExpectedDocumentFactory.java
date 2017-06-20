@@ -149,8 +149,8 @@ public class ExpectedDocumentFactory {
         List<Document> list = new ArrayList<>(windows.size());
 
         for (Long timestamp : windows) {
-            DoubleArrayCollector doubleArrayCollector = (DoubleArrayCollector) expectedValue
-                    .getSeries().get(timestamp);
+            DoubleArrayCollector doubleArrayCollector =
+                    (DoubleArrayCollector) expectedValue.getSeries().get(timestamp);
 
             long end = timestamp + DURATION;
 

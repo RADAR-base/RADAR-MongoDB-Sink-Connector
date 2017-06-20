@@ -280,6 +280,15 @@ public class EndToEndTest {
                 assertEquals(expected.getLong(key), actual.getLong(key), delta);
             } else if (expected.get(key) instanceof Integer) {
                 assertEquals(expected.getInteger(key), actual.getInteger(key), delta);
+            } else if (expected.get(key) instanceof List) {
+                List<Document> expectedList = (List<Document>) expected.get(key);
+                List<Document> actualList = (List<Document>) actual.get(key);
+
+                assertEquals(expectedList.size(), actualList.size());
+
+                for (int i = 0; i < expectedList.size(); i++) {
+                    assertDocument(expectedList.get(i), actualList.get(i), delta);
+                }
             } else {
                 assertEquals(expected.get(key), actual.get(key));
             }
