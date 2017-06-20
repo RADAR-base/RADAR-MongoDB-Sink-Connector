@@ -272,7 +272,7 @@ public class EndToEndTest {
         assertEquals(expected.keySet(), actual.keySet());
 
         for (String key : expected.keySet()) {
-            assertEquals(expected.get(key).getClass(), actual.get(key).getClass());
+            checkClasses(expected, actual);
 
             if (expected.get(key) instanceof Double) {
                 assertEquals(expected.getDouble(key), actual.getDouble(key), delta);
@@ -294,5 +294,17 @@ public class EndToEndTest {
             }
         }
 
+    }
+
+    /**
+     * Checks if the classes of inputs can be considered equals.
+     */
+    private void checkClasses(Document expected, Document actual) {
+        if (expected.getClass().getCanonicalName().equals("java.util.Arrays.ArrayList")
+                && actual.getClass().getCanonicalName().equals("java.util.ArrayList")) {
+            return;
+        } else {
+            assertEquals(expected.getClass(), actual.getClass());
+        }
     }
 }
