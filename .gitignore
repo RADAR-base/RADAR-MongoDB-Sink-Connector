@@ -1,0 +1,20 @@
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+
+# Gradle
+.gradle/
+.gradletasknamecache
+
+# Build
+build/
+
+# Test
+src/endToEndTest/image/*jar

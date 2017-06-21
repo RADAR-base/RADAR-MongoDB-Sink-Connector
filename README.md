@@ -42,7 +42,7 @@ Implements the hot-storage support for RADAR-CNS platform using MongoDBSinkConne
     # Factory class to do the actual record conversion
     record.converter.class=org.radarcns.sink.mongodb.RecordConverterFactoryRadar
     ```
-    For more details visit our [MongoDBConnector](https://github.com/RADAR-CNS/RADAR-MongoDbConnector) and [Kafka-Connect](http://docs.confluent.io/3.1.2/connect/quickstart.html)
+    For more details visit our [MongoDBConnector](https://github.com/RADAR-CNS/MongoDb-Sink-Connector) and [Kafka-Connect](http://docs.confluent.io/3.1.2/connect/quickstart.html)
    
 4. Run the connector. To run the connector in `standalone mode` (on an enviornment where the Confluent platform is installed):
    
@@ -51,5 +51,12 @@ Implements the hot-storage support for RADAR-CNS platform using MongoDBSinkConne
     ```   
    
 ## Contributing
+New converters
+ - should implement the interface `org.radarcns.serialization.RecordConverte`
+ - should be located under the `org.radarcns.sink.mongodb.converter` package
+ - should be listed in `org.radarcns.sink.mongodb.RecordConverterFactoryRadar` to be added to the class path
+
+The converters should take advantages of `org.bson.codecs.Encoder<T>`. Instances of this class are capable of encoding an instance of the type parameter `T` into a `BSON` value. The counter part is `org.bson.codecs.Decoder<T>`
+
 Code should be formatted using the [Google Java Code Style Guide](https://google.github.io/styleguide/javaguide.html).
 If you want to contribute a feature or fix browse our [issues](https://github.com/RADAR-CNS/RADAR-MongoDB-Sink-Connector/issues), and please make a pull request.

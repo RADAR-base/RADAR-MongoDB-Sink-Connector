@@ -1,5 +1,7 @@
+package org.radarcns.sink.mongodb;
+
 /*
- * Copyright 2017 Kings College London and The Hyve
+ * Copyright 2016 King's College London and The Hyve
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +16,37 @@
  * limitations under the License.
  */
 
-package org.radarcns.sink.mongodb;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.radarcns.serialization.RecordConverter;
 import org.radarcns.serialization.RecordConverterFactory;
+import org.radarcns.sink.mongodb.converter.AccelerationCollectorConverter;
+import org.radarcns.sink.mongodb.converter.DoubleCollectorConverter;
+import org.radarcns.sink.mongodb.converter.RecordCountConverter;
+import org.radarcns.sink.mongodb.converter.ServerStatusConverter;
+import org.radarcns.sink.mongodb.converter.UptimeStatusConverter;
 
 /**
- * Extended RecordConverterFactory to allow customized RecordConverter class that are needed
+ * Overrides {@link RecordConverterFactory} for adding customized {@link RecordConverter} to the
+ *      ClassPath.
  */
 public class RecordConverterFactoryRadar extends RecordConverterFactory {
 
     /**
-     * Overrides genericConverter to append custom RecordConverter class to RecordConverterFactory
+     * Overrides {@link RecordConverterFactory#genericConverters()} to append custom
+     *      {@link RecordConverter} class to {@link RecordConverterFactory}.
      *
-     * @return list of RecordConverters available
+     * @return {@code List<RecordConverter>} of available {@link RecordConverter}
      */
+    @Override
     protected List<RecordConverter> genericConverters() {
         List<RecordConverter> recordConverters = new ArrayList<RecordConverter>();
         recordConverters.addAll(super.genericConverters());
-        recordConverters.add(new AggregatedAccelerationRecordConverter());
-        recordConverters.add(new DoubleAggregatedRecordConverter());
-        recordConverters.add(new BatteryLevelRecordConverter());
-        recordConverters.add(new CountsStatusRecordConverter());
-        recordConverters.add(new ServerStatusRecordConverter());
-        recordConverters.add(new UptimeStatusRecordConverter());
+        recordConverters.add(new AccelerationCollectorConverter());
+        recordConverters.add(new DoubleCollectorConverter());
+        recordConverters.add(new RecordCountConverter());
+        recordConverters.add(new ServerStatusConverter());
+        recordConverters.add(new UptimeStatusConverter());
         return recordConverters;
     }
 
