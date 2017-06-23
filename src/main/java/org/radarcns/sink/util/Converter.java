@@ -1,4 +1,4 @@
-package org.radarcns.sink.mongodb.util;
+package org.radarcns.sink.util;
 
 /*
  * Copyright 2016 King's College London and The Hyve
@@ -16,12 +16,12 @@ package org.radarcns.sink.mongodb.util;
  * limitations under the License.
  */
 
-import static org.radarcns.sink.mongodb.util.MongoConstants.FIRST_QUARTILE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.SECOND_QUARTILE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.THIRD_QUARTILE;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SEPARATOR;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SOURCE_ID;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.USER_ID;
+import static org.radarcns.sink.util.MongoConstants.FIRST_QUARTILE;
+import static org.radarcns.sink.util.MongoConstants.SECOND_QUARTILE;
+import static org.radarcns.sink.util.MongoConstants.THIRD_QUARTILE;
+import static org.radarcns.sink.util.RadarAvroConstants.SEPARATOR;
+import static org.radarcns.sink.util.RadarAvroConstants.SOURCE_ID;
+import static org.radarcns.sink.util.RadarAvroConstants.USER_ID;
 
 import java.util.Arrays;
 import java.util.Date;

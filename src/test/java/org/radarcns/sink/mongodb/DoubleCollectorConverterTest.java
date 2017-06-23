@@ -19,20 +19,20 @@ package org.radarcns.sink.mongodb;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.radarcns.sink.mongodb.util.MongoConstants.SOURCE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.AVERAGE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.INTERQUARTILE_RANGE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.MAXIMUM;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.MINIMUM;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.QUARTILES;
-import static org.radarcns.sink.mongodb.util.MongoConstants.USER;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.AVG;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.COUNT;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.IQR;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.MAX;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.MIN;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.QUARTILE;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SUM;
+import static org.radarcns.sink.util.MongoConstants.SOURCE;
+import static org.radarcns.sink.util.MongoConstants.Stat.AVERAGE;
+import static org.radarcns.sink.util.MongoConstants.Stat.INTERQUARTILE_RANGE;
+import static org.radarcns.sink.util.MongoConstants.Stat.MAXIMUM;
+import static org.radarcns.sink.util.MongoConstants.Stat.MINIMUM;
+import static org.radarcns.sink.util.MongoConstants.Stat.QUARTILES;
+import static org.radarcns.sink.util.MongoConstants.USER;
+import static org.radarcns.sink.util.RadarAvroConstants.AVG;
+import static org.radarcns.sink.util.RadarAvroConstants.COUNT;
+import static org.radarcns.sink.util.RadarAvroConstants.IQR;
+import static org.radarcns.sink.util.RadarAvroConstants.MAX;
+import static org.radarcns.sink.util.RadarAvroConstants.MIN;
+import static org.radarcns.sink.util.RadarAvroConstants.QUARTILE;
+import static org.radarcns.sink.util.RadarAvroConstants.SUM;
 
 import java.util.Collection;
 import java.util.Date;
@@ -47,9 +47,10 @@ import org.junit.Test;
 import org.radarcns.aggregator.DoubleAggregator;
 import org.radarcns.key.WindowedKey;
 import org.radarcns.sink.mongodb.converter.DoubleCollectorConverter;
-import org.radarcns.sink.mongodb.util.Converter;
-import org.radarcns.sink.mongodb.util.MongoConstants;
-import org.radarcns.sink.mongodb.util.MongoConstants.Stat;
+import org.radarcns.sink.util.Converter;
+import org.radarcns.sink.util.MongoConstants;
+import org.radarcns.sink.util.MongoConstants.Stat;
+import org.radarcns.sink.util.UtilityTest;
 
 public class DoubleCollectorConverterTest {
 

@@ -16,31 +16,24 @@ package org.radarcns.sink.mongodb.converter;
  * limitations under the License.
  */
 
-import static org.radarcns.sink.util.MongoConstants.APPLICATION_UPTIME;
-import static org.radarcns.sink.util.MongoConstants.ID;
-import static org.radarcns.sink.util.MongoConstants.SOURCE;
-import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
-import static org.radarcns.sink.util.MongoConstants.USER;
-import static org.radarcns.sink.util.RadarAvroConstants.SOURCE_ID;
-import static org.radarcns.sink.util.RadarAvroConstants.TIME_RECEIVED;
-import static org.radarcns.sink.util.RadarAvroConstants.UPTIME;
-import static org.radarcns.sink.util.RadarAvroConstants.USER_ID;
-
 import java.util.Collection;
 import java.util.Collections;
-import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.errors.DataException;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.bson.Document;
-import org.radarcns.application.ApplicationUptime;
 import org.radarcns.key.MeasurementKey;
+import org.radarcns.questionnaire.Questionnaire;
+import org.radarcns.serialization.GenericRecordConverter;
 import org.radarcns.serialization.RecordConverter;
-import org.radarcns.sink.util.Converter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * {@link RecordConverter} to convert a {@link ApplicationUptime} record to Bson Document.
+ * {@link RecordConverter} to convert a {@link Questionnaire} record to Bson Document.
  */
-public class UptimeStatusConverter implements RecordConverter {
+public class QuestionnaireConverter implements RecordConverter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuestionnaireConverter.class);
 
     /**
      * Returns a {@code Collection<String>} reporting schema names supported by this converter.
@@ -52,7 +45,7 @@ public class UptimeStatusConverter implements RecordConverter {
     @Override
     public Collection<String> supportedSchemaNames() {
         return Collections.singleton(MeasurementKey.class.getCanonicalName() + "-"
-                + ApplicationUptime.class.getCanonicalName());
+                + Questionnaire.class.getCanonicalName());
     }
 
     /**
@@ -63,14 +56,11 @@ public class UptimeStatusConverter implements RecordConverter {
      */
     @Override
     public Document convert(SinkRecord sinkRecord) throws DataException {
+//        analise(sinkRecord.keySchema(), "KEY");
+//        analise(sinkRecord.valueSchema(), "VALUE");
 
-        Struct key = (Struct) sinkRecord.key();
-        Struct value = (Struct) sinkRecord.value();
+        //TODO implement it
 
-        return new Document(ID, Converter.measurementKeyToMongoDbKey(key)).append(
-                USER, key.getString(USER_ID)).append(
-                SOURCE, key.getString(SOURCE_ID)).append(
-                APPLICATION_UPTIME, value.getFloat64(UPTIME)).append(
-                TIMESTAMP, Converter.toDateTime(value.get(TIME_RECEIVED)));
+        return new GenericRecordConverter().convert(sinkRecord);
     }
 }

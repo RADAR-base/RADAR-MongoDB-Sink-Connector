@@ -17,12 +17,12 @@ package org.radarcns.sink.mongodb;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.radarcns.sink.mongodb.util.MongoConstants.FIRST_QUARTILE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.SECOND_QUARTILE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.THIRD_QUARTILE;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SEPARATOR;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SOURCE_ID;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.USER_ID;
+import static org.radarcns.sink.util.MongoConstants.FIRST_QUARTILE;
+import static org.radarcns.sink.util.MongoConstants.SECOND_QUARTILE;
+import static org.radarcns.sink.util.MongoConstants.THIRD_QUARTILE;
+import static org.radarcns.sink.util.RadarAvroConstants.SEPARATOR;
+import static org.radarcns.sink.util.RadarAvroConstants.SOURCE_ID;
+import static org.radarcns.sink.util.RadarAvroConstants.USER_ID;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -32,7 +32,7 @@ import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.bson.Document;
 import org.junit.Test;
-import org.radarcns.sink.mongodb.util.Converter;
+import org.radarcns.sink.util.Converter;
 
 public class ConverterTest {
 

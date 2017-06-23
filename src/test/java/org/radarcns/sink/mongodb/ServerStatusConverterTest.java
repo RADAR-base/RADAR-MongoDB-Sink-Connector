@@ -20,10 +20,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.radarcns.sink.mongodb.util.MongoConstants.SOURCE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.TIMESTAMP;
-import static org.radarcns.sink.mongodb.util.MongoConstants.USER;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.TIME_RECEIVED;
+import static org.radarcns.sink.util.MongoConstants.SOURCE;
+import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
+import static org.radarcns.sink.util.MongoConstants.USER;
+import static org.radarcns.sink.util.RadarAvroConstants.TIME_RECEIVED;
 
 import java.util.Collection;
 import java.util.Date;
@@ -34,11 +34,12 @@ import org.apache.kafka.connect.sink.SinkRecord;
 import org.bson.Document;
 import org.junit.Before;
 import org.junit.Test;
-import org.radarcns.application.ServerStatus;
+import org.radarcns.application.ApplicationServerStatus;
 import org.radarcns.key.MeasurementKey;
 import org.radarcns.sink.mongodb.converter.ServerStatusConverter;
-import org.radarcns.sink.mongodb.util.MongoConstants;
-import org.radarcns.sink.mongodb.util.RadarAvroConstants;
+import org.radarcns.sink.util.MongoConstants;
+import org.radarcns.sink.util.RadarAvroConstants;
+import org.radarcns.sink.util.UtilityTest;
 
 public class ServerStatusConverterTest {
 
@@ -58,7 +59,7 @@ public class ServerStatusConverterTest {
         Collection<String> values = this.converter.supportedSchemaNames();
         assertEquals(values.size(), 1, 0);
         assertEquals(MeasurementKey.class.getCanonicalName() + "-"
-                + ServerStatus.class.getCanonicalName(), values.toArray()[0]);
+                + ApplicationServerStatus.class.getCanonicalName(), values.toArray()[0]);
     }
 
     @Test

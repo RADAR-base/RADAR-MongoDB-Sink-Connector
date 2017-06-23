@@ -1,4 +1,4 @@
-package org.radarcns.sink.mongodb.util;
+package org.radarcns.sink.util;
 
 /*
  * Copyright 2017 King's College London and The Hyve

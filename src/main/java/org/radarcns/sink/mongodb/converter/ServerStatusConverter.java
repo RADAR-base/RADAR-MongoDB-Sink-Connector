@@ -16,15 +16,15 @@ package org.radarcns.sink.mongodb.converter;
  * limitations under the License.
  */
 
-import static org.radarcns.sink.mongodb.util.MongoConstants.CLIENT_IP;
-import static org.radarcns.sink.mongodb.util.MongoConstants.ID;
-import static org.radarcns.sink.mongodb.util.MongoConstants.SOURCE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.TIMESTAMP;
-import static org.radarcns.sink.mongodb.util.MongoConstants.USER;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.IP_ADDRESS;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SOURCE_ID;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.TIME_RECEIVED;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.USER_ID;
+import static org.radarcns.sink.util.MongoConstants.CLIENT_IP;
+import static org.radarcns.sink.util.MongoConstants.ID;
+import static org.radarcns.sink.util.MongoConstants.SOURCE;
+import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
+import static org.radarcns.sink.util.MongoConstants.USER;
+import static org.radarcns.sink.util.RadarAvroConstants.IP_ADDRESS;
+import static org.radarcns.sink.util.RadarAvroConstants.SOURCE_ID;
+import static org.radarcns.sink.util.RadarAvroConstants.TIME_RECEIVED;
+import static org.radarcns.sink.util.RadarAvroConstants.USER_ID;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -32,15 +32,15 @@ import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.errors.DataException;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.bson.Document;
-import org.radarcns.application.ServerStatus;
+import org.radarcns.application.ApplicationServerStatus;
 import org.radarcns.key.MeasurementKey;
 import org.radarcns.serialization.RecordConverter;
-import org.radarcns.sink.mongodb.util.Converter;
-import org.radarcns.sink.mongodb.util.MongoConstants;
-import org.radarcns.sink.mongodb.util.RadarAvroConstants;
+import org.radarcns.sink.util.Converter;
+import org.radarcns.sink.util.MongoConstants;
+import org.radarcns.sink.util.RadarAvroConstants;
 
 /**
- * {@link RecordConverter} to convert a {@link ServerStatus} record to Bson Document.
+ * {@link RecordConverter} to convert a {@link ApplicationServerStatus} record to Bson Document.
  */
 public class ServerStatusConverter implements RecordConverter {
 
@@ -54,7 +54,7 @@ public class ServerStatusConverter implements RecordConverter {
     @Override
     public Collection<String> supportedSchemaNames() {
         return Collections.singleton(MeasurementKey.class.getCanonicalName() + "-"
-                + ServerStatus.class.getCanonicalName());
+                + ApplicationServerStatus.class.getCanonicalName());
     }
 
     /**

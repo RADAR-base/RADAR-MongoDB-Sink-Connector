@@ -22,6 +22,7 @@ import org.radarcns.serialization.RecordConverter;
 import org.radarcns.serialization.RecordConverterFactory;
 import org.radarcns.sink.mongodb.converter.AccelerationCollectorConverter;
 import org.radarcns.sink.mongodb.converter.DoubleCollectorConverter;
+import org.radarcns.sink.mongodb.converter.QuestionnaireConverter;
 import org.radarcns.sink.mongodb.converter.RecordCountConverter;
 import org.radarcns.sink.mongodb.converter.ServerStatusConverter;
 import org.radarcns.sink.mongodb.converter.UptimeStatusConverter;
@@ -44,6 +45,7 @@ public class RecordConverterFactoryRadar extends RecordConverterFactory {
         recordConverters.addAll(super.genericConverters());
         recordConverters.add(new AccelerationCollectorConverter());
         recordConverters.add(new DoubleCollectorConverter());
+        recordConverters.add(new QuestionnaireConverter());
         recordConverters.add(new RecordCountConverter());
         recordConverters.add(new ServerStatusConverter());
         recordConverters.add(new UptimeStatusConverter());

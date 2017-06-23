@@ -20,11 +20,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.radarcns.sink.mongodb.util.MongoConstants.APPLICATION_UPTIME;
-import static org.radarcns.sink.mongodb.util.MongoConstants.SOURCE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.TIMESTAMP;
-import static org.radarcns.sink.mongodb.util.MongoConstants.USER;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.TIME_RECEIVED;
+import static org.radarcns.sink.util.MongoConstants.APPLICATION_UPTIME;
+import static org.radarcns.sink.util.MongoConstants.SOURCE;
+import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
+import static org.radarcns.sink.util.MongoConstants.USER;
+import static org.radarcns.sink.util.RadarAvroConstants.TIME_RECEIVED;
 
 import java.util.Collection;
 import java.util.Date;
@@ -38,7 +38,8 @@ import org.junit.Test;
 import org.radarcns.application.ApplicationUptime;
 import org.radarcns.key.MeasurementKey;
 import org.radarcns.sink.mongodb.converter.UptimeStatusConverter;
-import org.radarcns.sink.mongodb.util.RadarAvroConstants;
+import org.radarcns.sink.util.RadarAvroConstants;
+import org.radarcns.sink.util.UtilityTest;
 
 public class UptimeStatusConverterTest {
 

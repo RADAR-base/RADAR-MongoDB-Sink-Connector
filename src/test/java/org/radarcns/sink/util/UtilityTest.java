@@ -1,14 +1,13 @@
-package org.radarcns.sink.mongodb;
+package org.radarcns.sink.util;
 
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SOURCE_ID;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.USER_ID;
+import static org.radarcns.sink.util.RadarAvroConstants.SOURCE_ID;
+import static org.radarcns.sink.util.RadarAvroConstants.USER_ID;
 
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
-import org.radarcns.sink.mongodb.util.RadarAvroConstants;
 
 /*
  * Copyright 2017 King's College London and The Hyve

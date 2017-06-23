@@ -16,13 +16,13 @@ package org.radarcns.sink.mongodb.converter;
  * limitations under the License.
  */
 
-import static org.radarcns.sink.mongodb.util.MongoConstants.ID;
-import static org.radarcns.sink.mongodb.util.MongoConstants.SOURCE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.TIMESTAMP;
-import static org.radarcns.sink.mongodb.util.MongoConstants.USER;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.SOURCE_ID;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.TIME_RECEIVED;
-import static org.radarcns.sink.mongodb.util.RadarAvroConstants.USER_ID;
+import static org.radarcns.sink.util.MongoConstants.ID;
+import static org.radarcns.sink.util.MongoConstants.SOURCE;
+import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
+import static org.radarcns.sink.util.MongoConstants.USER;
+import static org.radarcns.sink.util.RadarAvroConstants.SOURCE_ID;
+import static org.radarcns.sink.util.RadarAvroConstants.TIME_RECEIVED;
+import static org.radarcns.sink.util.RadarAvroConstants.USER_ID;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -33,9 +33,9 @@ import org.bson.Document;
 import org.radarcns.application.ApplicationRecordCounts;
 import org.radarcns.key.MeasurementKey;
 import org.radarcns.serialization.RecordConverter;
-import org.radarcns.sink.mongodb.util.Converter;
-import org.radarcns.sink.mongodb.util.MongoConstants;
-import org.radarcns.sink.mongodb.util.RadarAvroConstants;
+import org.radarcns.sink.util.Converter;
+import org.radarcns.sink.util.MongoConstants;
+import org.radarcns.sink.util.RadarAvroConstants;
 
 /**
  * {@link RecordConverter} to convert a {@link ApplicationRecordCounts} record to Bson Document.

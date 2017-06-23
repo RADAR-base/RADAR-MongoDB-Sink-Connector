@@ -1,4 +1,4 @@
-package org.radarcns.integration;
+package org.radarcns.util;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -17,24 +17,24 @@ package org.radarcns.integration;
  */
 
 import static org.radarcns.mock.model.ExpectedValue.DURATION;
-import static org.radarcns.sink.mongodb.util.MongoConstants.END;
-import static org.radarcns.sink.mongodb.util.MongoConstants.FIRST_QUARTILE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.ID;
-import static org.radarcns.sink.mongodb.util.MongoConstants.SECOND_QUARTILE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.SOURCE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.START;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.AVERAGE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.COUNT;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.INTERQUARTILE_RANGE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.MAXIMUM;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.MINIMUM;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.QUARTILES;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Stat.SUM;
-import static org.radarcns.sink.mongodb.util.MongoConstants.THIRD_QUARTILE;
-import static org.radarcns.sink.mongodb.util.MongoConstants.USER;
-import static org.radarcns.sink.mongodb.util.MongoConstants.X_LABEL;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Y_LABEL;
-import static org.radarcns.sink.mongodb.util.MongoConstants.Z_LABEL;
+import static org.radarcns.sink.util.MongoConstants.END;
+import static org.radarcns.sink.util.MongoConstants.FIRST_QUARTILE;
+import static org.radarcns.sink.util.MongoConstants.ID;
+import static org.radarcns.sink.util.MongoConstants.SECOND_QUARTILE;
+import static org.radarcns.sink.util.MongoConstants.SOURCE;
+import static org.radarcns.sink.util.MongoConstants.START;
+import static org.radarcns.sink.util.MongoConstants.Stat.AVERAGE;
+import static org.radarcns.sink.util.MongoConstants.Stat.COUNT;
+import static org.radarcns.sink.util.MongoConstants.Stat.INTERQUARTILE_RANGE;
+import static org.radarcns.sink.util.MongoConstants.Stat.MAXIMUM;
+import static org.radarcns.sink.util.MongoConstants.Stat.MINIMUM;
+import static org.radarcns.sink.util.MongoConstants.Stat.QUARTILES;
+import static org.radarcns.sink.util.MongoConstants.Stat.SUM;
+import static org.radarcns.sink.util.MongoConstants.THIRD_QUARTILE;
+import static org.radarcns.sink.util.MongoConstants.USER;
+import static org.radarcns.sink.util.MongoConstants.X_LABEL;
+import static org.radarcns.sink.util.MongoConstants.Y_LABEL;
+import static org.radarcns.sink.util.MongoConstants.Z_LABEL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 import org.bson.Document;
 import org.radarcns.mock.model.ExpectedValue;
-import org.radarcns.sink.mongodb.util.MongoConstants.Stat;
+import org.radarcns.sink.util.MongoConstants.Stat;
 import org.radarcns.stream.collector.DoubleArrayCollector;
 import org.radarcns.stream.collector.DoubleValueCollector;
 

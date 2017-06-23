@@ -91,7 +91,7 @@ ext.codacyVersion = '1.0.10'
 ext.junitVersion = '4.12'
 ext.mongoDbSinkVersion = 'v0.1-alpha.1'
 ext.radarCommonsVersion = '0.4'
-ext.radarSchemasVersion = '0.1.1-alpha.1'
+ext.radarSchemasVersion = '0.1.1-alpha.2'
 ext.reflectionVersion = '0.9.11'
 
 sourceSets {
@@ -122,9 +122,12 @@ dependencies {
     compile group: "org.radarcns", name: 'kafka-connect-mongodb-sink', version: mongoDbSinkVersion
     compile group: 'org.radarcns', name: 'radar-commons', version: radarCommonsVersion
     compile group: 'org.radarcns', name: 'radar-schemas-commons', version: radarSchemasVersion
+    compile group: 'org.radarcns', name: 'radar-schemas-questionnaire', version: radarSchemasVersion
 
     testCompile group: 'junit', name: 'junit', version: junitVersion
     testCompile group: 'org.reflections', name: 'reflections', version: reflectionVersion
+
+    testCompile group: 'org.radarcns' , name: 'radar-schemas-restapi' , version: radarSchemasVersion
 
     endToEndTestCompile group: 'org.radarcns' , name: 'radar-commons-testing' , version: radarCommonsVersion
 
@@ -196,6 +199,8 @@ test {
         // Show that tests are run in the command-line output
         events "skipped", "failed"
     }
+
+    testLogging.showStandardStreams = true
 }
 
 
