@@ -16,6 +16,10 @@ package org.radarcns.sink.util;
  * limitations under the License.
  */
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -27,7 +31,8 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.junit.Before;
 import org.junit.Test;
-import org.radarcns.avro.restapi.app.ServerStatus;
+import org.radarcns.key.MeasurementKey;
+import org.radarcns.questionnaire.Questionnaire;
 import org.radarcns.sink.util.exception.ConverterRuntimeException;
 
 /**
@@ -44,18 +49,15 @@ public class AvroToStruct {
     @Before
     public void setUp() {
         this.input = new LinkedList<>();
-        this.input.add(ServerStatus.getClassSchema());
+        this.input.add(MeasurementKey.getClassSchema());
+        this.input.add(Questionnaire.getClassSchema());
     }
 
     @Test
     public void test() throws IOException {
         for (org.apache.avro.Schema schema : this.input) {
-            printAvroSchema(schema);
-
-            System.out.println("-----------");
-
             Schema dataSchema = convertSchema(schema);
-            analiseStruct(dataSchema, schema.getFullName());
+            analiseStruct(dataSchema);
         }
     }
 
@@ -202,66 +204,81 @@ public class AvroToStruct {
         //System.out.println(avroSchema.toString(true));
     //}
 
-    private void analiseStruct(Schema schema, String element) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[" + element.toUpperCase() + "]" + '\n');
-        stringBuilder.append("Schema: " + schema.toString() + '\n');
+    private JsonNode analiseStruct(Schema schema) throws IOException {
+        ObjectNode objectNode = analiseStruct(null, schema);
 
-        analiseStruct(null, schema, stringBuilder, 1);
+        JsonNode jsonNode = new ObjectMapper().readTree(objectNode.toString());
 
-        //System.out.println(stringBuilder.toString());
+        //System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode));
+
+        return jsonNode;
     }
 
-    private void analiseStruct(String fieldName, Schema schema, StringBuilder stringBuilder,
-            int space) {
-        String blank = "";
-        for (int i = 0; i < space; i++) {
-            blank += " ";
+    private ObjectNode analiseStruct(String fieldName, Schema schema) {
+
+        ObjectNode objectNode = new ObjectMapper().createObjectNode();
+
+        if (fieldName != null) {
+            objectNode = new ObjectMapper().createObjectNode();
+            objectNode.put("fieldName", fieldName);
+            objectNode.put("schema", schema.toString());
         }
 
-        if (fieldName != null)
-            stringBuilder.append(blank + "Name: " + fieldName + "\t Schema: "
-                    + schema.toString() + '\n');
+        if (schema.name() != null) {
+            objectNode.put("name", schema.name());
+        }
 
-        if (schema.name() != null) stringBuilder.append(blank + "[SCHEMA] name: "
-                + schema.name() + '\n');
-        if (schema.type() != null) stringBuilder.append(blank + "[SCHEMA] type: "
-                + schema.type() + '\n');
-        if (schema.doc() != null) stringBuilder.append(blank + "[SCHEMA] doc: "
-                + schema.doc() + '\n');
-        if (schema.defaultValue() != null) stringBuilder.append(blank + "[SCHEMA] default: "
-                + schema.defaultValue().toString() + '\n');
-        stringBuilder.append(blank + "[SCHEMA] optional: "
-                + Boolean.toString(schema.isOptional()) + '\n');
+        if (schema.type() != null) {
+            objectNode.put("type", schema.type().getName().toUpperCase());
+        }
+
+        if (schema.doc() != null) {
+            objectNode.put("doc", schema.doc());
+        }
+
+        if (schema.defaultValue() != null) {
+            objectNode.put("defaultValue", schema.defaultValue().toString());
+        }
+
+        objectNode.put("optional", Boolean.toString(schema.isOptional()));
 
         if (schema.type().equals(Schema.Type.ARRAY)) {
-            stringBuilder.append(blank + "[SCHEMA] VALUE" + '\n');
+            ArrayNode arrayItems = objectNode.putArray("arrayItems");
             for (org.apache.kafka.connect.data.Field sibling : schema.valueSchema().fields()) {
-                analiseStruct(sibling.name(), sibling.schema(), stringBuilder, space + 1);
+                arrayItems.add(analiseStruct(sibling.name(), sibling.schema()));
             }
         } else if (schema.type().equals(Schema.Type.MAP)) {
-            stringBuilder.append(blank + "[SCHEMA] KEY" + '\n');
-            if (schema.keySchema().name() != null)
-                    stringBuilder.append(blank + "[SCHEMA] name: "
-                            + schema.keySchema().name() + '\n');
-            if (schema.keySchema().type() != null)
-                    stringBuilder.append(blank + "[SCHEMA] type: "
-                            + schema.keySchema().type() + '\n');
-            if (schema.keySchema().doc() != null)
-                    stringBuilder.append(blank + "[SCHEMA] doc: "
-                            + schema.keySchema().doc() + '\n');
-            if (schema.keySchema().defaultValue() != null)
-                    stringBuilder.append(blank + "[SCHEMA] default: "
-                            + schema.keySchema().defaultValue().toString() + '\n');
+            ObjectNode keyNode = new ObjectMapper().createObjectNode();
 
-            stringBuilder.append(blank + "[SCHEMA] VALUE" + '\n');
+            if (schema.keySchema().name() != null) {
+                keyNode.put("name", schema.keySchema().name());
+            }
+
+            if (schema.keySchema().type() != null) {
+                keyNode.put("type", schema.keySchema().type().getName());
+            }
+
+            if (schema.keySchema().doc() != null) {
+                keyNode.put("doc", schema.keySchema().doc());
+            }
+
+            if (schema.keySchema().defaultValue() != null) {
+                keyNode.put("default", schema.keySchema().defaultValue().toString());
+            }
+
+            objectNode.set("mapKey", keyNode);
+
+            ArrayNode mapItems = objectNode.putArray("mapItems");
             for (org.apache.kafka.connect.data.Field sibling : schema.valueSchema().fields()) {
-                analiseStruct(sibling.name(), sibling.schema(), stringBuilder, space + 1);
+                mapItems.add(analiseStruct(sibling.name(), sibling.schema()));
             }
         } else if (schema.type().equals(Schema.Type.STRUCT)) {
+            ArrayNode fields = objectNode.putArray("fields");
             for (org.apache.kafka.connect.data.Field sibling : schema.fields()) {
-                analiseStruct(sibling.name(), sibling.schema(), stringBuilder, space + 1);
+                fields.add(analiseStruct(sibling.name(), sibling.schema()));
             }
         }
+
+        return objectNode;
     }
 }
