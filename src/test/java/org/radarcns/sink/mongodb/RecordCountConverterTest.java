@@ -41,6 +41,9 @@ import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.RadarAvroConstants;
 import org.radarcns.sink.util.UtilityTest;
 
+/**
+ * {@link RecordCountConverter} test case.
+ */
 public class RecordCountConverterTest {
 
     private RecordCountConverter converter;

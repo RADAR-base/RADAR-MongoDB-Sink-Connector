@@ -28,6 +28,9 @@ import org.radarcns.serialization.RecordConverter;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
+/**
+ * {@link RecordConverterFactoryRadar} test case.
+ */
 public class ConverterFactoryTest {
 
     private RecordConverterFactoryRadar factory;

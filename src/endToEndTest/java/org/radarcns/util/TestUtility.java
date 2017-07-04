@@ -44,7 +44,11 @@ import org.radarcns.producer.rest.RestClient;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class TestUtility extends TestCase{
+public final  class TestUtility extends TestCase {
+
+    private TestUtility(){
+        // Prevent instantiation
+    }
 
     /**
      * Checks if the test bed is ready to accept data.
@@ -117,7 +121,7 @@ public class TestUtility extends TestCase{
         Map<MockDataConfig, List<Document>> docMap = new HashMap<>();
         for (MockDataConfig key : expectedValue.keySet()) {
             List<Document> documents = expectedDocumentFactory.produceExpectedData(
-                expectedValue.get(key));
+                    expectedValue.get(key));
             docMap.put(key, documents);
         }
         return docMap;
@@ -138,12 +142,12 @@ public class TestUtility extends TestCase{
      */
     public static void checkMongoDbConnection() {
         List<ServerAddress> servers = asList(new ServerAddress(
-            MONGO_CONTAINER.concat(":").concat(MONGO_PORT)));
+                MONGO_CONTAINER.concat(":").concat(MONGO_PORT)));
         List<MongoCredential> credential = singletonList(
-            MongoCredential.createCredential(MONGO_USER, MONGO_DB, MONGO_PWD.toCharArray()));
+                MongoCredential.createCredential(MONGO_USER, MONGO_DB, MONGO_PWD.toCharArray()));
 
         MongoClient client = new MongoClient(servers, credential,
-            MongoClientOptions.builder().serverSelectionTimeout(1000).build());
+                MongoClientOptions.builder().serverSelectionTimeout(1000).build());
 
         hotstorage = client.getDatabase(MONGO_DB);
         try {
@@ -164,7 +168,7 @@ public class TestUtility extends TestCase{
     public static void fetchMongoDb(Map<MockDataConfig, List<Document>> expectedDocument) {
         for (MockDataConfig sensor : expectedDocument.keySet()) {
             FindIterable<Document> collection = hotstorage.getCollection(
-                sensor.getTopic().concat(SUFFIX)).find().sort(ascending(ID));
+                    sensor.getTopic().concat(SUFFIX)).find().sort(ascending(ID));
             List<Document> expectedDocs = expectedDocument.get(sensor);
             MongoCursor cursor = collection.iterator();
 
@@ -220,7 +224,7 @@ public class TestUtility extends TestCase{
      */
     public static void checkClasses(Document expected, Document actual) {
         if (expected.getClass().getCanonicalName().equals("java.util.Arrays.ArrayList")
-            && actual.getClass().getCanonicalName().equals("java.util.ArrayList")) {
+                && actual.getClass().getCanonicalName().equals("java.util.ArrayList")) {
             return;
         } else {
             assertEquals(expected.getClass(), actual.getClass());

@@ -34,6 +34,9 @@ import org.bson.Document;
 import org.junit.Test;
 import org.radarcns.sink.util.Converter;
 
+/**
+ * {@link Converter} test case.
+ */
 public class ConverterTest {
 
     @Test

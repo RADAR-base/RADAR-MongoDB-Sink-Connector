@@ -16,6 +16,7 @@ package org.radarcns.sink.mongodb.converter;
  * limitations under the License.
  */
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import org.apache.kafka.connect.errors.DataException;
@@ -25,6 +26,7 @@ import org.radarcns.key.MeasurementKey;
 import org.radarcns.questionnaire.Questionnaire;
 import org.radarcns.serialization.GenericRecordConverter;
 import org.radarcns.serialization.RecordConverter;
+import org.radarcns.sink.util.struct.StructAnalyser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +58,12 @@ public class QuestionnaireConverter implements RecordConverter {
      */
     @Override
     public Document convert(SinkRecord sinkRecord) throws DataException {
-//        analise(sinkRecord.keySchema(), "KEY");
-//        analise(sinkRecord.valueSchema(), "VALUE");
+        try {
+            LOGGER.info(StructAnalyser.prettyAnalise(sinkRecord.keySchema()));
+            LOGGER.info(StructAnalyser.prettyAnalise(sinkRecord.valueSchema()));
+        } catch (IOException e) {
+            LOGGER.error("SinkRecord cannot be analysed", e);
+        }
 
         //TODO implement it
 

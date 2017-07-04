@@ -41,6 +41,9 @@ import org.radarcns.sink.mongodb.converter.UptimeStatusConverter;
 import org.radarcns.sink.util.RadarAvroConstants;
 import org.radarcns.sink.util.UtilityTest;
 
+/**
+ * {@link UptimeStatusConverter} test case.
+ */
 public class UptimeStatusConverterTest {
 
     private UptimeStatusConverter converter;

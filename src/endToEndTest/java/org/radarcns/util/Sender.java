@@ -31,16 +31,19 @@ import org.radarcns.topic.AvroTopic;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/** Generic REST Kafka Sender. */
 public class Sender<K extends SpecificRecord, V extends SpecificRecord> {
 
     private static final int TIMEOUT = 60;
 
-    private KafkaSender<K, V> kafkaSender;
-    private KafkaTopicSender<K, V> kafkaTopicSender;
-    private SchemaRetriever schemaRetriever;
+    private final KafkaSender<K, V> kafkaSender;
+    private final KafkaTopicSender<K, V> kafkaTopicSender;
+    private final SchemaRetriever schemaRetriever;
 
     private int offset;
 
+    /** Constructor. */
     public Sender(BasicMockConfig config, AvroTopic<K, V> topic)
             throws InstantiationException, IllegalAccessException, IOException {
         this.schemaRetriever = new SchemaRetriever(config.getSchemaRegistry(), TIMEOUT);
@@ -68,6 +71,9 @@ public class Sender<K extends SpecificRecord, V extends SpecificRecord> {
         return new BatchedKafkaSender<>(firstSender, 1_000, 1000);
     }
 
+    /**
+     * Flush and close the sender.
+     */
     public void close() throws IOException {
         kafkaTopicSender.flush();
         kafkaTopicSender.close();
@@ -75,6 +81,7 @@ public class Sender<K extends SpecificRecord, V extends SpecificRecord> {
         schemaRetriever.close();
     }
 
+    /** Create and send a Kafka message with key K and value V.*/
     public void send(K key, V value) throws IOException {
         kafkaTopicSender.send(Arrays.asList(new Record<>(offset, key, value)));
         offset++;

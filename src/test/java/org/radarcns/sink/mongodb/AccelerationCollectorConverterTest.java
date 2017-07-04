@@ -59,6 +59,9 @@ import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.MongoConstants.Stat;
 import org.radarcns.sink.util.UtilityTest;
 
+/**
+ * {@link AccelerationCollectorConverter} test case.
+ */
 public class AccelerationCollectorConverterTest {
 
     private AccelerationCollectorConverter converter;

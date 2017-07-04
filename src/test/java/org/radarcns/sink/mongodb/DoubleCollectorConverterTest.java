@@ -52,6 +52,9 @@ import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.MongoConstants.Stat;
 import org.radarcns.sink.util.UtilityTest;
 
+/**
+ * {@link DoubleCollectorConverter} test case.
+ */
 public class DoubleCollectorConverterTest {
 
     private DoubleCollectorConverter converter;

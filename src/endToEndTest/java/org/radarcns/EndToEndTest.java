@@ -29,8 +29,8 @@ import org.bson.Document;
 import org.junit.Test;
 import org.radarcns.key.MeasurementKey;
 import org.radarcns.questionnaire.Answer;
+import org.radarcns.questionnaire.MapTest;
 import org.radarcns.questionnaire.Questionnaire;
-import org.radarcns.questionnaire.QuestionnaireType;
 import org.radarcns.topic.AvroTopic;
 import org.radarcns.util.Sender;
 import org.radarcns.util.TestCase;
@@ -42,29 +42,29 @@ import org.radarcns.util.TestCase;
  */
 public class EndToEndTest extends TestCase {
 
-//    @Test
-//    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-//    /**
-//     * Test mock sensor specified in {@code resources/basic_mock_config.yml}.
-//     */
-//    public void endToEndTest() throws Exception {
-//        produceInputFile();
-//
-//        Map<MockDataConfig, ExpectedValue> expectedValue = MockAggregator.getSimulations(
-//                config.getData(), dataRoot);
-//
-//        final Map<MockDataConfig, List<Document>> expectedDocument = produceExpectedDocument(
-//                expectedValue, new ExpectedDocumentFactory());
-//
-//        streamToKafka();
-//
-//        LOGGER.info("Waiting data ({} seconds) ... ", LATENCY);
-//        Thread.sleep(TimeUnit.SECONDS.toMillis(LATENCY));
-//
-//        checkMongoDbConnection();
-//
-//        fetchMongoDb(expectedDocument);
-//    }
+    //@Test
+    //@SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    /**
+     * Test mock sensor specified in {@code resources/basic_mock_config.yml}.
+     */
+    /*public void endToEndTest() throws Exception {
+        produceInputFile();
+
+        Map<MockDataConfig, ExpectedValue> expectedValue = MockAggregator.getSimulations(
+                config.getData(), dataRoot);
+
+        final Map<MockDataConfig, List<Document>> expectedDocument = produceExpectedDocument(
+                expectedValue, new ExpectedDocumentFactory());
+
+        streamToKafka();
+
+        LOGGER.info("Waiting data ({} seconds) ... ", LATENCY);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(LATENCY));
+
+        checkMongoDbConnection();
+
+        fetchMongoDb(expectedDocument);
+    }*/
 
     @Test
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
@@ -79,15 +79,24 @@ public class EndToEndTest extends TestCase {
         answers.add(new Answer("1", time, time));
 
         MeasurementKey key = new MeasurementKey(USER_ID_MOCK, SOURCE_ID_MOCK);
-        Questionnaire questionnaire = new Questionnaire(time, time, QuestionnaireType.PHQ8,
-            "v1.0", answers, time, time);
+        //Questionnaire questionnaire = new Questionnaire(time, time, QuestionnaireType.PHQ8,
+        //    "v1.0", answers, time, time);
+        MapTest mapTest = new MapTest(time, time, "Test");
 
-        AvroTopic<MeasurementKey, Questionnaire> topic =
-            new AvroTopic<>(topicName, MeasurementKey.getClassSchema(),
-                Questionnaire.getClassSchema(), MeasurementKey.class, Questionnaire.class);
+        //AvroTopic<MeasurementKey, Questionnaire> topic =
+        //    new AvroTopic<>(topicName, MeasurementKey.getClassSchema(),
+        //        Questionnaire.getClassSchema(), MeasurementKey.class, Questionnaire.class);
 
-        Sender<MeasurementKey, Questionnaire> sender = new Sender<>(config, topic);
-        sender.send(key, questionnaire);
+        AvroTopic<MeasurementKey, MapTest> topic =
+                new AvroTopic<>(topicName, MeasurementKey.getClassSchema(),
+                MapTest.getClassSchema(), MeasurementKey.class, MapTest.class);
+
+        //Sender<MeasurementKey, Questionnaire> sender = new Sender<>(config, topic);
+        Sender<MeasurementKey, MapTest> sender = new Sender<>(config, topic);
+
+        //sender.send(key, questionnaire);
+        sender.send(key, mapTest);
+
         sender.close();
 
         LOGGER.info("Waiting data ({} seconds) ... ", LATENCY);
@@ -103,9 +112,9 @@ public class EndToEndTest extends TestCase {
             Document actualDoc = (Document) cursor.next();
 
             LOGGER.info("Actual: {}", actualDoc.toJson());
-            Document expectedDoc = null;
-//            assertDocument(expectedDoc, actualDoc, sensor.getMaximumDifference());
-//            count++;
+            //Document expectedDoc = null;
+            //assertDocument(expectedDoc, actualDoc, sensor.getMaximumDifference());
+            //count++;
         }
 
     }

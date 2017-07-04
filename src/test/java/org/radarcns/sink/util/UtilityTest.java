@@ -24,6 +24,10 @@ import org.apache.kafka.connect.data.Struct;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * Utility functions useful to test.
+ */
 public final class UtilityTest {
 
     private UtilityTest() {}

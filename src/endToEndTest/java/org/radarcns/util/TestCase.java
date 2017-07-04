@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * limitations under the License.
  */
 
+@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class TestCase {
     public static final Logger LOGGER = LoggerFactory.getLogger(TestCase.class);
 

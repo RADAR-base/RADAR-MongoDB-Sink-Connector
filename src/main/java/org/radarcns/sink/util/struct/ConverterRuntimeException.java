@@ -1,4 +1,4 @@
-package org.radarcns.sink.util.exception;
+package org.radarcns.sink.util.struct;
 
 /*
  * Copyright 2017 King's College London and The Hyve
