@@ -90,7 +90,7 @@ sourceCompatibility = '1.8'
 ext.codacyVersion = '1.0.10'
 ext.junitVersion = '4.12'
 ext.mongoDbSinkVersion = 'v0.1-alpha.1'
-ext.radarCommonsVersion = '0.4'
+ext.radarCommonsVersion = '0.4.1'
 ext.radarSchemasVersion = '0.1.1-alpha.2'
 ext.reflectionVersion = '0.9.11'
 
@@ -119,16 +119,30 @@ repositories {
 }
 
 dependencies {
+    //Base MongoDb connector extended by this project
     compile group: "org.radarcns", name: 'kafka-connect-mongodb-sink', version: mongoDbSinkVersion
+
+    //RADAR-CNS commons code
     compile group: 'org.radarcns', name: 'radar-commons', version: radarCommonsVersion
+
+    //Set of schemas used by the sources streaming data into the platform
     compile group: 'org.radarcns', name: 'radar-schemas-commons', version: radarSchemasVersion
 
+    //Test library
     testCompile group: 'junit', name: 'junit', version: junitVersion
+    //Useful to check that RecordConverterFactoryRadar is correct
     testCompile group: 'org.reflections', name: 'reflections', version: reflectionVersion
 
+    //Useful to generate random data for testing
     endToEndTestCompile group: 'org.radarcns' , name: 'radar-commons-testing' , version: radarCommonsVersion
 
     codacy group: 'com.github.codacy', name: 'codacy-coverage-reporter', version: codacyVersion
+
+    //TODO remove them when radar-commons will be published
+    compile group: 'org.apache.avro', name: 'avro', version: '1.8.1'
+    compile group: 'com.fasterxml.jackson.core' , name: 'jackson-databind' , version: '2.8.5'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.8.5'
+    endToEndTestCompile group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.6.0'
 }
 
 jar {

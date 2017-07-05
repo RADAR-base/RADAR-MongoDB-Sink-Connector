@@ -183,6 +183,7 @@ public final  class TestUtility extends TestCase {
 
             assertEquals(expectedDocs.size(), count);
         }
+
     }
 
     /**
@@ -229,6 +230,24 @@ public final  class TestUtility extends TestCase {
         } else {
             assertEquals(expected.getClass(), actual.getClass());
         }
+    }
+
+    /**
+     * Return the first available document for the given MongoDb collection name.
+     */
+    public static Document getActualDocumet(String collectionName) {
+        checkMongoDbConnection();
+
+        FindIterable<Document> collection = hotstorage.getCollection(collectionName).find().sort(
+                ascending(ID));
+
+        MongoCursor cursor = collection.iterator();
+        if (cursor.hasNext()) {
+            return (Document) cursor.next();
+        }
+
+        throw new IllegalStateException("No documents are available");
+
     }
 
 }
