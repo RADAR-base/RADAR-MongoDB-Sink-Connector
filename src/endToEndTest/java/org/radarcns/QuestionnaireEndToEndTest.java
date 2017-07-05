@@ -16,9 +16,13 @@ package org.radarcns;
  * limitations under the License.
  */
 
+import static org.radarcns.sink.util.MongoConstants.ANSWERS;
 import static org.radarcns.sink.util.MongoConstants.END;
 import static org.radarcns.sink.util.MongoConstants.ID;
+import static org.radarcns.sink.util.MongoConstants.NAME;
+import static org.radarcns.sink.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.util.MongoConstants.START;
+import static org.radarcns.sink.util.MongoConstants.USER;
 import static org.radarcns.sink.util.MongoConstants.VALUE;
 import static org.radarcns.sink.util.RadarAvroConstants.SEPARATOR;
 
@@ -89,12 +93,12 @@ public class QuestionnaireEndToEndTest extends SenderTestCase {
         return new Document(ID,
             USER_ID_MOCK.concat(SEPARATOR).concat(SOURCE_ID_MOCK).concat(SEPARATOR).concat(
                     keyTime).concat(SEPARATOR).concat(keyTime)).append(
-            MongoConstants.USER, USER_ID_MOCK).append(
-            MongoConstants.SOURCE, SOURCE_ID_MOCK).append(
-            MongoConstants.NAME, TYPE.name()).append(
-            MongoConstants.VERSION, VERSION).append(
-            MongoConstants.ANSWERS, answers).append(
-            MongoConstants.START, timestamp).append(
-            MongoConstants.END, timestamp);
+            USER, USER_ID_MOCK).append(
+            SOURCE, SOURCE_ID_MOCK).append(
+            NAME, TYPE.name()).append(
+            VERSION, VERSION).append(
+            ANSWERS, answers).append(
+            START, timestamp).append(
+            END, timestamp);
     }
 }
