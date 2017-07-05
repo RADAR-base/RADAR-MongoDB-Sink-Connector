@@ -273,8 +273,6 @@ public abstract class TestCase {
      * Return the first available document for the given MongoDb collection name.
      */
     public Document getActualDocumet(String collectionName) {
-        checkMongoDbConnection();
-
         FindIterable<Document> collection = hotstorage.getCollection(collectionName).find().sort(
                 ascending(ID));
 

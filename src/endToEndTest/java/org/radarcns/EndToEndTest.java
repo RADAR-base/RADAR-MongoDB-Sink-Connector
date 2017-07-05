@@ -82,8 +82,6 @@ public class EndToEndTest extends TestCase {
         testCases.add(new ServerStatusEndToEndTest());
         testCases.add(new UptimeEndToEndTest());
 
-        checkMongoDbConnection();
-
         for (SenderTestCase executor : testCases) {
             executor.send();
         }
