@@ -25,8 +25,6 @@ cache:
     - $HOME/.gradle/wrapper/
 
 before_install:
-  - sudo apt-get update
-  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
   - docker --version
   - mkdir -p "$HOME/bin";
   - export PATH="$HOME/bin:$PATH";
