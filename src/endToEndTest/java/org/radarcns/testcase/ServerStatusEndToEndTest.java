@@ -1,4 +1,4 @@
-package org.radarcns;
+package org.radarcns.testcase;
 
 /*
  * Copyright 2017 Kings College London and The Hyve
@@ -16,6 +16,8 @@ package org.radarcns;
  * limitations under the License.
  */
 
+import static org.radarcns.sink.util.KeyGenerator.toDateTime;
+import static org.radarcns.sink.util.MongoConstants.CLIENT_IP;
 import static org.radarcns.sink.util.MongoConstants.ID;
 import static org.radarcns.sink.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
@@ -24,55 +26,57 @@ import static org.radarcns.sink.util.RadarAvroConstants.SEPARATOR;
 
 import java.io.IOException;
 import org.bson.Document;
-import org.radarcns.application.ApplicationRecordCounts;
+import org.radarcns.application.ApplicationServerStatus;
+import org.radarcns.application.ServerStatus;
 import org.radarcns.key.MeasurementKey;
-import org.radarcns.sink.util.KeyGenerator;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.topic.SensorTopic;
 import org.radarcns.util.Sender;
 import org.radarcns.util.SenderTestCase;
 
 /**
- * MongoDB Sink connector e2e test. It streams a static generated {@link ApplicationRecordCounts}
+ * MongoDB Sink connector e2e test. It streams a static generated {@link ApplicationServerStatus}
  *      message into the data pipeline and then queries MongoDb to check that data has been
  *      correctly stored.
  */
-public class RecordCountEndToEndTest extends SenderTestCase {
+public class ServerStatusEndToEndTest extends SenderTestCase {
 
-    private static final Integer MOCK_VALUE = 10;
+    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
+    private static final String IP_ADDRESS = "127.0.0.1";
+    private static final ServerStatus STATUS = ServerStatus.CONNECTED;
     private static final double TIME = System.currentTimeMillis() / 1000d;
 
     @Override
-    protected String getTopicName() {
-        return "application_record_counts";
+    public String getTopicName() {
+        return "application_server_status";
     }
 
     @Override
-    protected void send()
+    public void send()
             throws IOException, IllegalAccessException, InstantiationException {
         MeasurementKey key = new MeasurementKey(USER_ID_MOCK, SOURCE_ID_MOCK);
 
-        ApplicationRecordCounts recordCounts = new ApplicationRecordCounts(TIME, TIME, MOCK_VALUE,
-                MOCK_VALUE, MOCK_VALUE);
+        ApplicationServerStatus status = new ApplicationServerStatus(TIME, TIME, STATUS,
+                IP_ADDRESS);
 
-        SensorTopic<MeasurementKey, ApplicationRecordCounts> topic =
+        SensorTopic<MeasurementKey, ApplicationServerStatus> topic =
                 new SensorTopic<>(getTopicName(), MeasurementKey.getClassSchema(),
-                recordCounts.getSchema(), MeasurementKey.class, ApplicationRecordCounts.class);
+                    status.getSchema(), MeasurementKey.class, ApplicationServerStatus.class);
 
-        Sender<MeasurementKey, ApplicationRecordCounts> sender = new Sender<>(config, topic);
+        Sender<MeasurementKey, ApplicationServerStatus> sender = new Sender<>(config, topic);
 
-        sender.send(key, recordCounts);
+        sender.send(key, status);
 
         sender.close();
     }
 
     @Override
-    protected Document getExpectedDocument() {
+    public Document getExpectedDocument() {
         return new Document(ID, USER_ID_MOCK.concat(SEPARATOR).concat(SOURCE_ID_MOCK)).append(
-                USER, USER_ID_MOCK).append(SOURCE, SOURCE_ID_MOCK).append(
-                MongoConstants.RECORDS_CACHED, MOCK_VALUE).append(
-                MongoConstants.RECORDS_SENT, MOCK_VALUE).append(
-                MongoConstants.RECORDS_UNSENT, MOCK_VALUE).append(
-                TIMESTAMP, KeyGenerator.toDateTime(TIME));
+                USER, USER_ID_MOCK).append(
+                SOURCE, SOURCE_ID_MOCK).append(
+                MongoConstants.SERVER_STATUS, STATUS.name()).append(
+                CLIENT_IP, IP_ADDRESS).append(
+                TIMESTAMP, toDateTime(TIME));
     }
 }

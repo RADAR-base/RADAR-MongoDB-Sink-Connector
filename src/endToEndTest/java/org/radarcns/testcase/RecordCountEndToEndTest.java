@@ -1,4 +1,4 @@
-package org.radarcns;
+package org.radarcns.testcase;
 
 /*
  * Copyright 2017 Kings College London and The Hyve
@@ -16,8 +16,6 @@ package org.radarcns;
  * limitations under the License.
  */
 
-import static org.radarcns.sink.util.KeyGenerator.toDateTime;
-import static org.radarcns.sink.util.MongoConstants.APPLICATION_UPTIME;
 import static org.radarcns.sink.util.MongoConstants.ID;
 import static org.radarcns.sink.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
@@ -26,52 +24,55 @@ import static org.radarcns.sink.util.RadarAvroConstants.SEPARATOR;
 
 import java.io.IOException;
 import org.bson.Document;
-import org.radarcns.application.ApplicationServerStatus;
-import org.radarcns.application.ApplicationUptime;
+import org.radarcns.application.ApplicationRecordCounts;
 import org.radarcns.key.MeasurementKey;
+import org.radarcns.sink.util.KeyGenerator;
+import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.topic.SensorTopic;
 import org.radarcns.util.Sender;
 import org.radarcns.util.SenderTestCase;
 
 /**
- * MongoDB Sink connector e2e test. It streams a static generated {@link ApplicationServerStatus}
+ * MongoDB Sink connector e2e test. It streams a static generated {@link ApplicationRecordCounts}
  *      message into the data pipeline and then queries MongoDb to check that data has been
  *      correctly stored.
  */
-public class UptimeEndToEndTest extends SenderTestCase {
+public class RecordCountEndToEndTest extends SenderTestCase {
 
-    private static final Double MOCK_VALUE = 10d;
+    private static final Integer MOCK_VALUE = 10;
     private static final double TIME = System.currentTimeMillis() / 1000d;
 
     @Override
-    protected String getTopicName() {
-        return "application_uptime";
+    public String getTopicName() {
+        return "application_record_counts";
     }
 
     @Override
-    protected void send()
+    public void send()
             throws IOException, IllegalAccessException, InstantiationException {
         MeasurementKey key = new MeasurementKey(USER_ID_MOCK, SOURCE_ID_MOCK);
 
-        ApplicationUptime uptime = new ApplicationUptime(TIME, TIME, MOCK_VALUE);
+        ApplicationRecordCounts recordCounts = new ApplicationRecordCounts(TIME, TIME, MOCK_VALUE,
+                MOCK_VALUE, MOCK_VALUE);
 
-        SensorTopic<MeasurementKey, ApplicationUptime> topic =
+        SensorTopic<MeasurementKey, ApplicationRecordCounts> topic =
                 new SensorTopic<>(getTopicName(), MeasurementKey.getClassSchema(),
-                    uptime.getSchema(), MeasurementKey.class, ApplicationUptime.class);
+                recordCounts.getSchema(), MeasurementKey.class, ApplicationRecordCounts.class);
 
-        Sender<MeasurementKey, ApplicationUptime> sender = new Sender<>(config, topic);
+        Sender<MeasurementKey, ApplicationRecordCounts> sender = new Sender<>(config, topic);
 
-        sender.send(key, uptime);
+        sender.send(key, recordCounts);
 
         sender.close();
     }
 
     @Override
-    protected Document getExpectedDocument() {
+    public Document getExpectedDocument() {
         return new Document(ID, USER_ID_MOCK.concat(SEPARATOR).concat(SOURCE_ID_MOCK)).append(
-            USER, USER_ID_MOCK).append(
-            SOURCE, SOURCE_ID_MOCK).append(
-            APPLICATION_UPTIME, MOCK_VALUE).append(
-            TIMESTAMP, toDateTime(TIME));
+                USER, USER_ID_MOCK).append(SOURCE, SOURCE_ID_MOCK).append(
+                MongoConstants.RECORDS_CACHED, MOCK_VALUE).append(
+                MongoConstants.RECORDS_SENT, MOCK_VALUE).append(
+                MongoConstants.RECORDS_UNSENT, MOCK_VALUE).append(
+                TIMESTAMP, KeyGenerator.toDateTime(TIME));
     }
 }

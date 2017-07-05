@@ -16,7 +16,25 @@ package org.radarcns;
  * limitations under the License.
  */
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import org.bson.Document;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.radarcns.config.YamlConfigLoader;
+import org.radarcns.mock.config.BasicMockConfig;
+import org.radarcns.testcase.QuestionnaireEndToEndTest;
+import org.radarcns.testcase.RecordCountEndToEndTest;
+import org.radarcns.testcase.ServerStatusEndToEndTest;
+import org.radarcns.testcase.UptimeEndToEndTest;
+import org.radarcns.util.SenderTestCase;
 import org.radarcns.util.TestCase;
 
 /**
@@ -26,10 +44,25 @@ import org.radarcns.util.TestCase;
  */
 public class EndToEndTest extends TestCase {
 
+    /**
+     * Test initialisation. It loads the config file and waits that the infrastructure is ready
+     *      to accept requests.
+     */
+    @BeforeClass
+    public static void setUpClass() throws IOException, InterruptedException {
+        URL configResource = EndToEndTest.class.getClassLoader().getResource(CONFIG_FILE);
+        assertNotNull(configResource);
+        File configFile = new File(configResource.getFile());
+        config = new YamlConfigLoader().load(configFile, BasicMockConfig.class);
+        dataRoot = configFile.getAbsoluteFile().getParentFile();
+
+        waitInfrastructure();
+    }
+
     @Test
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     /**
-     * Test mock sensor specified in {@code resources/basic_mock_config.yml}.
+     * Test mock sources.
      */
     public void endToEndTest() throws Exception {
         //TODO add it back when the Backend project will be aligned with the new WindowedKey
@@ -41,13 +74,45 @@ public class EndToEndTest extends TestCase {
         final Map<MockDataConfig, List<Document>> expectedDocument = produceExpectedDocument(
                 expectedValue, new ExpectedDocumentFactory());
 
-        streamToKafka();
+        streamToKafka();*/
+
+        Set<SenderTestCase> testCases = new HashSet<>();
+        testCases.add(new QuestionnaireEndToEndTest());
+        testCases.add(new RecordCountEndToEndTest());
+        testCases.add(new ServerStatusEndToEndTest());
+        testCases.add(new UptimeEndToEndTest());
+
+        checkMongoDbConnection();
+
+        for (SenderTestCase executor : testCases) {
+            executor.send();
+        }
 
         LOGGER.info("Waiting data ({} seconds) ... ", LATENCY);
         Thread.sleep(TimeUnit.SECONDS.toMillis(LATENCY));
 
         checkMongoDbConnection();
 
-        fetchMongoDb(expectedDocument);*/
+        //fetchMongoDb(expectedDocument);
+
+        for (SenderTestCase executor : testCases) {
+            test(executor);
+        }
+
+        closeMongoDbConnection();
+    }
+
+    private void test(SenderTestCase testcase)
+        throws IllegalAccessException, IOException, InstantiationException,
+        InterruptedException {
+        Document expectedDoc = testcase.getExpectedDocument();
+        LOGGER.info("Expected: {}", expectedDoc.toJson());
+
+        Document actualDoc = getActualDocumet(testcase.getTopicName());
+        LOGGER.info("Actual: {}", actualDoc.toJson());
+
+        for (String key : expectedDoc.keySet()) {
+            assertEquals(expectedDoc.get(key), actualDoc.get(key));
+        }
     }
 }

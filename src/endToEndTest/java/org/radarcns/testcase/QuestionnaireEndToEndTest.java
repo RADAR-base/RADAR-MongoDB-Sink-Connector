@@ -1,4 +1,4 @@
-package org.radarcns;
+package org.radarcns.testcase;
 
 /*
  * Copyright 2017 Kings College London and The Hyve
@@ -56,12 +56,12 @@ public class QuestionnaireEndToEndTest extends SenderTestCase {
     private static final double TIME = System.currentTimeMillis() / 1000d;
 
     @Override
-    protected String getTopicName() {
+    public String getTopicName() {
         return "active_questionnaire_phq8";
     }
 
     @Override
-    protected void send()
+    public void send()
             throws IOException, IllegalAccessException, InstantiationException {
         List<Answer> answers = new ArrayList<>();
         answers.add(new Answer(ANSWER, TIME, TIME));
@@ -82,7 +82,7 @@ public class QuestionnaireEndToEndTest extends SenderTestCase {
     }
 
     @Override
-    protected Document getExpectedDocument() {
+    public Document getExpectedDocument() {
         Date timestamp = KeyGenerator.toDateTime(TIME);
         String keyTime = Long.toString(KeyGenerator.toDateTime(TIME).getTime());
 
@@ -96,7 +96,7 @@ public class QuestionnaireEndToEndTest extends SenderTestCase {
             USER, USER_ID_MOCK).append(
             SOURCE, SOURCE_ID_MOCK).append(
             NAME, TYPE.name()).append(
-            VERSION, VERSION).append(
+            MongoConstants.VERSION, VERSION).append(
             ANSWERS, answers).append(
             START, timestamp).append(
             END, timestamp);

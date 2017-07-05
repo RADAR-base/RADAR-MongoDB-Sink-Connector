@@ -1,4 +1,4 @@
-package org.radarcns;
+package org.radarcns.testcase;
 
 /*
  * Copyright 2017 Kings College London and The Hyve
@@ -17,7 +17,7 @@ package org.radarcns;
  */
 
 import static org.radarcns.sink.util.KeyGenerator.toDateTime;
-import static org.radarcns.sink.util.MongoConstants.CLIENT_IP;
+import static org.radarcns.sink.util.MongoConstants.APPLICATION_UPTIME;
 import static org.radarcns.sink.util.MongoConstants.ID;
 import static org.radarcns.sink.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
@@ -27,9 +27,8 @@ import static org.radarcns.sink.util.RadarAvroConstants.SEPARATOR;
 import java.io.IOException;
 import org.bson.Document;
 import org.radarcns.application.ApplicationServerStatus;
-import org.radarcns.application.ServerStatus;
+import org.radarcns.application.ApplicationUptime;
 import org.radarcns.key.MeasurementKey;
-import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.topic.SensorTopic;
 import org.radarcns.util.Sender;
 import org.radarcns.util.SenderTestCase;
@@ -39,44 +38,40 @@ import org.radarcns.util.SenderTestCase;
  *      message into the data pipeline and then queries MongoDb to check that data has been
  *      correctly stored.
  */
-public class ServerStatusEndToEndTest extends SenderTestCase {
+public class UptimeEndToEndTest extends SenderTestCase {
 
-    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-    private static final String IP_ADDRESS = "127.0.0.1";
-    private static final ServerStatus STATUS = ServerStatus.CONNECTED;
+    private static final Double MOCK_VALUE = 10d;
     private static final double TIME = System.currentTimeMillis() / 1000d;
 
     @Override
-    protected String getTopicName() {
-        return "application_server_status";
+    public String getTopicName() {
+        return "application_uptime";
     }
 
     @Override
-    protected void send()
+    public void send()
             throws IOException, IllegalAccessException, InstantiationException {
         MeasurementKey key = new MeasurementKey(USER_ID_MOCK, SOURCE_ID_MOCK);
 
-        ApplicationServerStatus status = new ApplicationServerStatus(TIME, TIME, STATUS,
-                IP_ADDRESS);
+        ApplicationUptime uptime = new ApplicationUptime(TIME, TIME, MOCK_VALUE);
 
-        SensorTopic<MeasurementKey, ApplicationServerStatus> topic =
+        SensorTopic<MeasurementKey, ApplicationUptime> topic =
                 new SensorTopic<>(getTopicName(), MeasurementKey.getClassSchema(),
-                    status.getSchema(), MeasurementKey.class, ApplicationServerStatus.class);
+                    uptime.getSchema(), MeasurementKey.class, ApplicationUptime.class);
 
-        Sender<MeasurementKey, ApplicationServerStatus> sender = new Sender<>(config, topic);
+        Sender<MeasurementKey, ApplicationUptime> sender = new Sender<>(config, topic);
 
-        sender.send(key, status);
+        sender.send(key, uptime);
 
         sender.close();
     }
 
     @Override
-    protected Document getExpectedDocument() {
+    public Document getExpectedDocument() {
         return new Document(ID, USER_ID_MOCK.concat(SEPARATOR).concat(SOURCE_ID_MOCK)).append(
-                USER, USER_ID_MOCK).append(
-                SOURCE, SOURCE_ID_MOCK).append(
-                MongoConstants.SERVER_STATUS, STATUS.name()).append(
-                CLIENT_IP, IP_ADDRESS).append(
-                TIMESTAMP, toDateTime(TIME));
+            USER, USER_ID_MOCK).append(
+            SOURCE, SOURCE_ID_MOCK).append(
+            APPLICATION_UPTIME, MOCK_VALUE).append(
+            TIMESTAMP, toDateTime(TIME));
     }
 }

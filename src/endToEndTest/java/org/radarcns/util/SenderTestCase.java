@@ -1,11 +1,7 @@
 package org.radarcns.util;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import org.bson.Document;
-import org.junit.Test;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -24,31 +20,11 @@ import org.junit.Test;
  */
 public abstract class SenderTestCase extends TestCase {
 
-    @Test
-    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-    /**
-     * Test a specific {@link org.apache.avro.specific.SpecificRecord}.
-     */
-    public void test() throws Exception {
-        send();
+    public abstract String getTopicName();
 
-        LOGGER.info("Waiting data ({} seconds) ... ", LATENCY);
-        Thread.sleep(TimeUnit.SECONDS.toMillis(LATENCY));
-
-        Document expectedDoc = getExpectedDocument();
-        LOGGER.info("Expected: {}", expectedDoc.toJson());
-
-        Document actualDoc = TestUtility.getActualDocumet(getTopicName());
-        LOGGER.info("Actual: {}", actualDoc.toJson());
-
-        assertEquals(expectedDoc, actualDoc);
-    }
-
-    protected abstract String getTopicName();
-
-    protected abstract void send()
+    public abstract void send()
             throws IOException, IllegalAccessException, InstantiationException;
 
-    protected abstract Document getExpectedDocument();
+    public abstract Document getExpectedDocument();
 
 }
