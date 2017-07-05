@@ -19,6 +19,7 @@ package org.radarcns.sink.util.struct;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.Schema.Type;
 import org.apache.kafka.connect.data.ConnectSchema;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
@@ -27,7 +28,7 @@ import org.apache.kafka.connect.data.SchemaBuilder;
  * Converter from AVRO {@link org.apache.avro.Schema} to Struct
  *      {@link org.apache.kafka.connect.data.Schema}.
  */
-@SuppressWarnings("PMD.GodClass")
+@SuppressWarnings({"PMD.GodClass", "PMD.StdCyclomaticComplexity"})
 public final class AvroToStruct {
 
     public static final String ARRAY_LABEL = "array";
@@ -41,15 +42,25 @@ public final class AvroToStruct {
     /**
      * Convert the input AVRO {@link org.apache.avro.Schema} into an equivalent
      *      Struct {@link Schema}.
-     * @param avroSchema AVRO {@link org.apache.avro.Schema} to converted
+     * @param avroSchema AVRO {@link org.apache.avro.Schema} to be converted
      * @return a Struct {@link Schema} equivalent to the input AVRO {@link org.apache.avro.Schema}
      */
     public static Schema convertSchema(org.apache.avro.Schema avroSchema) {
         switch (avroSchema.getType()) {
-            case RECORD: return getRecordSchema(avroSchema, false);
+            case ARRAY: return getArraySchema(avroSchema, false);
+            case BYTES: return Schema.BYTES_SCHEMA;
+            case BOOLEAN: return Schema.BOOLEAN_SCHEMA;
+            case DOUBLE: return Schema.FLOAT64_SCHEMA;
             case ENUM: return new ConnectSchema(Schema.Type.STRING, false, null,
                 avroSchema.getFullName(), null, avroSchema.getDoc(), null,
                 null, null, null);
+            case FLOAT: return Schema.FLOAT32_SCHEMA;
+            case INT: return Schema.INT32_SCHEMA;
+            case LONG: return Schema.INT64_SCHEMA;
+            case MAP: return getMapSchema(avroSchema, false);
+            case RECORD: return getRecordSchema(avroSchema, false);
+            case STRING: return Schema.STRING_SCHEMA;
+
             default: throw new ConverterRuntimeException(avroSchema.getFullName()
                 + " cannot be converted");
         }
@@ -61,7 +72,6 @@ public final class AvroToStruct {
      * @param field {@link org.apache.avro.Schema.Field} to be converted in Struct {@link Schema}
      * @return Struct {@link Schema} equivalent to the input {@link org.apache.avro.Schema.Field}
      */
-    @SuppressWarnings("PMD.StdCyclomaticComplexity")
     private static Schema convertSchema(Field field) {
         org.apache.avro.Schema avroSchema = field.schema();
 
@@ -84,6 +94,33 @@ public final class AvroToStruct {
     }
 
     /**
+     * Convert the input {@link org.apache.avro.Schema.Field} into the equivalent optional Struct
+     *      {@link Schema} representation.
+     * @param field {@link org.apache.avro.Schema.Field} to be converted in Struct {@link Schema}
+     * @return Struct {@link Schema} equivalent to the input {@link org.apache.avro.Schema.Field}
+     */
+    private static Schema convertOptionalSchema(Field field) {
+        org.apache.avro.Schema avroSchema = field.schema();
+
+        switch (avroSchema.getType()) {
+            case ARRAY: return getArraySchema(field, true);
+            case BYTES: return Schema.OPTIONAL_BYTES_SCHEMA;
+            case BOOLEAN: return Schema.OPTIONAL_BOOLEAN_SCHEMA;
+            case DOUBLE: return Schema.OPTIONAL_FLOAT64_SCHEMA;
+            case ENUM: return getEnumSchema(field, true);
+            case FLOAT: return Schema.OPTIONAL_FLOAT32_SCHEMA;
+            case INT: return Schema.OPTIONAL_INT32_SCHEMA;
+            case LONG: return Schema.OPTIONAL_INT64_SCHEMA;
+            case MAP: return getMapSchema(field, true);
+            case RECORD: return optionalSchema(avroSchema);
+            case STRING: return Schema.OPTIONAL_STRING_SCHEMA;
+            case UNION: return getUnionSchema(field, true);
+            default: throw new ConverterRuntimeException(field.schema().getType()
+                + " cannot be converted");
+        }
+    }
+
+    /**
      * Convert the input {@link org.apache.avro.Schema} into the equivalent Struct
      *      {@link Schema} representation setting it as optional if needed. A schema is optional if
      *      listed by an AVRO {@link org.apache.avro.Schema.Type#UNION}.
@@ -92,7 +129,6 @@ public final class AvroToStruct {
      * @return optional Struct {@link Schema} equivalent to the input
      *      {@link org.apache.avro.Schema.Field}
      */
-    @SuppressWarnings("PMD.StdCyclomaticComplexity")
     private static Schema optionalSchema(org.apache.avro.Schema avroSchema) {
         switch (avroSchema.getType()) {
             case ARRAY: return getArraySchema(avroSchema, true);
@@ -292,16 +328,51 @@ public final class AvroToStruct {
      * @return Struct {@link Schema} equivalent to the input {@link org.apache.avro.Schema.Field}
      */
     private static Schema getUnionSchema(Field field, boolean optional) {
-        SchemaBuilder schemaBuilder = SchemaBuilder.struct().name(UNION_LABEL).doc(field.doc());
+        if (checkSingletone(field)) {
+            for (org.apache.avro.Schema avroSchema : field.schema().getTypes()) {
+                if (!avroSchema.getType().equals(Type.NULL)) {
+                    return convertOptionalSchema(new Field(field.name(), avroSchema, field.doc(),
+                            field.defaultVal()));
+                }
+            }
+        } else {
+            SchemaBuilder schemaBuilder = SchemaBuilder.struct().name(UNION_LABEL);
 
-        for (org.apache.avro.Schema avroSchema : field.schema().getTypes()) {
-            schemaBuilder.field(avroSchema.getName(), optionalSchema(avroSchema));
-        }
+            for (org.apache.avro.Schema avroSchema : field.schema().getTypes()) {
+                schemaBuilder.field(avroSchema.getName(), optionalSchema(avroSchema));
+            }
 
-        schemaBuilder = setDocDefaultOptional(schemaBuilder, field.defaultVal(), field.doc(),
+            schemaBuilder = setDocDefaultOptional(schemaBuilder, field.defaultVal(), field.doc(),
                 optional);
 
-        return schemaBuilder.build();
+            return schemaBuilder.build();
+        }
+
+        throw new ConverterRuntimeException("UNION cannot be converted");
+    }
+
+    /**
+     * Check if the input {@link org.apache.avro.Schema.Type#UNION}
+     *      {@link org.apache.avro.Schema.Field} has been used to define a single optional field.
+     *      This happens when in the AVRO {@link org.apache.avro.Schema} a field has {@code type}
+     *      like {@code "type": ["null", "string"]}. Using Struct {@link Schema} a single optional
+     *      field can provide the same functionality.
+     *
+     * @param field {@link org.apache.avro.Schema.Field} to be analysed
+     *
+     * @return {@code true} if the {@link org.apache.avro.Schema.Type#UNION}
+     *      {@link org.apache.avro.Schema.Field} contains only two schema type and one of those is
+     *      {@link org.apache.avro.Schema.Type#NULL}
+     */
+    private static boolean checkSingletone(Field field) {
+        if (field.schema().getTypes().size() == 2) {
+            for (org.apache.avro.Schema avroSchema : field.schema().getTypes()) {
+                if (avroSchema.getType().equals(Type.NULL)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -323,7 +394,8 @@ public final class AvroToStruct {
             local = local.doc(documentation);
         }
 
-        if (defaultValue != null) {
+        if (defaultValue != null
+                && !(defaultValue instanceof org.apache.avro.JsonProperties.Null)) {
             local = local.defaultValue(defaultValue);
         }
 

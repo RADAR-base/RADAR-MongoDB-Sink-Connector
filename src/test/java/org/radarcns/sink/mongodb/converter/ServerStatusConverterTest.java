@@ -1,4 +1,4 @@
-package org.radarcns.sink.mongodb;
+package org.radarcns.sink.mongodb.converter;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -27,8 +27,6 @@ import static org.radarcns.sink.util.RadarAvroConstants.TIME_RECEIVED;
 
 import java.util.Collection;
 import java.util.Date;
-import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.bson.Document;
@@ -36,10 +34,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.radarcns.application.ApplicationServerStatus;
 import org.radarcns.key.MeasurementKey;
-import org.radarcns.sink.mongodb.converter.ServerStatusConverter;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.RadarAvroConstants;
 import org.radarcns.sink.util.UtilityTest;
+import org.radarcns.sink.util.struct.AvroToStruct;
 
 /**
  * {@link ServerStatusConverter} test case.
@@ -47,14 +45,22 @@ import org.radarcns.sink.util.UtilityTest;
 public class ServerStatusConverterTest {
 
     private ServerStatusConverter converter;
+
     private static final String STATUS = "CONNECTED";
+    private static final String USER_VALUE = "user";
+    private static final String SOURCE_VALUE = "source";
+    private static final String TIME_FIELD = "time";
+
+    private Long time;
 
     @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
     private static final String IP_ADDRESS = "127.0.0.1";
 
+    /** Initializer. */
     @Before
     public void setUp() {
         this.converter = new ServerStatusConverter();
+        this.time = System.currentTimeMillis();
     }
 
     @Test
@@ -67,37 +73,21 @@ public class ServerStatusConverterTest {
 
     @Test
     public void convert() {
-        Long time = System.currentTimeMillis();
-        String user = "user";
-        String source = "source";
-
-        String timeField = "time";
-
-        Struct keyStruct = UtilityTest.getKeyStruct(user, source);
-
-        Schema valueSchema = SchemaBuilder.struct().field(
-                timeField, Schema.FLOAT64_SCHEMA).field(
-                TIME_RECEIVED, Schema.FLOAT64_SCHEMA).field(
-                RadarAvroConstants.SERVER_STATUS, Schema.STRING_SCHEMA).field(
-                RadarAvroConstants.IP_ADDRESS, Schema.STRING_SCHEMA).build();
-        Struct valueStruct = new Struct(valueSchema);
-        valueStruct.put(timeField, time.doubleValue() / 1000d);
-        valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);
-        valueStruct.put(RadarAvroConstants.SERVER_STATUS, STATUS);
-        valueStruct.put(RadarAvroConstants.IP_ADDRESS, IP_ADDRESS);
+        Struct keyStruct = UtilityTest.getKeyStruct(USER_VALUE, SOURCE_VALUE);
+        Struct valueStruct = getStructValue();
 
         SinkRecord record = new SinkRecord("mine", 0, keyStruct.schema(),
-                keyStruct, valueSchema, valueStruct, 0);
+                keyStruct, valueStruct.schema(), valueStruct, 0);
 
         Document document = this.converter.convert(record);
 
         assertNotNull(document);
 
         assertTrue(document.get(USER) instanceof String);
-        assertEquals(user, document.get(USER));
+        assertEquals(USER_VALUE, document.get(USER));
 
         assertTrue(document.get(SOURCE) instanceof String);
-        assertEquals(source, document.get(SOURCE));
+        assertEquals(SOURCE_VALUE, document.get(SOURCE));
 
         assertTrue(document.get(MongoConstants.SERVER_STATUS) instanceof String);
         assertEquals(STATUS, document.get(MongoConstants.SERVER_STATUS));
@@ -108,6 +98,19 @@ public class ServerStatusConverterTest {
         assertTrue(document.get(TIMESTAMP) instanceof Date);
         assertEquals(time, document.getDate(TIMESTAMP).getTime(), 0);
 
-        assertNull(document.get(timeField));
+        assertNull(document.get(TIME_FIELD));
+    }
+
+    private Struct getStructValue() {
+        org.apache.avro.Schema valueSchema = ApplicationServerStatus.getClassSchema();
+
+        Struct valueStruct = new Struct(AvroToStruct.convertSchema(valueSchema));
+
+        valueStruct.put(TIME_FIELD, time.doubleValue() / 1000d);
+        valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);
+        valueStruct.put(RadarAvroConstants.SERVER_STATUS, STATUS);
+        valueStruct.put(RadarAvroConstants.IP_ADDRESS, IP_ADDRESS);
+
+        return valueStruct;
     }
 }

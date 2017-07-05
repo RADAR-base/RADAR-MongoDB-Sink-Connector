@@ -16,6 +16,8 @@ package org.radarcns.sink.mongodb.converter;
  * limitations under the License.
  */
 
+import static org.radarcns.sink.util.KeyGenerator.measurementKeyToMongoDbKey;
+import static org.radarcns.sink.util.KeyGenerator.toDateTime;
 import static org.radarcns.sink.util.MongoConstants.ID;
 import static org.radarcns.sink.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
@@ -33,7 +35,6 @@ import org.bson.Document;
 import org.radarcns.application.ApplicationRecordCounts;
 import org.radarcns.key.MeasurementKey;
 import org.radarcns.serialization.RecordConverter;
-import org.radarcns.sink.util.Converter;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.RadarAvroConstants;
 
@@ -67,7 +68,7 @@ public class RecordCountConverter implements RecordConverter {
         Struct key = (Struct) sinkRecord.key();
         Struct value = (Struct) sinkRecord.value();
 
-        return new Document(ID, Converter.measurementKeyToMongoDbKey(key)).append(
+        return new Document(ID, measurementKeyToMongoDbKey(key)).append(
                 USER, key.getString(USER_ID)).append(
                 SOURCE, key.getString(SOURCE_ID)).append(
                 MongoConstants.RECORDS_CACHED,
@@ -76,7 +77,7 @@ public class RecordCountConverter implements RecordConverter {
                         value.getInt32(RadarAvroConstants.RECORDS_SENT)).append(
                 MongoConstants.RECORDS_UNSENT,
                         value.getInt32(RadarAvroConstants.RECORDS_UNSENT)).append(
-                TIMESTAMP, Converter.toDateTime(value.get(TIME_RECEIVED)));
+                TIMESTAMP, toDateTime(value.get(TIME_RECEIVED)));
     }
 
 

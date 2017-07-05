@@ -28,6 +28,7 @@ import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.OPTIONAL;
 import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.SCHEMA;
 import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.TYPE;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -79,11 +80,15 @@ public final class StructAnalyser {
      *      the input schema.
      * @param schema Struct {@link Schema} to convert
      * @return a {@link String} stating the pretty JSON representation of the input schema
-     * @throws IOException in case the input cannot be converted
+     * @throws ConverterRuntimeException in case the input cannot be converted
      */
-    public static String prettyAnalise(Schema schema) throws IOException {
-        return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(
-            analise(schema));
+    public static String prettyAnalise(Schema schema) {
+        try {
+            return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(
+                analise(schema));
+        } catch (JsonProcessingException exc) {
+            throw new ConverterRuntimeException(exc);
+        }
     }
 
     /**
@@ -93,14 +98,15 @@ public final class StructAnalyser {
      * @param schema Struct {@link Schema} to convert
      * @return {@link JsonNode} reporting all {@link Schema} meta-data and properties of each field
      *      contained in to it.
-     * @throws IOException if something went wrong while converting
+     * @throws ConverterRuntimeException if something went wrong while converting
      */
-    public static JsonNode analise(Schema schema) throws IOException {
-        ObjectNode objectNode = analise(null, schema);
-
-        JsonNode jsonNode = new ObjectMapper().readTree(objectNode.toString());
-
-        return jsonNode;
+    public static JsonNode analise(Schema schema) {
+        try {
+            ObjectNode objectNode = analise(null, schema);
+            return new ObjectMapper().readTree(objectNode.toString());
+        } catch (IOException exc) {
+            throw new ConverterRuntimeException(exc);
+        }
     }
 
     /**

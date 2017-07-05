@@ -20,48 +20,17 @@ import static org.junit.Assert.assertEquals;
 import static org.radarcns.sink.util.MongoConstants.FIRST_QUARTILE;
 import static org.radarcns.sink.util.MongoConstants.SECOND_QUARTILE;
 import static org.radarcns.sink.util.MongoConstants.THIRD_QUARTILE;
-import static org.radarcns.sink.util.RadarAvroConstants.SEPARATOR;
-import static org.radarcns.sink.util.RadarAvroConstants.SOURCE_ID;
-import static org.radarcns.sink.util.RadarAvroConstants.USER_ID;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.data.SchemaBuilder;
-import org.apache.kafka.connect.data.Struct;
 import org.bson.Document;
 import org.junit.Test;
-import org.radarcns.sink.util.Converter;
+import org.radarcns.sink.util.RadarUtility;
 
 /**
- * {@link Converter} test case.
+ * {@link RadarUtility} test case.
  */
-public class ConverterTest {
-
-    @Test
-    public void testKey() {
-        Schema keySchema = SchemaBuilder.struct().field(
-                USER_ID, Schema.STRING_SCHEMA).field(
-                SOURCE_ID, Schema.STRING_SCHEMA).build();
-
-        Struct keyStruct = new Struct(keySchema);
-        keyStruct.put(USER_ID, "user");
-        keyStruct.put(SOURCE_ID, "source");
-
-        assertEquals("user".concat(SEPARATOR).concat("source"),
-                Converter.measurementKeyToMongoDbKey(keyStruct));
-    }
-
-    @Test
-    public void testDate() {
-        Long time = System.currentTimeMillis();
-        Date expected = new Date(time);
-
-        assertEquals(expected, Converter.toDateTime(time));
-
-        assertEquals(expected, Converter.toDateTime(time.doubleValue() / 1000));
-    }
+public class RadarUtilityTest {
 
     @Test
     public void testQuartile() {
@@ -72,7 +41,7 @@ public class ConverterTest {
         quartile.add(value);
         quartile.add(value);
 
-        List<Document> documents = Converter.extractQuartile(quartile);
+        List<Document> documents = RadarUtility.extractQuartile(quartile);
 
         assertEquals(value, documents.get(0).getDouble(FIRST_QUARTILE), 0.0);
         assertEquals(value, documents.get(1).getDouble(SECOND_QUARTILE), 0.0);

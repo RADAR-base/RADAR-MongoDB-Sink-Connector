@@ -1,4 +1,4 @@
-package org.radarcns.sink.mongodb;
+package org.radarcns.sink.mongodb.converter;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -28,8 +28,6 @@ import static org.radarcns.sink.util.RadarAvroConstants.TIME_RECEIVED;
 
 import java.util.Collection;
 import java.util.Date;
-import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.bson.Document;
@@ -37,9 +35,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.radarcns.application.ApplicationUptime;
 import org.radarcns.key.MeasurementKey;
-import org.radarcns.sink.mongodb.converter.UptimeStatusConverter;
 import org.radarcns.sink.util.RadarAvroConstants;
 import org.radarcns.sink.util.UtilityTest;
+import org.radarcns.sink.util.struct.AvroToStruct;
 
 /**
  * {@link UptimeStatusConverter} test case.
@@ -47,11 +45,19 @@ import org.radarcns.sink.util.UtilityTest;
 public class UptimeStatusConverterTest {
 
     private UptimeStatusConverter converter;
-    private static final Double UPTIME = 1000.00;
 
+    private static final Double UPTIME = 1000.00;
+    private static final String USER_VALUE = "user";
+    private static final String SOURCE_VALUE = "source";
+    private static final String TIME_FIELD = "time";
+
+    private Long time;
+
+    /** Initializer. */
     @Before
     public void setUp() {
         this.converter = new UptimeStatusConverter();
+        this.time = System.currentTimeMillis();
     }
 
     @Test
@@ -64,35 +70,21 @@ public class UptimeStatusConverterTest {
 
     @Test
     public void convert() {
-        Long time = System.currentTimeMillis();
-        String user = "user";
-        String source = "source";
-
-        String timeField = "time";
-
-        Struct keyStruct = UtilityTest.getKeyStruct(user, source);
-
-        Schema valueSchema = SchemaBuilder.struct().field(
-                timeField, Schema.FLOAT64_SCHEMA).field(
-                TIME_RECEIVED, Schema.FLOAT64_SCHEMA).field(
-                RadarAvroConstants.UPTIME, Schema.FLOAT64_SCHEMA).build();
-        Struct valueStruct = new Struct(valueSchema);
-        valueStruct.put(timeField, time.doubleValue() / 1000d);
-        valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);
-        valueStruct.put(RadarAvroConstants.UPTIME, UPTIME);
+        Struct keyStruct = UtilityTest.getKeyStruct(USER_VALUE, SOURCE_VALUE);
+        Struct valueStruct = getValueStruct();
 
         SinkRecord record = new SinkRecord("mine", 0, keyStruct.schema(),
-                keyStruct, valueSchema, valueStruct, 0);
+                keyStruct, valueStruct.schema(), valueStruct, 0);
 
         Document document = this.converter.convert(record);
 
         assertNotNull(document);
 
         assertTrue(document.get(USER) instanceof String);
-        assertEquals(user, document.get(USER));
+        assertEquals(USER_VALUE, document.get(USER));
 
         assertTrue(document.get(SOURCE) instanceof String);
-        assertEquals(source, document.get(SOURCE));
+        assertEquals(SOURCE_VALUE, document.get(SOURCE));
 
         assertTrue(document.get(APPLICATION_UPTIME) instanceof Double);
         assertEquals(UPTIME, document.getDouble(APPLICATION_UPTIME), 0);
@@ -100,6 +92,16 @@ public class UptimeStatusConverterTest {
         assertTrue(document.get(TIMESTAMP) instanceof Date);
         assertEquals(time, document.getDate(TIMESTAMP).getTime(), 0);
 
-        assertNull(document.get(timeField));
+        assertNull(document.get(TIME_FIELD));
+    }
+
+    private Struct getValueStruct() {
+        Struct valueStruct = new Struct(AvroToStruct.convertSchema(
+                ApplicationUptime.getClassSchema()));
+        valueStruct.put(TIME_FIELD, time.doubleValue() / 1000d);
+        valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);
+        valueStruct.put(RadarAvroConstants.UPTIME, UPTIME);
+
+        return valueStruct;
     }
 }

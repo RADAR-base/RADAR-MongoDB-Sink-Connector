@@ -1,4 +1,4 @@
-package org.radarcns.sink.mongodb;
+package org.radarcns.sink.mongodb.converter;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -27,8 +27,6 @@ import static org.radarcns.sink.util.RadarAvroConstants.TIME_RECEIVED;
 
 import java.util.Collection;
 import java.util.Date;
-import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.bson.Document;
@@ -36,10 +34,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.radarcns.application.ApplicationRecordCounts;
 import org.radarcns.key.MeasurementKey;
-import org.radarcns.sink.mongodb.converter.RecordCountConverter;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.RadarAvroConstants;
 import org.radarcns.sink.util.UtilityTest;
+import org.radarcns.sink.util.struct.AvroToStruct;
 
 /**
  * {@link RecordCountConverter} test case.
@@ -48,9 +46,17 @@ public class RecordCountConverterTest {
 
     private RecordCountConverter converter;
 
+    private static final String TIME_FIELD = "time";
+    private static final String USER_VALUE = "user";
+    private static final String SOURCE_VALUE = "source";
+
+    private Long time;
+
+    /** Initializer. */
     @Before
     public void setUp() {
         this.converter = new RecordCountConverter();
+        this.time = System.currentTimeMillis();
     }
 
     @Test
@@ -63,39 +69,22 @@ public class RecordCountConverterTest {
 
     @Test
     public void convert() {
-        Long time = System.currentTimeMillis();
-        String user = "user";
-        String source = "source";
+        Struct keyStruct = UtilityTest.getKeyStruct(USER_VALUE, SOURCE_VALUE);
 
-        String timeField = "time";
-
-        Struct keyStruct = UtilityTest.getKeyStruct(user, source);
-
-        Schema valueSchema = SchemaBuilder.struct().field(
-                timeField, Schema.FLOAT64_SCHEMA).field(
-                TIME_RECEIVED, Schema.FLOAT64_SCHEMA).field(
-                RadarAvroConstants.RECORDS_CACHED, Schema.INT32_SCHEMA).field(
-                RadarAvroConstants.RECORDS_SENT, Schema.INT32_SCHEMA).field(
-                RadarAvroConstants.RECORDS_UNSENT, Schema.INT32_SCHEMA).build();
-        Struct valueStruct = new Struct(valueSchema);
-        valueStruct.put(timeField, time.doubleValue() / 1000d);
-        valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);
-        valueStruct.put(RadarAvroConstants.RECORDS_CACHED, 10);
-        valueStruct.put(RadarAvroConstants.RECORDS_SENT, 100);
-        valueStruct.put(RadarAvroConstants.RECORDS_UNSENT, 1000);
+        Struct valueStruct = getValueStruct();
 
         SinkRecord record = new SinkRecord("mine", 0, keyStruct.schema(),
-                keyStruct, valueSchema, valueStruct, 0);
+                keyStruct, valueStruct.schema(), valueStruct, 0);
 
         Document document = this.converter.convert(record);
 
         assertNotNull(document);
 
         assertTrue(document.get(USER) instanceof String);
-        assertEquals(user, document.get(USER));
+        assertEquals(USER_VALUE, document.get(USER));
 
         assertTrue(document.get(SOURCE) instanceof String);
-        assertEquals(source, document.get(SOURCE));
+        assertEquals(SOURCE_VALUE, document.get(SOURCE));
 
         assertTrue(document.get(MongoConstants.RECORDS_CACHED) instanceof Integer);
         assertEquals(10, document.get(MongoConstants.RECORDS_CACHED));
@@ -109,6 +98,18 @@ public class RecordCountConverterTest {
         assertTrue(document.get(TIMESTAMP) instanceof Date);
         assertEquals(time, document.getDate(TIMESTAMP).getTime(), 0);
 
-        assertNull(document.get(timeField));
+        assertNull(document.get(TIME_FIELD));
+    }
+
+    private Struct getValueStruct() {
+        Struct valueStruct = new Struct(AvroToStruct.convertSchema(
+                ApplicationRecordCounts.getClassSchema()));
+        valueStruct.put(TIME_FIELD, time.doubleValue() / 1000d);
+        valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);
+        valueStruct.put(RadarAvroConstants.RECORDS_CACHED, 10);
+        valueStruct.put(RadarAvroConstants.RECORDS_SENT, 100);
+        valueStruct.put(RadarAvroConstants.RECORDS_UNSENT, 1000);
+
+        return valueStruct;
     }
 }

@@ -16,7 +16,6 @@ package org.radarcns.sink.mongodb.converter;
  * limitations under the License.
  */
 
-import static org.radarcns.sink.util.Converter.extractQuartile;
 import static org.radarcns.sink.util.MongoConstants.ID;
 import static org.radarcns.sink.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.util.MongoConstants.USER;
@@ -38,11 +37,11 @@ import org.bson.Document;
 import org.radarcns.aggregator.DoubleAggregator;
 import org.radarcns.key.WindowedKey;
 import org.radarcns.serialization.RecordConverter;
-import org.radarcns.sink.util.Converter;
+import org.radarcns.sink.util.KeyGenerator;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.MongoConstants.Stat;
 import org.radarcns.sink.util.RadarAvroConstants;
-import org.radarcns.util.Utility;
+import org.radarcns.sink.util.RadarUtility;
 
 /**
  * {@link RecordConverter} to convert a {@link DoubleAggregator} record to Bson Document.
@@ -73,7 +72,7 @@ public class DoubleCollectorConverter implements RecordConverter {
         Struct key = (Struct) sinkRecord.key();
         Struct value = (Struct) sinkRecord.value();
 
-        return new Document(ID, Utility.intervalKeyToMongoKey(key)).append(
+        return new Document(ID, KeyGenerator.windowedKeyToMongoKey(key)).append(
                 USER, key.getString(USER_ID)).append(
                 SOURCE, key.getString(SOURCE_ID)).append(
                 Stat.MINIMUM.getParam(), value.getFloat64(MIN)).append(
@@ -81,10 +80,11 @@ public class DoubleCollectorConverter implements RecordConverter {
                 Stat.SUM.getParam(), value.getFloat64(SUM)).append(
                 Stat.COUNT.getParam(), value.getFloat64(COUNT)).append(
                 Stat.AVERAGE.getParam(), value.getFloat64(AVG)).append(
-                Stat.QUARTILES.getParam(), extractQuartile(value.getArray(QUARTILE))).append(
+                Stat.QUARTILES.getParam(),
+                    RadarUtility.extractQuartile(value.getArray(QUARTILE))).append(
                 Stat.INTERQUARTILE_RANGE.getParam(), value.getFloat64(IQR)).append(
                 MongoConstants.START,
-                        Converter.toDateTime(key.getInt64(RadarAvroConstants.START))).append(
-                MongoConstants.END, Converter.toDateTime(key.getInt64(RadarAvroConstants.END)));
+                    KeyGenerator.toDateTime(key.getInt64(RadarAvroConstants.START))).append(
+                MongoConstants.END, KeyGenerator.toDateTime(key.getInt64(RadarAvroConstants.END)));
     }
 }

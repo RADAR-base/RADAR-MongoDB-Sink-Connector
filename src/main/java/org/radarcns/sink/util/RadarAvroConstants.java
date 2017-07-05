@@ -25,8 +25,8 @@ public final class RadarAvroConstants {
 
     public static final String SEPARATOR = "-";
 
-    public static final String USER_ID = "userID";
-    public static final String SOURCE_ID = "sourceID";
+    public static final String USER_ID = "userId";
+    public static final String SOURCE_ID = "sourceId";
 
     public static final String MIN = "min";
     public static final String MAX = "max";
@@ -47,6 +47,13 @@ public final class RadarAvroConstants {
     public static final String IP_ADDRESS = "ipAddress";
 
     public static final String UPTIME = "uptime";
+
+    public static final String NAME = "name";
+    public static final String VERSION = "version";
+    public static final String ANSWERS = "answers";
+    public static final String VALUE = "value";
+    public static final String START_TIME = "startTime";
+    public static final String END_TIME = "endTime";
 
     public static final String TIME_RECEIVED = "timeReceived";
 

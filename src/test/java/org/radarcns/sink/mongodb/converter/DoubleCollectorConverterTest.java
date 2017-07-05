@@ -1,4 +1,4 @@
-package org.radarcns.sink.mongodb;
+package org.radarcns.sink.mongodb.converter;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -37,8 +37,6 @@ import static org.radarcns.sink.util.RadarAvroConstants.SUM;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.bson.Document;
@@ -46,11 +44,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.radarcns.aggregator.DoubleAggregator;
 import org.radarcns.key.WindowedKey;
-import org.radarcns.sink.mongodb.converter.DoubleCollectorConverter;
-import org.radarcns.sink.util.Converter;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.MongoConstants.Stat;
+import org.radarcns.sink.util.RadarUtility;
 import org.radarcns.sink.util.UtilityTest;
+import org.radarcns.sink.util.struct.AvroToStruct;
 
 /**
  * {@link DoubleCollectorConverter} test case.
@@ -59,23 +57,17 @@ public class DoubleCollectorConverterTest {
 
     private DoubleCollectorConverter converter;
 
-    private Schema valueSchema;
-
     private static final Double MOCK_VALUE = 99.99;
+    private static final String USER_VALUE = "user";
+    private static final String SOURCE_VALUE = "source";
+
+    private Long time;
 
     /** Initializer. */
     @Before
     public void setUp() {
         this.converter = new DoubleCollectorConverter();
-
-        this.valueSchema = SchemaBuilder.struct().field(
-            MIN, Schema.FLOAT64_SCHEMA).field(
-            MAX, Schema.FLOAT64_SCHEMA).field(
-            SUM, Schema.FLOAT64_SCHEMA).field(
-            COUNT, Schema.FLOAT64_SCHEMA).field(
-            AVG, Schema.FLOAT64_SCHEMA).field(
-            QUARTILE, SchemaBuilder.array(Schema.FLOAT64_SCHEMA)).field(
-            IQR, Schema.FLOAT64_SCHEMA).build();
+        this.time = System.currentTimeMillis();
     }
 
     @Test
@@ -88,23 +80,20 @@ public class DoubleCollectorConverterTest {
 
     @Test
     public void convert() {
-        Long time = System.currentTimeMillis();
-        String user = "user";
-        String source = "source";
-
-        Struct keyStruct = UtilityTest.getKeyStruct(user, source, time);
+        Struct keyStruct = UtilityTest.getKeyStruct(USER_VALUE, SOURCE_VALUE, time);
+        Struct valueStruct = getValueStruct();
 
         SinkRecord record = new SinkRecord("mine", 0, keyStruct.schema(),
-                keyStruct, valueSchema, getValueStruct(), 0);
+                keyStruct, valueStruct.schema(), valueStruct, 0);
         Document document = this.converter.convert(record);
 
         assertNotNull(document);
 
         assertTrue(document.get(USER) instanceof String);
-        assertEquals(user, document.get(USER));
+        assertEquals(USER_VALUE, document.get(USER));
 
         assertTrue(document.get(SOURCE) instanceof String);
-        assertEquals(source, document.get(SOURCE));
+        assertEquals(SOURCE_VALUE, document.get(SOURCE));
 
         assertTrue(document.get(MINIMUM.getParam()) instanceof Double);
         assertEquals(MOCK_VALUE, document.getDouble(MINIMUM.getParam()), 0);
@@ -122,7 +111,7 @@ public class DoubleCollectorConverterTest {
         assertEquals(MOCK_VALUE, document.getDouble(AVERAGE.getParam()), 0);
 
         assertTrue(document.get(QUARTILES.getParam()) instanceof List);
-        assertEquals(Converter.extractQuartile(UtilityTest.getMockList(MOCK_VALUE)),
+        assertEquals(RadarUtility.extractQuartile(UtilityTest.getMockList(MOCK_VALUE)),
                 document.get(QUARTILES.getParam()));
 
         assertTrue(document.get(INTERQUARTILE_RANGE.getParam()) instanceof Double);
@@ -136,7 +125,8 @@ public class DoubleCollectorConverterTest {
     }
 
     private Struct getValueStruct() {
-        Struct valueStruct = new Struct(valueSchema);
+        Struct valueStruct = new Struct(AvroToStruct.convertSchema(
+                DoubleAggregator.getClassSchema()));
 
         valueStruct.put(MIN, MOCK_VALUE);
         valueStruct.put(MAX, MOCK_VALUE);

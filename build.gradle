@@ -122,12 +122,9 @@ dependencies {
     compile group: "org.radarcns", name: 'kafka-connect-mongodb-sink', version: mongoDbSinkVersion
     compile group: 'org.radarcns', name: 'radar-commons', version: radarCommonsVersion
     compile group: 'org.radarcns', name: 'radar-schemas-commons', version: radarSchemasVersion
-    compile group: 'org.radarcns', name: 'radar-schemas-questionnaire', version: radarSchemasVersion
 
     testCompile group: 'junit', name: 'junit', version: junitVersion
     testCompile group: 'org.reflections', name: 'reflections', version: reflectionVersion
-
-    testCompile group: 'org.radarcns' , name: 'radar-schemas-restapi' , version: radarSchemasVersion
 
     endToEndTestCompile group: 'org.radarcns' , name: 'radar-commons-testing' , version: radarCommonsVersion
 

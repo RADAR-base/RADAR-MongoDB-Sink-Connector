@@ -46,10 +46,31 @@ public final class MongoConstants {
     public static final String Y_LABEL = "y";
     public static final String Z_LABEL = "z";
 
+    public static final String ANSWERS = RadarAvroConstants.ANSWERS;
+    public static final String NAME = RadarAvroConstants.NAME;
+    public static final String VERSION = RadarAvroConstants.VERSION;
+    public static final String VALUE = RadarAvroConstants.VALUE;
+
+    public static final String TYPE = "type";
+
     /**
-     * Private constructor to prevent instantiation.
+     * Enumerate all types used in AVRO Union.
      */
-    private MongoConstants() {}
+    public enum TypeLabel {
+        DOUBLE("double"),
+        INT("int"),
+        STRING("string");
+
+        private final String param;
+
+        TypeLabel(String param) {
+            this.param = param;
+        }
+
+        public String getParam() {
+            return param;
+        }
+    }
 
     /**
      * Enumerate all available statistical values. The string value represents the name of Bson
@@ -75,5 +96,10 @@ public final class MongoConstants {
             return param;
         }
     }
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private MongoConstants() {}
 
 }

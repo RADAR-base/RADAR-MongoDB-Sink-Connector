@@ -16,23 +16,22 @@ package org.radarcns;
  * limitations under the License.
  */
 
-import static com.mongodb.client.model.Sorts.ascending;
-import static org.radarcns.sink.util.MongoConstants.ID;
 import static org.radarcns.util.TestUtility.checkMongoDbConnection;
+import static org.radarcns.util.TestUtility.fetchMongoDb;
+import static org.radarcns.util.TestUtility.produceExpectedDocument;
+import static org.radarcns.util.TestUtility.produceInputFile;
+import static org.radarcns.util.TestUtility.streamToKafka;
 
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCursor;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.bson.Document;
 import org.junit.Test;
-import org.radarcns.key.MeasurementKey;
-import org.radarcns.questionnaire.Answer;
-import org.radarcns.questionnaire.MapTest;
+import org.radarcns.mock.config.MockDataConfig;
+import org.radarcns.mock.model.ExpectedValue;
+import org.radarcns.mock.model.MockAggregator;
 import org.radarcns.questionnaire.Questionnaire;
-import org.radarcns.topic.AvroTopic;
-import org.radarcns.util.Sender;
+import org.radarcns.util.ExpectedDocumentFactory;
 import org.radarcns.util.TestCase;
 
 /**
@@ -42,12 +41,12 @@ import org.radarcns.util.TestCase;
  */
 public class EndToEndTest extends TestCase {
 
-    //@Test
-    //@SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    @Test
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     /**
      * Test mock sensor specified in {@code resources/basic_mock_config.yml}.
      */
-    /*public void endToEndTest() throws Exception {
+    public void endToEndTest() throws Exception {
         produceInputFile();
 
         Map<MockDataConfig, ExpectedValue> expectedValue = MockAggregator.getSimulations(
@@ -64,14 +63,15 @@ public class EndToEndTest extends TestCase {
         checkMongoDbConnection();
 
         fetchMongoDb(expectedDocument);
-    }*/
+    }
 
-    @Test
-    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    //TODO re-enable when AvroTopic will be generalised to avoid check on time and timeReceived
+    //@Test
+    //@SuppressWarnings("PMD.SignatureDeclareThrowsException")
     /**
      * Test {@link Questionnaire} {@link org.apache.avro.specific.SpecificRecord}.
      */
-    public void questionnaireTest() throws Exception {
+    /*public void questionnaireTest() throws Exception {
         String topicName = "active_questionnaire_phq8";
         double time = System.currentTimeMillis() / 1000d;
 
@@ -79,23 +79,17 @@ public class EndToEndTest extends TestCase {
         answers.add(new Answer("1", time, time));
 
         MeasurementKey key = new MeasurementKey(USER_ID_MOCK, SOURCE_ID_MOCK);
-        //Questionnaire questionnaire = new Questionnaire(time, time, QuestionnaireType.PHQ8,
-        //    "v1.0", answers, time, time);
-        MapTest mapTest = new MapTest(time, time, "Test");
 
-        //AvroTopic<MeasurementKey, Questionnaire> topic =
-        //    new AvroTopic<>(topicName, MeasurementKey.getClassSchema(),
-        //        Questionnaire.getClassSchema(), MeasurementKey.class, Questionnaire.class);
+        Questionnaire questionnaire = new Questionnaire(QuestionnaireType.PHQ8,
+            "v1.0", answers, time, time);
 
-        AvroTopic<MeasurementKey, MapTest> topic =
-                new AvroTopic<>(topicName, MeasurementKey.getClassSchema(),
-                MapTest.getClassSchema(), MeasurementKey.class, MapTest.class);
+        AvroTopic<MeasurementKey, Questionnaire> topic =
+            new AvroTopic<>(topicName, MeasurementKey.getClassSchema(),
+                Questionnaire.getClassSchema(), MeasurementKey.class, Questionnaire.class);
 
-        //Sender<MeasurementKey, Questionnaire> sender = new Sender<>(config, topic);
-        Sender<MeasurementKey, MapTest> sender = new Sender<>(config, topic);
+        Sender<MeasurementKey, Questionnaire> sender = new Sender<>(config, topic);
 
-        //sender.send(key, questionnaire);
-        sender.send(key, mapTest);
+        sender.send(key, questionnaire);
 
         sender.close();
 
@@ -116,6 +110,5 @@ public class EndToEndTest extends TestCase {
             //assertDocument(expectedDoc, actualDoc, sensor.getMaximumDifference());
             //count++;
         }
-
-    }
+    }*/
 }

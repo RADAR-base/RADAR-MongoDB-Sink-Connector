@@ -1,4 +1,4 @@
-package org.radarcns.sink.util;
+package org.radarcns.sink.util.struct;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -33,7 +33,6 @@ import org.apache.kafka.connect.data.Schema.Type;
 import org.junit.Before;
 import org.junit.Test;
 import org.radarcns.key.MeasurementKey;
-import org.radarcns.sink.util.struct.StructAnalyser;
 import org.radarcns.sink.util.struct.StructAnalyser.JsonKey;
 
 /**

@@ -16,7 +16,6 @@ package org.radarcns.sink.mongodb.converter;
  * limitations under the License.
  */
 
-import static org.radarcns.sink.util.Converter.extractQuartile;
 import static org.radarcns.sink.util.MongoConstants.ID;
 import static org.radarcns.sink.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.util.MongoConstants.USER;
@@ -29,6 +28,7 @@ import static org.radarcns.sink.util.RadarAvroConstants.QUARTILE;
 import static org.radarcns.sink.util.RadarAvroConstants.SOURCE_ID;
 import static org.radarcns.sink.util.RadarAvroConstants.SUM;
 import static org.radarcns.sink.util.RadarAvroConstants.USER_ID;
+import static org.radarcns.sink.util.RadarUtility.extractQuartile;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -39,11 +39,10 @@ import org.bson.Document;
 import org.radarcns.aggregator.DoubleArrayAggregator;
 import org.radarcns.key.WindowedKey;
 import org.radarcns.serialization.RecordConverter;
-import org.radarcns.sink.util.Converter;
+import org.radarcns.sink.util.KeyGenerator;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.MongoConstants.Stat;
 import org.radarcns.sink.util.RadarAvroConstants;
-import org.radarcns.util.Utility;
 
 /**
  * {@link RecordConverter} to convert a {@link DoubleArrayAggregator} record to Bson Document.
@@ -74,7 +73,7 @@ public class AccelerationCollectorConverter implements RecordConverter {
         Struct key = (Struct) sinkRecord.key();
         Struct value = (Struct) sinkRecord.value();
 
-        return new Document(ID, Utility.intervalKeyToMongoKey(key)).append(
+        return new Document(ID, KeyGenerator.windowedKeyToMongoKey(key)).append(
                 USER, key.getString(USER_ID)).append(
                 SOURCE, key.getString(SOURCE_ID)).append(
                 Stat.MINIMUM.getParam(), sampleToDocument(value.getArray(MIN))).append(
@@ -85,9 +84,9 @@ public class AccelerationCollectorConverter implements RecordConverter {
                 Stat.QUARTILES.getParam(), quartileToDocument(value.getArray(QUARTILE))).append(
                 Stat.INTERQUARTILE_RANGE.getParam(), sampleToDocument(value.getArray(IQR))).append(
                 MongoConstants.START,
-                    Converter.toDateTime(key.getInt64(RadarAvroConstants.START))).append(
+                    KeyGenerator.toDateTime(key.getInt64(RadarAvroConstants.START))).append(
                 MongoConstants.END,
-                    Converter.toDateTime(key.getInt64(RadarAvroConstants.END)));
+                    KeyGenerator.toDateTime(key.getInt64(RadarAvroConstants.END)));
     }
 
     /**

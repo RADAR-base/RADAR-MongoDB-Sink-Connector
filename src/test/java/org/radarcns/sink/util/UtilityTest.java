@@ -6,8 +6,10 @@ import static org.radarcns.sink.util.RadarAvroConstants.USER_ID;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
+import org.radarcns.key.MeasurementKey;
+import org.radarcns.key.WindowedKey;
+import org.radarcns.sink.util.struct.AvroToStruct;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -26,7 +28,7 @@ import org.apache.kafka.connect.data.Struct;
  */
 
 /**
- * Utility functions useful to test.
+ * RadarUtility functions useful to test.
  */
 public final class UtilityTest {
 
@@ -36,20 +38,14 @@ public final class UtilityTest {
      * Returns {@link Schema} representing a {@link org.radarcns.key.WindowedKey}.
      */
     public static Schema getWindowedKeySchema() {
-        return SchemaBuilder.struct().field(
-            USER_ID, Schema.STRING_SCHEMA).field(
-            SOURCE_ID, Schema.STRING_SCHEMA).field(
-            RadarAvroConstants.START, Schema.INT64_SCHEMA).field(
-            RadarAvroConstants.END, Schema.INT64_SCHEMA).build();
+        return AvroToStruct.convertSchema(WindowedKey.getClassSchema());
     }
 
     /**
      * Returns {@link Schema} representing a {@link org.radarcns.key.MeasurementKey}.
      */
     public static Schema getMeasuramentKey() {
-        return SchemaBuilder.struct().field(
-            USER_ID, Schema.STRING_SCHEMA).field(
-            SOURCE_ID, Schema.STRING_SCHEMA).build();
+        return AvroToStruct.convertSchema(MeasurementKey.getClassSchema());
     }
 
     /**
@@ -67,7 +63,6 @@ public final class UtilityTest {
         Schema schema = time == null ? getMeasuramentKey() : getWindowedKeySchema();
 
         Struct keyStruct = new Struct(schema);
-
         keyStruct.put(USER_ID, user);
         keyStruct.put(SOURCE_ID, source);
 

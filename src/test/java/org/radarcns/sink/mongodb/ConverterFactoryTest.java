@@ -20,6 +20,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashSet;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,18 +38,34 @@ public class ConverterFactoryTest {
 
     private static final String PACKAGE = "org.radarcns.sink.mongodb.converter";
 
+    private Set<Class<? extends Object>> expectedConverters;
+
+    /**
+     * Test initializer.
+     */
     @Before
     public void setUp() {
         this.factory = new RecordConverterFactoryRadar();
+
+        Reflections reflections = new Reflections(PACKAGE,
+                new SubTypesScanner(false));
+
+        this.expectedConverters = reflections.getSubTypesOf(Object.class);
+        this.expectedConverters.add(GenericRecordConverter.class);
+        CharSequence innerClassToken = "$";
+        CharSequence testClassToken = "Test";
+        Set<Class<? extends Object>> toRemove = new HashSet<>();
+        for (Class<? extends Object> converter : this.expectedConverters) {
+            if (converter.toString().contains(innerClassToken)
+                    || converter.toString().contains(testClassToken)) {
+                toRemove.add(converter);
+            }
+        }
+        this.expectedConverters.removeAll(toRemove);
     }
 
     @Test
     public void converterFactoryTest() {
-        Reflections reflections = new Reflections(PACKAGE,
-                new SubTypesScanner(false));
-        Set<Class<? extends Object>> expectedConverters = reflections.getSubTypesOf(Object.class);
-        expectedConverters.add(GenericRecordConverter.class);
-
         assertEquals(expectedConverters.size(), factory.genericConverters().size());
 
         for (RecordConverter converters : factory.genericConverters()) {

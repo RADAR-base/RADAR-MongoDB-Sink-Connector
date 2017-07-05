@@ -1,4 +1,4 @@
-package org.radarcns.sink.mongodb;
+package org.radarcns.sink.mongodb.converter;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -7,7 +7,7 @@ package org.radarcns.sink.mongodb;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * http:www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,8 +44,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.bson.Document;
@@ -53,11 +51,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.radarcns.aggregator.DoubleArrayAggregator;
 import org.radarcns.key.WindowedKey;
-import org.radarcns.sink.mongodb.converter.AccelerationCollectorConverter;
-import org.radarcns.sink.util.Converter;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.MongoConstants.Stat;
+import org.radarcns.sink.util.RadarUtility;
 import org.radarcns.sink.util.UtilityTest;
+import org.radarcns.sink.util.struct.AvroToStruct;
 
 /**
  * {@link AccelerationCollectorConverter} test case.
@@ -66,9 +64,11 @@ public class AccelerationCollectorConverterTest {
 
     private AccelerationCollectorConverter converter;
 
-    private Schema valueSchema;
-
     private static final Double MOCK_VALUE = 99.99;
+    private static final String USER_VALUE = "user";
+    private static final String SOURCE_VALUE = "source";
+
+    private Long time;
 
     /**
      * Initializer.
@@ -76,16 +76,7 @@ public class AccelerationCollectorConverterTest {
     @Before
     public void setUp() {
         this.converter = new AccelerationCollectorConverter();
-
-        this.valueSchema = SchemaBuilder.struct().field(
-            MIN, SchemaBuilder.array(Schema.FLOAT64_SCHEMA)).field(
-            MAX, SchemaBuilder.array(Schema.FLOAT64_SCHEMA)).field(
-            SUM, SchemaBuilder.array(Schema.FLOAT64_SCHEMA)).field(
-            COUNT, SchemaBuilder.array(Schema.FLOAT64_SCHEMA)).field(
-            AVG, SchemaBuilder.array(Schema.FLOAT64_SCHEMA)).field(
-            QUARTILE, SchemaBuilder.array(
-                SchemaBuilder.array(Schema.FLOAT64_SCHEMA))).field(
-            IQR, SchemaBuilder.array(Schema.FLOAT64_SCHEMA)).build();
+        this.time = System.currentTimeMillis();
     }
 
     @Test
@@ -98,32 +89,20 @@ public class AccelerationCollectorConverterTest {
 
     @Test
     public void convert() {
-        Long time = System.currentTimeMillis();
-        String user = "user";
-        String source = "source";
-
-        Struct keyStruct = UtilityTest.getKeyStruct(user, source, time);
-
-        Struct valueStruct = new Struct(valueSchema);
-        valueStruct.put(MIN, UtilityTest.getMockList(MOCK_VALUE));
-        valueStruct.put(MAX, UtilityTest.getMockList(MOCK_VALUE));
-        valueStruct.put(SUM, UtilityTest.getMockList(MOCK_VALUE));
-        valueStruct.put(COUNT, UtilityTest.getMockList(MOCK_VALUE));
-        valueStruct.put(AVG, UtilityTest.getMockList(MOCK_VALUE));
-        valueStruct.put(QUARTILE, getMockQuartile());
-        valueStruct.put(IQR, UtilityTest.getMockList(MOCK_VALUE));
+        Struct keyStruct = UtilityTest.getKeyStruct(USER_VALUE, SOURCE_VALUE, time);
+        Struct valueStruct = getValueStruct();
 
         SinkRecord record = new SinkRecord("mine", 0, keyStruct.schema(),
-                keyStruct, valueSchema, valueStruct, 0);
+                keyStruct, valueStruct.schema(), valueStruct, 0);
         Document document = this.converter.convert(record);
 
         assertNotNull(document);
 
         assertTrue(document.get(USER) instanceof String);
-        assertEquals(user, document.get(USER));
+        assertEquals(USER_VALUE, document.get(USER));
 
         assertTrue(document.get(SOURCE) instanceof String);
-        assertEquals(source, document.get(SOURCE));
+        assertEquals(SOURCE_VALUE, document.get(SOURCE));
 
         Document valuesDocument = AccelerationCollectorConverter.sampleToDocument(
                 UtilityTest.getMockList(MOCK_VALUE));
@@ -182,9 +161,9 @@ public class AccelerationCollectorConverterTest {
     @Test
     public void quartileToDocument() {
         Document expected = new Document(
-                X_LABEL, Converter.extractQuartile(UtilityTest.getMockList(MOCK_VALUE))).append(
-                Y_LABEL, Converter.extractQuartile(UtilityTest.getMockList(MOCK_VALUE))).append(
-                Z_LABEL, Converter.extractQuartile(UtilityTest.getMockList(MOCK_VALUE)));
+                X_LABEL, RadarUtility.extractQuartile(UtilityTest.getMockList(MOCK_VALUE))).append(
+                Y_LABEL, RadarUtility.extractQuartile(UtilityTest.getMockList(MOCK_VALUE))).append(
+                Z_LABEL, RadarUtility.extractQuartile(UtilityTest.getMockList(MOCK_VALUE)));
 
         Document actual = AccelerationCollectorConverter.quartileToDocument(getMockQuartile());
 
@@ -217,6 +196,20 @@ public class AccelerationCollectorConverterTest {
         quartileValues.add(UtilityTest.getMockList(MOCK_VALUE));
 
         return quartileValues;
+    }
+
+    private Struct getValueStruct() {
+        Struct valueStruct = new Struct(AvroToStruct.convertSchema(
+                DoubleArrayAggregator.getClassSchema()));
+        valueStruct.put(MIN, UtilityTest.getMockList(MOCK_VALUE));
+        valueStruct.put(MAX, UtilityTest.getMockList(MOCK_VALUE));
+        valueStruct.put(SUM, UtilityTest.getMockList(MOCK_VALUE));
+        valueStruct.put(COUNT, UtilityTest.getMockList(MOCK_VALUE));
+        valueStruct.put(AVG, UtilityTest.getMockList(MOCK_VALUE));
+        valueStruct.put(QUARTILE, getMockQuartile());
+        valueStruct.put(IQR, UtilityTest.getMockList(MOCK_VALUE));
+
+        return valueStruct;
     }
 
 }

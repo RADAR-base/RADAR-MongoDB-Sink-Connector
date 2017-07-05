@@ -16,6 +16,8 @@ package org.radarcns.sink.mongodb.converter;
  * limitations under the License.
  */
 
+import static org.radarcns.sink.util.KeyGenerator.measurementKeyToMongoDbKey;
+import static org.radarcns.sink.util.KeyGenerator.toDateTime;
 import static org.radarcns.sink.util.MongoConstants.APPLICATION_UPTIME;
 import static org.radarcns.sink.util.MongoConstants.ID;
 import static org.radarcns.sink.util.MongoConstants.SOURCE;
@@ -35,7 +37,6 @@ import org.bson.Document;
 import org.radarcns.application.ApplicationUptime;
 import org.radarcns.key.MeasurementKey;
 import org.radarcns.serialization.RecordConverter;
-import org.radarcns.sink.util.Converter;
 
 /**
  * {@link RecordConverter} to convert a {@link ApplicationUptime} record to Bson Document.
@@ -67,10 +68,10 @@ public class UptimeStatusConverter implements RecordConverter {
         Struct key = (Struct) sinkRecord.key();
         Struct value = (Struct) sinkRecord.value();
 
-        return new Document(ID, Converter.measurementKeyToMongoDbKey(key)).append(
+        return new Document(ID, measurementKeyToMongoDbKey(key)).append(
                 USER, key.getString(USER_ID)).append(
                 SOURCE, key.getString(SOURCE_ID)).append(
                 APPLICATION_UPTIME, value.getFloat64(UPTIME)).append(
-                TIMESTAMP, Converter.toDateTime(value.get(TIME_RECEIVED)));
+                TIMESTAMP, toDateTime(value.get(TIME_RECEIVED)));
     }
 }
