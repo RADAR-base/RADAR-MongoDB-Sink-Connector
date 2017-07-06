@@ -109,10 +109,5 @@ public class EndToEndTest extends TestCase {
 
         assertEquals("Expected " + expectedDoc.toJson() + " is not equal to actual "
                     + actualDoc.toJson(), expectedDoc, actualDoc);
-
-//        for (String key : expectedDoc.keySet()) {
-//            assertEquals("Expected " + expectedDoc.toJson() + " is not equal to actual "
-//                    + actualDoc.toJson(), expectedDoc.get(key), actualDoc.get(key));
-//        }
     }
 }
