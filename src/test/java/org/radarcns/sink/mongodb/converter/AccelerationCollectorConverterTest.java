@@ -171,19 +171,19 @@ public class AccelerationCollectorConverterTest {
 
         List<Document> documents;
         assertTrue(actual.get(X_LABEL) instanceof List);
-        documents = (List<Document>) actual.get(X_LABEL);
+        documents = getComponent(actual, X_LABEL);
         assertEquals(MOCK_VALUE, documents.get(0).getDouble(FIRST_QUARTILE), 0.0);
         assertEquals(MOCK_VALUE, documents.get(1).getDouble(SECOND_QUARTILE), 0.0);
         assertEquals(MOCK_VALUE, documents.get(2).getDouble(THIRD_QUARTILE), 0.0);
 
         assertTrue(actual.get(Y_LABEL) instanceof List);
-        documents = (List<Document>) actual.get(Y_LABEL);
+        documents = getComponent(actual, Y_LABEL);
         assertEquals(MOCK_VALUE, documents.get(0).getDouble(FIRST_QUARTILE), 0.0);
         assertEquals(MOCK_VALUE, documents.get(1).getDouble(SECOND_QUARTILE), 0.0);
         assertEquals(MOCK_VALUE, documents.get(2).getDouble(THIRD_QUARTILE), 0.0);
 
         assertTrue(actual.get(Z_LABEL) instanceof List);
-        documents = (List<Document>) actual.get(Z_LABEL);
+        documents = getComponent(actual, Z_LABEL);
         assertEquals(MOCK_VALUE, documents.get(0).getDouble(FIRST_QUARTILE), 0.0);
         assertEquals(MOCK_VALUE, documents.get(1).getDouble(SECOND_QUARTILE), 0.0);
         assertEquals(MOCK_VALUE, documents.get(2).getDouble(THIRD_QUARTILE), 0.0);
@@ -210,6 +210,11 @@ public class AccelerationCollectorConverterTest {
         valueStruct.put(IQR, UtilityTest.getMockList(MOCK_VALUE));
 
         return valueStruct;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Document> getComponent(Document document, String label) {
+        return (List<Document>) document.get(label);
     }
 
 }
