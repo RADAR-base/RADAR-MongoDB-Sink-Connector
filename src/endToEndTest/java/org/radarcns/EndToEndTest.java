@@ -103,14 +103,16 @@ public class EndToEndTest extends TestCase {
     private void test(SenderTestCase testcase)
         throws IllegalAccessException, IOException, InstantiationException,
         InterruptedException {
+
         Document expectedDoc = testcase.getExpectedDocument();
-        LOGGER.info("Expected: {}", expectedDoc.toJson());
-
         Document actualDoc = getActualDocumet(testcase.getTopicName());
-        LOGGER.info("Actual: {}", actualDoc.toJson());
 
-        for (String key : expectedDoc.keySet()) {
-            assertEquals(expectedDoc.get(key), actualDoc.get(key));
-        }
+        assertEquals("Expected " + expectedDoc.toJson() + " is not equal to actual "
+                    + actualDoc.toJson(), expectedDoc, actualDoc);
+
+//        for (String key : expectedDoc.keySet()) {
+//            assertEquals("Expected " + expectedDoc.toJson() + " is not equal to actual "
+//                    + actualDoc.toJson(), expectedDoc.get(key), actualDoc.get(key));
+//        }
     }
 }
