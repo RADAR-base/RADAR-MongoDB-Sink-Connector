@@ -94,20 +94,13 @@ public class EndToEndTest extends TestCase {
         //fetchMongoDb(expectedDocument);
 
         for (SenderTestCase executor : testCases) {
-            test(executor);
+            Document expectedDoc = executor.getExpectedDocument();
+            Document actualDoc = getActualDocumet(executor.getTopicName());
+
+            assertEquals("Expected " + expectedDoc.toJson() + " is not equal to actual "
+                + actualDoc.toJson(), expectedDoc, actualDoc);
         }
 
         closeMongoDbConnection();
-    }
-
-    private void test(SenderTestCase testcase)
-        throws IllegalAccessException, IOException, InstantiationException,
-        InterruptedException {
-
-        Document expectedDoc = testcase.getExpectedDocument();
-        Document actualDoc = getActualDocumet(testcase.getTopicName());
-
-        assertEquals("Expected " + expectedDoc.toJson() + " is not equal to actual "
-                    + actualDoc.toJson(), expectedDoc, actualDoc);
     }
 }
