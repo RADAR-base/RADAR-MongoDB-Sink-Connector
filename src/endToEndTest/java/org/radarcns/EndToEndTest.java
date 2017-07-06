@@ -98,7 +98,7 @@ public class EndToEndTest extends TestCase {
             Document actualDoc = getActualDocumet(executor.getTopicName());
 
             assertEquals("Expected " + expectedDoc.toJson() + " is not equal to actual "
-                + actualDoc.toJson(), expectedDoc, actualDoc);
+                    + actualDoc.toJson(), expectedDoc, actualDoc);
         }
 
         closeMongoDbConnection();
