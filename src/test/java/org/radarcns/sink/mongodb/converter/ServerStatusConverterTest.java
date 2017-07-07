@@ -37,7 +37,6 @@ import org.radarcns.key.MeasurementKey;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.RadarAvroConstants;
 import org.radarcns.sink.util.UtilityTest;
-import org.radarcns.sink.util.struct.AvroToStruct;
 
 /**
  * {@link ServerStatusConverter} test case.
@@ -104,7 +103,7 @@ public class ServerStatusConverterTest {
     private Struct getStructValue() {
         org.apache.avro.Schema valueSchema = ApplicationServerStatus.getClassSchema();
 
-        Struct valueStruct = new Struct(AvroToStruct.convertSchema(valueSchema));
+        Struct valueStruct = new Struct(UtilityTest.avroToStruct(valueSchema));
 
         valueStruct.put(TIME_FIELD, time.doubleValue() / 1000d);
         valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);

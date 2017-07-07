@@ -48,7 +48,6 @@ import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.MongoConstants.Stat;
 import org.radarcns.sink.util.RadarUtility;
 import org.radarcns.sink.util.UtilityTest;
-import org.radarcns.sink.util.struct.AvroToStruct;
 
 /**
  * {@link DoubleCollectorConverter} test case.
@@ -125,7 +124,7 @@ public class DoubleCollectorConverterTest {
     }
 
     private Struct getValueStruct() {
-        Struct valueStruct = new Struct(AvroToStruct.convertSchema(
+        Struct valueStruct = new Struct(UtilityTest.avroToStruct(
                 DoubleAggregator.getClassSchema()));
 
         valueStruct.put(MIN, MOCK_VALUE);

@@ -37,7 +37,6 @@ import org.radarcns.application.ApplicationUptime;
 import org.radarcns.key.MeasurementKey;
 import org.radarcns.sink.util.RadarAvroConstants;
 import org.radarcns.sink.util.UtilityTest;
-import org.radarcns.sink.util.struct.AvroToStruct;
 
 /**
  * {@link UptimeStatusConverter} test case.
@@ -96,7 +95,7 @@ public class UptimeStatusConverterTest {
     }
 
     private Struct getValueStruct() {
-        Struct valueStruct = new Struct(AvroToStruct.convertSchema(
+        Struct valueStruct = new Struct(UtilityTest.avroToStruct(
                 ApplicationUptime.getClassSchema()));
         valueStruct.put(TIME_FIELD, time.doubleValue() / 1000d);
         valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);

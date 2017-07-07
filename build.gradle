@@ -88,6 +88,7 @@ targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
 ext.codacyVersion = '1.0.10'
+ext.confluentVersion = '3.2.2'
 ext.junitVersion = '4.12'
 ext.mongoDbSinkVersion = 'v0.1-alpha.1'
 ext.radarCommonsVersion = '0.4.1'
@@ -132,6 +133,8 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: junitVersion
     //Useful to check that RecordConverterFactoryRadar is correct
     testCompile group: 'org.reflections', name: 'reflections', version: reflectionVersion
+    //Converter from Avro Schema to Struct Schema
+    testCompile group: 'io.confluent', name: 'kafka-connect-avro-converter', version: confluentVersion
 
     //Useful to generate random data for testing
     endToEndTestCompile group: 'org.radarcns' , name: 'radar-commons-testing' , version: radarCommonsVersion

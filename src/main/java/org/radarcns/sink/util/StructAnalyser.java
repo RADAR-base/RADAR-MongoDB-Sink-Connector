@@ -1,4 +1,4 @@
-package org.radarcns.sink.util.struct;
+package org.radarcns.sink.util;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -16,17 +16,17 @@ package org.radarcns.sink.util.struct;
  * limitations under the License.
  */
 
-import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.ARRAY_ITEMS;
-import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.DEFAULT_VALUE;
-import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.DOC;
-import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.FIELDS;
-import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.FIELD_NAME;
-import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.MAP_ITEMS;
-import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.MAP_KEY;
-import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.NAME;
-import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.OPTIONAL;
-import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.SCHEMA;
-import static org.radarcns.sink.util.struct.StructAnalyser.JsonKey.TYPE;
+import static org.radarcns.sink.util.StructAnalyser.JsonKey.ARRAY_ITEMS;
+import static org.radarcns.sink.util.StructAnalyser.JsonKey.DEFAULT_VALUE;
+import static org.radarcns.sink.util.StructAnalyser.JsonKey.DOC;
+import static org.radarcns.sink.util.StructAnalyser.JsonKey.FIELDS;
+import static org.radarcns.sink.util.StructAnalyser.JsonKey.FIELD_NAME;
+import static org.radarcns.sink.util.StructAnalyser.JsonKey.MAP_ITEMS;
+import static org.radarcns.sink.util.StructAnalyser.JsonKey.MAP_KEY;
+import static org.radarcns.sink.util.StructAnalyser.JsonKey.NAME;
+import static org.radarcns.sink.util.StructAnalyser.JsonKey.OPTIONAL;
+import static org.radarcns.sink.util.StructAnalyser.JsonKey.SCHEMA;
+import static org.radarcns.sink.util.StructAnalyser.JsonKey.TYPE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -80,14 +80,14 @@ public final class StructAnalyser {
      *      the input schema.
      * @param schema Struct {@link Schema} to convert
      * @return a {@link String} stating the pretty JSON representation of the input schema
-     * @throws ConverterRuntimeException in case the input cannot be converted
+     * @throws IllegalArgumentException in case the input cannot be converted
      */
     public static String prettyAnalise(Schema schema) {
         try {
             return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(
                 analise(schema));
         } catch (JsonProcessingException exc) {
-            throw new ConverterRuntimeException(exc);
+            throw new IllegalArgumentException(exc);
         }
     }
 
@@ -98,14 +98,14 @@ public final class StructAnalyser {
      * @param schema Struct {@link Schema} to convert
      * @return {@link JsonNode} reporting all {@link Schema} meta-data and properties of each field
      *      contained in to it.
-     * @throws ConverterRuntimeException if something went wrong while converting
+     * @throws IllegalArgumentException if something went wrong while converting
      */
     public static JsonNode analise(Schema schema) {
         try {
             ObjectNode objectNode = analise(null, schema);
             return new ObjectMapper().readTree(objectNode.toString());
         } catch (IOException exc) {
-            throw new ConverterRuntimeException(exc);
+            throw new IllegalArgumentException(exc);
         }
     }
 

@@ -1,4 +1,4 @@
-package org.radarcns.sink.util.struct;
+package org.radarcns.sink.util;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -17,7 +17,6 @@ package org.radarcns.sink.util.struct;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.radarcns.sink.util.struct.AvroToStruct.convertSchema;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,12 +32,12 @@ import org.apache.kafka.connect.data.Schema.Type;
 import org.junit.Before;
 import org.junit.Test;
 import org.radarcns.key.MeasurementKey;
-import org.radarcns.sink.util.struct.StructAnalyser.JsonKey;
+import org.radarcns.sink.util.StructAnalyser.JsonKey;
 
 /**
- * {@link org.radarcns.sink.util.struct.AvroToStruct} testcase.
+ * {@link org.radarcns.sink.util.StructAnalyser} testcase.
  */
-public class AvroToStructTest {
+public class StructAnalyserTest {
 
     private List<org.apache.avro.Schema> input;
     private Map<String, JsonNode> output;
@@ -58,7 +57,7 @@ public class AvroToStructTest {
     public void test() throws IOException {
         for (org.apache.avro.Schema schema : this.input) {
             assertEquals(this.output.get(schema.getFullName()),
-                    StructAnalyser.analise(convertSchema(schema)));
+                    StructAnalyser.analise(UtilityTest.avroToStruct(schema)));
         }
     }
 
@@ -74,18 +73,21 @@ public class AvroToStructTest {
         objectNode.put(JsonKey.OPTIONAL.getParam(), Boolean.toString(false));
 
         ObjectNode userIdNode = mapper.createObjectNode();
-        userIdNode.put(JsonKey.FIELD_NAME.getParam(), "userId");
+        userIdNode.put(JsonKey.FIELD_NAME.getParam(), RadarAvroConstants.USER_ID);
         userIdNode.put(JsonKey.SCHEMA.getParam(), Schema.STRING_SCHEMA.toString());
         userIdNode.put(JsonKey.TYPE.getParam(), Schema.Type.STRING.getName().toUpperCase());
+        userIdNode.put(JsonKey.DOC.getParam(), schema.getField(RadarAvroConstants.USER_ID).doc());
         userIdNode.put(JsonKey.OPTIONAL.getParam(), Boolean.toString(false));
 
         ArrayNode fields = objectNode.putArray(JsonKey.FIELDS.getParam());
         fields.add(userIdNode);
 
         ObjectNode sourceIdNode = mapper.createObjectNode();
-        sourceIdNode.put(JsonKey.FIELD_NAME.getParam(), "sourceId");
+        sourceIdNode.put(JsonKey.FIELD_NAME.getParam(), RadarAvroConstants.SOURCE_ID);
         sourceIdNode.put(JsonKey.SCHEMA.getParam(), Schema.STRING_SCHEMA.toString());
         sourceIdNode.put(JsonKey.TYPE.getParam(), Schema.Type.STRING.getName().toUpperCase());
+        sourceIdNode.put(JsonKey.DOC.getParam(),
+                schema.getField(RadarAvroConstants.SOURCE_ID).doc());
         sourceIdNode.put(JsonKey.OPTIONAL.getParam(), Boolean.toString(false));
         fields.add(sourceIdNode);
 

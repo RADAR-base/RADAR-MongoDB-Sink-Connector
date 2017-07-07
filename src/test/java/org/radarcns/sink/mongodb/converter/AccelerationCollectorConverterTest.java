@@ -55,7 +55,6 @@ import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.MongoConstants.Stat;
 import org.radarcns.sink.util.RadarUtility;
 import org.radarcns.sink.util.UtilityTest;
-import org.radarcns.sink.util.struct.AvroToStruct;
 
 /**
  * {@link AccelerationCollectorConverter} test case.
@@ -199,7 +198,7 @@ public class AccelerationCollectorConverterTest {
     }
 
     private Struct getValueStruct() {
-        Struct valueStruct = new Struct(AvroToStruct.convertSchema(
+        Struct valueStruct = new Struct(UtilityTest.avroToStruct(
                 DoubleArrayAggregator.getClassSchema()));
         valueStruct.put(MIN, UtilityTest.getMockList(MOCK_VALUE));
         valueStruct.put(MAX, UtilityTest.getMockList(MOCK_VALUE));

@@ -3,13 +3,13 @@ package org.radarcns.sink.util;
 import static org.radarcns.sink.util.RadarAvroConstants.SOURCE_ID;
 import static org.radarcns.sink.util.RadarAvroConstants.USER_ID;
 
+import io.confluent.connect.avro.AvroData;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Struct;
 import org.radarcns.key.MeasurementKey;
 import org.radarcns.key.WindowedKey;
-import org.radarcns.sink.util.struct.AvroToStruct;
 
 /*
  * Copyright 2017 King's College London and The Hyve
@@ -38,14 +38,14 @@ public final class UtilityTest {
      * Returns {@link Schema} representing a {@link org.radarcns.key.WindowedKey}.
      */
     public static Schema getWindowedKeySchema() {
-        return AvroToStruct.convertSchema(WindowedKey.getClassSchema());
+        return UtilityTest.avroToStruct(WindowedKey.getClassSchema());
     }
 
     /**
      * Returns {@link Schema} representing a {@link org.radarcns.key.MeasurementKey}.
      */
     public static Schema getMeasuramentKey() {
-        return AvroToStruct.convertSchema(MeasurementKey.getClassSchema());
+        return UtilityTest.avroToStruct(MeasurementKey.getClassSchema());
     }
 
     /**
@@ -84,6 +84,13 @@ public final class UtilityTest {
         values.add(mockValue);
 
         return values;
+    }
+
+    /**
+     * Convert the AVRO {@link org.apache.avro.Schema} into the equivalent Struct {@link Schema}.
+     */
+    public static Schema avroToStruct(org.apache.avro.Schema schema) {
+        return new AvroData(1).toConnectSchema(schema);
     }
 
 }

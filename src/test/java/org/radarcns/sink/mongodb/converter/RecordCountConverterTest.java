@@ -37,7 +37,6 @@ import org.radarcns.key.MeasurementKey;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.RadarAvroConstants;
 import org.radarcns.sink.util.UtilityTest;
-import org.radarcns.sink.util.struct.AvroToStruct;
 
 /**
  * {@link RecordCountConverter} test case.
@@ -102,7 +101,7 @@ public class RecordCountConverterTest {
     }
 
     private Struct getValueStruct() {
-        Struct valueStruct = new Struct(AvroToStruct.convertSchema(
+        Struct valueStruct = new Struct(UtilityTest.avroToStruct(
                 ApplicationRecordCounts.getClassSchema()));
         valueStruct.put(TIME_FIELD, time.doubleValue() / 1000d);
         valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);

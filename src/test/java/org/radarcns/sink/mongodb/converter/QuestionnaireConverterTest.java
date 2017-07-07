@@ -47,7 +47,6 @@ import org.radarcns.questionnaire.QuestionnaireType;
 import org.radarcns.sink.util.MongoConstants.TypeLabel;
 import org.radarcns.sink.util.RadarAvroConstants;
 import org.radarcns.sink.util.UtilityTest;
-import org.radarcns.sink.util.struct.AvroToStruct;
 
 /**
  * {@link RecordCountConverter} test case.
@@ -123,7 +122,7 @@ public class QuestionnaireConverterTest {
     }
 
     private List<Struct> getMockAnswer() {
-        Schema answerSchema = AvroToStruct.convertSchema(Questionnaire.getClassSchema()).field(
+        Schema answerSchema = UtilityTest.avroToStruct(Questionnaire.getClassSchema()).field(
                 RadarAvroConstants.ANSWERS).schema().valueSchema();
 
         Schema valueSchema = answerSchema.field(RadarAvroConstants.VALUE).schema();
@@ -161,7 +160,7 @@ public class QuestionnaireConverterTest {
     }
 
     private Struct getValueStruct() {
-        Struct valueStruct = new Struct(AvroToStruct.convertSchema(Questionnaire.getClassSchema()));
+        Struct valueStruct = new Struct(UtilityTest.avroToStruct(Questionnaire.getClassSchema()));
         valueStruct.put(RadarAvroConstants.NAME, type.name());
         valueStruct.put(RadarAvroConstants.VERSION, version);
         valueStruct.put(RadarAvroConstants.ANSWERS, getMockAnswer());
