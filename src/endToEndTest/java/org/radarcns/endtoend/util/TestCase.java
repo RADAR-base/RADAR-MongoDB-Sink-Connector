@@ -1,4 +1,4 @@
-package org.radarcns.util;
+package org.radarcns.endtoend.util;
 
 import static com.mongodb.client.model.Sorts.ascending;
 import static java.util.Arrays.asList;
@@ -67,7 +67,7 @@ public abstract class TestCase {
     public static final String SUFFIX = "_output";
 
     // Latency expressed in second
-    public static final long LATENCY = 120;
+    public static final long LATENCY = 180;
 
     public static final String MONGO_CONTAINER = "localhost";
     public static final String MONGO_PORT = "27017";
@@ -204,6 +204,8 @@ public abstract class TestCase {
      */
     public void fetchMongoDb(Map<MockDataConfig, List<Document>> expectedDocument) {
         for (MockDataConfig sensor : expectedDocument.keySet()) {
+            LOGGER.info("Fetching {}", sensor.getTopic().concat(SUFFIX));
+
             FindIterable<Document> collection = hotstorage.getCollection(
                     sensor.getTopic().concat(SUFFIX)).find().sort(ascending(ID));
             List<Document> expectedDocs = expectedDocument.get(sensor);
@@ -228,8 +230,8 @@ public abstract class TestCase {
      * representing the maximum delta for which both numbers are still considered equal.
      */
     public static void assertDocument(Document expected, Document actual, Double delta) {
-        LOGGER.info("Expected: {}", expected.toJson());
-        LOGGER.info("Actual: {}", actual.toJson());
+        LOGGER.debug("Expected: {}", expected.toJson());
+        LOGGER.debug("Actual: {}", actual.toJson());
 
         assertEquals(expected.keySet(), actual.keySet());
 

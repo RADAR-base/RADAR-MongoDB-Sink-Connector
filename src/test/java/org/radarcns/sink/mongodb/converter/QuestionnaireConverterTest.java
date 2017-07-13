@@ -164,8 +164,8 @@ public class QuestionnaireConverterTest {
         valueStruct.put(RadarAvroConstants.NAME, type.name());
         valueStruct.put(RadarAvroConstants.VERSION, version);
         valueStruct.put(RadarAvroConstants.ANSWERS, getMockAnswer());
-        valueStruct.put(RadarAvroConstants.START_TIME, time.doubleValue() / 1000d);
-        valueStruct.put(RadarAvroConstants.END_TIME, time.doubleValue() / 1000d);
+        valueStruct.put(RadarAvroConstants.TIME, time.doubleValue() / 1000d);
+        valueStruct.put(RadarAvroConstants.TIME_COMPLETED, time.doubleValue() / 1000d);
 
         return valueStruct;
     }

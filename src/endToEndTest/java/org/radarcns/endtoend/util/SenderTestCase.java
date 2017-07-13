@@ -1,4 +1,4 @@
-package org.radarcns.util;
+package org.radarcns.endtoend.util;
 
 import java.io.IOException;
 import org.bson.Document;

@@ -1,4 +1,4 @@
-package org.radarcns.testcase;
+package org.radarcns.endtoend.testcase;
 
 /*
  * Copyright 2017 Kings College London and The Hyve
@@ -40,8 +40,8 @@ import org.radarcns.sink.util.KeyGenerator;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.sink.util.MongoConstants.TypeLabel;
 import org.radarcns.topic.AvroTopic;
-import org.radarcns.util.Sender;
-import org.radarcns.util.SenderTestCase;
+import org.radarcns.endtoend.util.Sender;
+import org.radarcns.endtoend.util.SenderTestCase;
 
 /**
  * MongoDB Sink connector e2e test. It streams a static generated {@link Questionnaire} message
@@ -68,7 +68,7 @@ public class QuestionnaireEndToEndTest extends SenderTestCase {
 
         MeasurementKey key = new MeasurementKey(USER_ID_MOCK, SOURCE_ID_MOCK);
 
-        Questionnaire questionnaire = new Questionnaire(TYPE, VERSION, answers, TIME, TIME);
+        Questionnaire questionnaire = new Questionnaire(TIME, TIME, TYPE, VERSION, answers);
 
         AvroTopic<MeasurementKey, Questionnaire> topic =
                 new AvroTopic<>(getTopicName(), MeasurementKey.getClassSchema(),

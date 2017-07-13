@@ -52,9 +52,12 @@ public final class RadarAvroConstants {
     public static final String VERSION = "version";
     public static final String ANSWERS = "answers";
     public static final String VALUE = "value";
+
     public static final String START_TIME = "startTime";
     public static final String END_TIME = "endTime";
 
+    public static final String TIME = "time";
+    public static final String TIME_COMPLETED = "timeCompleted";
     public static final String TIME_RECEIVED = "timeReceived";
 
     /**

@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.radarcns.sink.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
 import static org.radarcns.sink.util.MongoConstants.USER;
+import static org.radarcns.sink.util.RadarAvroConstants.TIME;
 import static org.radarcns.sink.util.RadarAvroConstants.TIME_RECEIVED;
 
 import java.util.Collection;
@@ -45,7 +46,6 @@ public class RecordCountConverterTest {
 
     private RecordCountConverter converter;
 
-    private static final String TIME_FIELD = "time";
     private static final String USER_VALUE = "user";
     private static final String SOURCE_VALUE = "source";
 
@@ -97,13 +97,13 @@ public class RecordCountConverterTest {
         assertTrue(document.get(TIMESTAMP) instanceof Date);
         assertEquals(time, document.getDate(TIMESTAMP).getTime(), 0);
 
-        assertNull(document.get(TIME_FIELD));
+        assertNull(document.get(TIME));
     }
 
     private Struct getValueStruct() {
         Struct valueStruct = new Struct(UtilityTest.avroToStruct(
                 ApplicationRecordCounts.getClassSchema()));
-        valueStruct.put(TIME_FIELD, time.doubleValue() / 1000d);
+        valueStruct.put(TIME, time.doubleValue() / 1000d);
         valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);
         valueStruct.put(RadarAvroConstants.RECORDS_CACHED, 10);
         valueStruct.put(RadarAvroConstants.RECORDS_SENT, 100);

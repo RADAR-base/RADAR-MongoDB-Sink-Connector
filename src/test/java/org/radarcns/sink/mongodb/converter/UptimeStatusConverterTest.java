@@ -24,6 +24,7 @@ import static org.radarcns.sink.util.MongoConstants.APPLICATION_UPTIME;
 import static org.radarcns.sink.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
 import static org.radarcns.sink.util.MongoConstants.USER;
+import static org.radarcns.sink.util.RadarAvroConstants.TIME;
 import static org.radarcns.sink.util.RadarAvroConstants.TIME_RECEIVED;
 
 import java.util.Collection;
@@ -48,7 +49,6 @@ public class UptimeStatusConverterTest {
     private static final Double UPTIME = 1000.00;
     private static final String USER_VALUE = "user";
     private static final String SOURCE_VALUE = "source";
-    private static final String TIME_FIELD = "time";
 
     private Long time;
 
@@ -91,13 +91,13 @@ public class UptimeStatusConverterTest {
         assertTrue(document.get(TIMESTAMP) instanceof Date);
         assertEquals(time, document.getDate(TIMESTAMP).getTime(), 0);
 
-        assertNull(document.get(TIME_FIELD));
+        assertNull(document.get(TIME));
     }
 
     private Struct getValueStruct() {
         Struct valueStruct = new Struct(UtilityTest.avroToStruct(
                 ApplicationUptime.getClassSchema()));
-        valueStruct.put(TIME_FIELD, time.doubleValue() / 1000d);
+        valueStruct.put(TIME, time.doubleValue() / 1000d);
         valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);
         valueStruct.put(RadarAvroConstants.UPTIME, UPTIME);
 

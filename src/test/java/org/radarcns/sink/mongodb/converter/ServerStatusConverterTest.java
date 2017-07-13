@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.radarcns.sink.util.MongoConstants.SOURCE;
 import static org.radarcns.sink.util.MongoConstants.TIMESTAMP;
 import static org.radarcns.sink.util.MongoConstants.USER;
+import static org.radarcns.sink.util.RadarAvroConstants.TIME;
 import static org.radarcns.sink.util.RadarAvroConstants.TIME_RECEIVED;
 
 import java.util.Collection;
@@ -48,7 +49,6 @@ public class ServerStatusConverterTest {
     private static final String STATUS = "CONNECTED";
     private static final String USER_VALUE = "user";
     private static final String SOURCE_VALUE = "source";
-    private static final String TIME_FIELD = "time";
 
     private Long time;
 
@@ -97,7 +97,7 @@ public class ServerStatusConverterTest {
         assertTrue(document.get(TIMESTAMP) instanceof Date);
         assertEquals(time, document.getDate(TIMESTAMP).getTime(), 0);
 
-        assertNull(document.get(TIME_FIELD));
+        assertNull(document.get(TIME));
     }
 
     private Struct getStructValue() {
@@ -105,7 +105,7 @@ public class ServerStatusConverterTest {
 
         Struct valueStruct = new Struct(UtilityTest.avroToStruct(valueSchema));
 
-        valueStruct.put(TIME_FIELD, time.doubleValue() / 1000d);
+        valueStruct.put(TIME, time.doubleValue() / 1000d);
         valueStruct.put(TIME_RECEIVED, time.doubleValue() / 1000d);
         valueStruct.put(RadarAvroConstants.SERVER_STATUS, STATUS);
         valueStruct.put(RadarAvroConstants.IP_ADDRESS, IP_ADDRESS);

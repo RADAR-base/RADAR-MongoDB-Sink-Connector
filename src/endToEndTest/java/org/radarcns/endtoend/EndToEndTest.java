@@ -1,4 +1,4 @@
-package org.radarcns;
+package org.radarcns.endtoend;
 
 /*
  * Copyright 2017 Kings College London and The Hyve
@@ -23,19 +23,25 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.bson.Document;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.radarcns.config.YamlConfigLoader;
+import org.radarcns.endtoend.util.ExpectedDocumentFactory;
 import org.radarcns.mock.config.BasicMockConfig;
-import org.radarcns.testcase.QuestionnaireEndToEndTest;
-import org.radarcns.testcase.RecordCountEndToEndTest;
-import org.radarcns.testcase.ServerStatusEndToEndTest;
-import org.radarcns.testcase.UptimeEndToEndTest;
-import org.radarcns.util.SenderTestCase;
-import org.radarcns.util.TestCase;
+import org.radarcns.endtoend.testcase.QuestionnaireEndToEndTest;
+import org.radarcns.endtoend.testcase.RecordCountEndToEndTest;
+import org.radarcns.endtoend.testcase.ServerStatusEndToEndTest;
+import org.radarcns.endtoend.testcase.UptimeEndToEndTest;
+import org.radarcns.endtoend.util.SenderTestCase;
+import org.radarcns.endtoend.util.TestCase;
+import org.radarcns.mock.config.MockDataConfig;
+import org.radarcns.mock.model.ExpectedValue;
+import org.radarcns.mock.model.MockAggregator;
 
 /**
  * MongoDB Sink connector e2e test. It streams randomly generated data into the data pipeline and
@@ -66,7 +72,7 @@ public class EndToEndTest extends TestCase {
      */
     public void endToEndTest() throws Exception {
         //TODO add it back when the Backend project will be aligned with the new WindowedKey
-        /*produceInputFile();
+        produceInputFile();
 
         Map<MockDataConfig, ExpectedValue> expectedValue = MockAggregator.getSimulations(
                 config.getData(), dataRoot);
@@ -74,7 +80,7 @@ public class EndToEndTest extends TestCase {
         final Map<MockDataConfig, List<Document>> expectedDocument = produceExpectedDocument(
                 expectedValue, new ExpectedDocumentFactory());
 
-        streamToKafka();*/
+        streamToKafka();
 
         Set<SenderTestCase> testCases = new HashSet<>();
         testCases.add(new QuestionnaireEndToEndTest());
@@ -91,7 +97,7 @@ public class EndToEndTest extends TestCase {
 
         checkMongoDbConnection();
 
-        //fetchMongoDb(expectedDocument);
+        fetchMongoDb(expectedDocument);
 
         for (SenderTestCase executor : testCases) {
             Document expectedDoc = executor.getExpectedDocument();

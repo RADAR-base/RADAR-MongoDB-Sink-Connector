@@ -1,4 +1,4 @@
-package org.radarcns.testcase;
+package org.radarcns.endtoend.testcase;
 
 /*
  * Copyright 2017 Kings College London and The Hyve
@@ -29,8 +29,8 @@ import org.radarcns.key.MeasurementKey;
 import org.radarcns.sink.util.KeyGenerator;
 import org.radarcns.sink.util.MongoConstants;
 import org.radarcns.topic.SensorTopic;
-import org.radarcns.util.Sender;
-import org.radarcns.util.SenderTestCase;
+import org.radarcns.endtoend.util.Sender;
+import org.radarcns.endtoend.util.SenderTestCase;
 
 /**
  * MongoDB Sink connector e2e test. It streams a static generated {@link ApplicationRecordCounts}

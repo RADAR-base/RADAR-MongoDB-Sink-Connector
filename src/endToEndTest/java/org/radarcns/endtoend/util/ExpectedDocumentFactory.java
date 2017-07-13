@@ -1,4 +1,4 @@
-package org.radarcns.util;
+package org.radarcns.endtoend.util;
 
 /*
  * Copyright 2017 King's College London and The Hyve

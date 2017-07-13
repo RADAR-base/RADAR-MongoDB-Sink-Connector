@@ -26,6 +26,8 @@ import static org.radarcns.sink.util.RadarAvroConstants.END_TIME;
 import static org.radarcns.sink.util.RadarAvroConstants.NAME;
 import static org.radarcns.sink.util.RadarAvroConstants.SOURCE_ID;
 import static org.radarcns.sink.util.RadarAvroConstants.START_TIME;
+import static org.radarcns.sink.util.RadarAvroConstants.TIME;
+import static org.radarcns.sink.util.RadarAvroConstants.TIME_COMPLETED;
 import static org.radarcns.sink.util.RadarAvroConstants.USER_ID;
 import static org.radarcns.sink.util.RadarAvroConstants.VERSION;
 
@@ -75,15 +77,15 @@ public class QuestionnaireConverter implements RecordConverter {
         Struct key = (Struct) sinkRecord.key();
         Struct value = (Struct) sinkRecord.value();
 
-        return new Document(ID, intervalKeyToMongoKey(key, value.getFloat64(START_TIME),
-            value.getFloat64(END_TIME))).append(
+        return new Document(ID, intervalKeyToMongoKey(key, value.getFloat64(TIME),
+            value.getFloat64(TIME_COMPLETED))).append(
             MongoConstants.USER, key.getString(USER_ID)).append(
             MongoConstants.SOURCE, key.getString(SOURCE_ID)).append(
             MongoConstants.NAME, value.getString(NAME)).append(
             MongoConstants.VERSION, value.getString(VERSION)).append(
             MongoConstants.ANSWERS, getAnswers(value.getArray(ANSWERS))).append(
-            MongoConstants.START, toDateTime(value.getFloat64(START_TIME))).append(
-            MongoConstants.END, toDateTime(value.getFloat64(END_TIME)));
+            MongoConstants.START, toDateTime(value.getFloat64(TIME))).append(
+            MongoConstants.END, toDateTime(value.getFloat64(TIME_COMPLETED)));
     }
 
     private static List<Document> getAnswers(List<Object> input) {
