@@ -71,7 +71,6 @@ public class EndToEndTest extends TestCase {
      * Test mock sources.
      */
     public void endToEndTest() throws Exception {
-        //TODO add it back when the Backend project will be aligned with the new WindowedKey
         produceInputFile();
 
         Map<MockDataConfig, ExpectedValue> expectedValue = MockAggregator.getSimulations(
@@ -100,6 +99,7 @@ public class EndToEndTest extends TestCase {
         fetchMongoDb(expectedDocument);
 
         for (SenderTestCase executor : testCases) {
+            LOGGER.info("Fetching {}", executor.getTopicName());
             Document expectedDoc = executor.getExpectedDocument();
             Document actualDoc = getActualDocumet(executor.getTopicName());
 

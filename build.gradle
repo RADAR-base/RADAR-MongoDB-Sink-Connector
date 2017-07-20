@@ -92,7 +92,7 @@ ext.confluentVersion = '3.2.2'
 ext.junitVersion = '4.12'
 ext.mongoDbSinkVersion = 'v0.1-alpha.1'
 ext.radarCommonsVersion = '0.4.1'
-ext.radarSchemasVersion = '0.1.1-alpha.2'
+ext.radarSchemasVersion = '0.2-alpha.1'
 ext.reflectionVersion = '0.9.11'
 
 sourceSets {
