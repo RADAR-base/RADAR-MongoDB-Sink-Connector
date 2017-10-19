@@ -1,29 +1,52 @@
 language: java
+
 jdk:
   - oraclejdk8
-sudo: false
+
+sudo: required
+
+services:
+  - docker
+
+env:
+  DOCKER_COMPOSE_VERSION: 1.11.2
+
+addons:
+  hosts:
+    - hotstorage
+
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-  - rm -fr $HOME/.gradle/caches/*/scripts/
+
 cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
 before_install:
-  - ./gradlew downloadDependencies
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+  - docker --version
+  - mkdir -p "$HOME/bin";
+  - export PATH="$HOME/bin:$PATH";
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose";
+  - chmod +x "$HOME/bin/docker-compose";
+  - sudo $HOME/bin/docker-compose --version
+
+script:
+  - ./gradlew check
+  - ./gradlew -PdockerComposePath="$HOME/bin/docker-compose" endToEndTest
+
 after_script:
   - ./gradlew sendCoverageToCodacy
 
 deploy:
   provider: releases
-  api_key:
-    secure: ${GH_TOKEN}
+  api_key: ${GH_TOKEN}
+  file_glob: true
   file:
-    - build/libs/radar-mongodb-sink-connector-${TRAVIS_TAG}.jar
-    - build/libs/radar-mongodb-sink-connector-${TRAVIS_TAG}-javadoc.jar
-    - build/libs/radar-mongodb-sink-connector-${TRAVIS_TAG}-sources.jar
+    - "build/libs/*.jar"
   skip_cleanup: true
   on:
     tags: true
