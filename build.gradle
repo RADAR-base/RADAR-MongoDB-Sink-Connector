@@ -89,7 +89,7 @@ sourceCompatibility = '1.8'
 
 ext.codacyVersion = '1.0.10'
 ext.junitVersion = '4.12'
-ext.mongoDbSinkVersion = 'v0.1-alpha.1'
+ext.mongoDbSinkVersion = '0.1.1'
 ext.radarCommonsVersion = '0.4'
 ext.radarSchemasVersion = '0.1.1-alpha.1'
 ext.reflectionVersion = '0.9.11'
