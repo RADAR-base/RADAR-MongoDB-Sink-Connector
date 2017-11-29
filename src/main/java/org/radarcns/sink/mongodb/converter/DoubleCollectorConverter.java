@@ -42,7 +42,7 @@ import org.radarcns.sink.mongodb.util.Converter;
 import org.radarcns.sink.mongodb.util.MongoConstants;
 import org.radarcns.sink.mongodb.util.MongoConstants.Stat;
 import org.radarcns.sink.mongodb.util.RadarAvroConstants;
-import org.radarcns.util.Utility;
+import org.radarcns.sink.mongodb.util.Utility;
 
 /**
  * {@link RecordConverter} to convert a {@link DoubleAggregator} record to Bson Document.
